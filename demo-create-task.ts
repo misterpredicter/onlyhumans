@@ -3,7 +3,7 @@
  *
  * Prerequisites:
  *   1. Fund the buyer wallet with testnet USDC on Base Sepolia:
- *      https://faucet.circle.com → send to 0x638515E43Db0a20c9AFA02d4543CF3C6c2148D43
+ *      https://faucet.circle.com → send to 0xfc271e50E7B1DF02C4430882Ae67C045CD724fa9
  *   2. npm install (already done if you're in the project root)
  *
  * Usage:
@@ -16,8 +16,8 @@ import { wrapFetchWithPayment } from "@x402/fetch";
 import { privateKeyToAccount } from "viem/accounts";
 
 // ── Buyer wallet (fund this with testnet USDC on Base Sepolia) ──────────
-const BUYER_PRIVATE_KEY = "0xc796645beb856d202a8d2a65513d3630b79c0dfa7bfab3cadd589b47771f2eb4";
-const BUYER_ADDRESS = "0x638515E43Db0a20c9AFA02d4543CF3C6c2148D43";
+const BUYER_PRIVATE_KEY = "0x61944c75ae1539e940a956336e71145dcabfe1ed7a755a686e82e1642cda493b";
+const BUYER_ADDRESS = "0xfc271e50E7B1DF02C4430882Ae67C045CD724fa9";
 
 // ── Config ──────────────────────────────────────────────────────────────
 const APP_URL = process.env.APP_URL ?? "https://themo.live";
