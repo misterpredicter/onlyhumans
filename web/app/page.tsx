@@ -56,7 +56,7 @@ export default function Home() {
         <div style={{ borderTop: "1px solid #1F1F1F", backgroundColor: "#111111", width: "100%" }}>
           <div style={{
             maxWidth: "1200px", margin: "0 auto", padding: "0 40px",
-            display: "flex", alignItems: "center",
+            display: "flex", alignItems: "center", justifyContent: "center",
           }}>
             {STEPS.map((step, i) => (
               <div key={i} style={{
