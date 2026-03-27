@@ -2,60 +2,96 @@ import { TaskCreator } from "@/components/TaskCreator";
 
 export default function Home() {
   return (
-    <div className="max-w-xl mx-auto">
-      <div className="mb-10 text-center">
-        <h1 className="text-4xl font-bold tracking-tight mb-3">
-          Human taste, cryptographically verified
-        </h1>
-        <p className="text-gray-500 text-lg">
-          Post a judgment task. Real humans vote via World ID — one person, one vote.
-          Workers paid automatically. Feedback quality drives reputation.
-        </p>
-      </div>
+    <>
+      {/* Dark hero */}
+      <div style={{ backgroundColor: "#0C0C0C" }}>
+        <div className="max-w-6xl mx-auto px-8 py-16 flex flex-col items-center gap-8 text-center">
+          {/* Stack pill */}
+          <div style={{
+            display: "inline-flex", alignItems: "center", gap: "8px",
+            backgroundColor: "#1A1A1A", border: "1px solid #2A2A2A",
+            borderRadius: "100px", padding: "6px 16px 6px 12px",
+          }}>
+            <div style={{ width: "6px", height: "6px", backgroundColor: "#10B981", borderRadius: "100px" }} />
+            <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", fontWeight: 500, color: "#71717A", letterSpacing: "0.2px" }}>
+              World ID · x402 · Base Sepolia
+            </span>
+          </div>
 
-      {/* How it works */}
-      <div className="bg-gray-50 rounded-2xl p-5 mb-8">
-        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4 text-center">
-          You set the price
-        </p>
-        <div className="grid grid-cols-3 gap-3 text-center text-sm">
-          <div className="bg-white rounded-xl p-3 border border-gray-200">
-            <div className="text-2xl font-bold">1</div>
-            <div className="text-xs text-gray-500 mt-1">Set bounty per vote</div>
-          </div>
-          <div className="bg-white rounded-xl p-3 border border-gray-200">
-            <div className="text-2xl font-bold">2</div>
-            <div className="text-xs text-gray-500 mt-1">Choose max voters</div>
-          </div>
-          <div className="bg-white rounded-xl p-3 border border-gray-200">
-            <div className="text-2xl font-bold">3</div>
-            <div className="text-xs text-gray-500 mt-1">Pay total upfront</div>
+          {/* Headline */}
+          <div className="flex flex-col items-center gap-4">
+            <h1 style={{
+              fontFamily: "'DM Serif Display', serif",
+              fontSize: "clamp(40px, 5vw, 60px)",
+              fontWeight: 400,
+              color: "#FFFFFF",
+              lineHeight: 1.1,
+              letterSpacing: "-1.5px",
+              margin: 0,
+              maxWidth: "680px",
+            }}>
+              Human taste,<br />cryptographically verified.
+            </h1>
+            <p style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: "17px", color: "#71717A",
+              lineHeight: 1.6, margin: 0, maxWidth: "520px",
+            }}>
+              Post a judgment task. Real humans vote via World ID — one person, one vote.
+              Workers paid automatically per vote. Feedback quality builds reputation.
+            </p>
           </div>
         </div>
-        <div className="mt-3 flex justify-center gap-6 text-center text-xs text-gray-400">
-          <span>
-            <span className="font-semibold text-gray-700">0</span> sybil votes possible
-          </span>
-          <span>
-            <span className="font-semibold text-gray-700">up to 6</span> options per task
-          </span>
-          <span>
-            <span className="font-semibold text-gray-700">on-chain</span> payments
-          </span>
+
+        {/* Steps bar */}
+        <div style={{ borderTop: "1px solid #1F1F1F", backgroundColor: "#111111" }}>
+          <div className="max-w-6xl mx-auto px-8 flex items-center">
+            {[
+              { n: "1", label: "Set bounty per vote" },
+              { n: "2", label: "Choose max voters" },
+              { n: "3", label: "Pay upfront via x402" },
+            ].map((step, i) => (
+              <div key={i} className="flex items-center gap-2.5 py-4 px-8" style={{ borderRight: "1px solid #1F1F1F" }}>
+                <div style={{
+                  width: "26px", height: "26px",
+                  backgroundColor: "#1A1A1A", border: "1px solid #2A2A2A",
+                  borderRadius: "100px", display: "flex", alignItems: "center", justifyContent: "center",
+                  flexShrink: 0,
+                }}>
+                  <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", fontWeight: 600, color: "#FFFFFF" }}>{step.n}</span>
+                </div>
+                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#71717A" }}>{step.label}</span>
+              </div>
+            ))}
+            <div className="flex items-center gap-2 py-4 px-8">
+              <div style={{ width: "6px", height: "6px", backgroundColor: "#10B981", borderRadius: "100px" }} />
+              <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#71717A" }}>0 sybil votes possible</span>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
-        <h2 className="font-semibold text-lg mb-5">Create judgment task</h2>
-        <TaskCreator />
+      {/* Form section */}
+      <div className="max-w-6xl mx-auto px-8 py-12 flex justify-center">
+        <div style={{
+          width: "100%", maxWidth: "580px",
+          backgroundColor: "#FFFFFF",
+          border: "1.5px solid #E8E5DE",
+          borderRadius: "20px",
+          padding: "32px",
+          boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
+        }}>
+          <h2 style={{
+            fontFamily: "'DM Sans', sans-serif",
+            fontSize: "18px", fontWeight: 700,
+            color: "#0C0C0C", margin: "0 0 24px",
+            letterSpacing: "-0.3px",
+          }}>
+            Create judgment task
+          </h2>
+          <TaskCreator />
+        </div>
       </div>
-
-      <div className="mt-8 text-center text-sm text-gray-400">
-        Built on{" "}
-        <span className="font-medium text-gray-600">World ID</span> +{" "}
-        <span className="font-medium text-gray-600">x402</span> +{" "}
-        <span className="font-medium text-gray-600">Base Sepolia</span>
-      </div>
-    </div>
+    </>
   );
 }

@@ -26,22 +26,21 @@ interface VoteResult {
   optionIndex: number;
 }
 
-const BADGE_STYLES: Record<string, string> = {
-  platinum: "bg-slate-100 text-slate-700 border border-slate-300",
-  gold: "bg-yellow-50 text-yellow-700 border border-yellow-300",
-  silver: "bg-gray-100 text-gray-600 border border-gray-300",
-  bronze: "bg-orange-50 text-orange-700 border border-orange-300",
-  new: "bg-gray-50 text-gray-400 border border-gray-200",
-};
+const dm: React.CSSProperties = { fontFamily: "'DM Sans', sans-serif" };
 
-function ReputationBadge({ badge }: { badge: string }) {
-  const cls = BADGE_STYLES[badge] ?? BADGE_STYLES.new;
-  return (
-    <span className={`inline-flex text-xs font-medium px-1.5 py-0.5 rounded capitalize ${cls}`}>
-      {badge}
-    </span>
-  );
-}
+const textareaStyle: React.CSSProperties = {
+  width: "100%",
+  backgroundColor: "#F9F8F5",
+  border: "1.5px solid #E8E5DE",
+  borderRadius: "10px",
+  padding: "10px 14px",
+  fontFamily: "'DM Sans', sans-serif",
+  fontSize: "14px",
+  color: "#0C0C0C",
+  outline: "none",
+  resize: "vertical",
+  boxSizing: "border-box",
+};
 
 const isImage = (url: string) =>
   /\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i.test(url) || url.startsWith("http");
@@ -62,16 +61,14 @@ export function MultiOptionJudgment({
   const [contextExpanded, setContextExpanded] = useState(false);
   const [creatorRated, setCreatorRated] = useState(false);
 
-  // Tier-specific feedback state
-  const [feedbackText, setFeedbackText] = useState(""); // reasoned
-  const [feedbackWorks, setFeedbackWorks] = useState(""); // detailed
-  const [feedbackDoesnt, setFeedbackDoesnt] = useState(""); // detailed
-  const [feedbackSuggestions, setFeedbackSuggestions] = useState(""); // detailed
+  const [feedbackText, setFeedbackText] = useState("");
+  const [feedbackWorks, setFeedbackWorks] = useState("");
+  const [feedbackDoesnt, setFeedbackDoesnt] = useState("");
+  const [feedbackSuggestions, setFeedbackSuggestions] = useState("");
 
   const vote = async (optionIndex: number) => {
     if (voting !== null) return;
 
-    // Validate feedback before submitting
     if (tier === "reasoned" && !feedbackText.trim()) {
       setError("Please write a brief reason for your choice before submitting.");
       return;
@@ -138,205 +135,226 @@ export function MultiOptionJudgment({
       await fetch(`/api/tasks/${taskId}/rate`, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          type: "creator",
-          nullifier_hash: nullifierHash,
-          rating,
-        }),
+        body: JSON.stringify({ type: "creator", nullifier_hash: nullifierHash, rating }),
       });
       setCreatorRated(true);
     } catch {
-      // silent — creator rating is optional
+      // silent — optional
     }
   };
 
-  // Post-vote confirmation screen
+  // Post-vote screen
   if (voted && result) {
     const chosenOption = options.find((o) => o.option_index === result.optionIndex);
     return (
-      <div className="space-y-4">
-        <div className="text-center p-8 bg-green-50 rounded-2xl border border-green-200">
-          <p className="text-3xl font-bold mb-1">Vote recorded</p>
-          <p className="text-gray-500 text-sm mb-3">
-            You picked: <span className="font-medium text-gray-800">{chosenOption?.label}</span>
+      <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+        <div style={{
+          textAlign: "center", padding: "40px 24px",
+          backgroundColor: "#F0FDF4", borderRadius: "16px",
+          border: "1px solid #BBF7D0",
+        }}>
+          <p style={{ ...dm, fontSize: "28px", fontWeight: 800, color: "#0C0C0C", margin: "0 0 6px" }}>Vote recorded</p>
+          <p style={{ ...dm, fontSize: "14px", color: "#6B7280", margin: "0 0 16px" }}>
+            You picked: <span style={{ fontWeight: 700, color: "#0C0C0C" }}>{chosenOption?.label}</span>
           </p>
           {result.amount > 0 ? (
             <>
-              <p className="text-green-600 text-lg font-medium">
+              <p style={{ ...dm, fontSize: "18px", fontWeight: 700, color: "#059669", margin: "0 0 4px" }}>
                 +${result.amount.toFixed(2)} USDC sent to your wallet
               </p>
               {result.tx && (
-                <p className="text-xs text-gray-400 mt-1 font-mono">
+                <p style={{ fontFamily: "'DM Mono', monospace", fontSize: "12px", color: "#9CA3AF", margin: 0 }}>
                   tx: {result.tx.slice(0, 22)}...
                 </p>
               )}
             </>
           ) : (
-            <p className="text-gray-500">Vote counted ({result.totalVotes} total)</p>
+            <p style={{ ...dm, fontSize: "14px", color: "#6B7280" }}>Vote counted ({result.totalVotes} total)</p>
           )}
         </div>
 
         {!creatorRated && (
-          <div className="bg-gray-50 rounded-xl p-4 text-center">
-            <p className="text-sm text-gray-600 mb-3">Was this task clear and fair?</p>
-            <div className="flex justify-center gap-3">
-              <button
-                onClick={() => rateCreator(1)}
-                className="flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm hover:border-green-400 hover:text-green-600 transition-colors"
-              >
-                👍 Yes
-              </button>
-              <button
-                onClick={() => rateCreator(-1)}
-                className="flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm hover:border-red-400 hover:text-red-600 transition-colors"
-              >
-                👎 No
-              </button>
+          <div style={{
+            backgroundColor: "#F9F8F5", borderRadius: "14px",
+            padding: "20px", textAlign: "center",
+          }}>
+            <p style={{ ...dm, fontSize: "14px", color: "#374151", margin: "0 0 12px" }}>Was this task clear and fair?</p>
+            <div style={{ display: "flex", justifyContent: "center", gap: "10px" }}>
+              {[{ rating: 1 as const, label: "👍 Yes" }, { rating: -1 as const, label: "👎 No" }].map(({ rating, label }) => (
+                <button
+                  key={rating}
+                  onClick={() => rateCreator(rating)}
+                  style={{
+                    display: "flex", alignItems: "center", gap: "6px",
+                    padding: "10px 20px",
+                    backgroundColor: "#FFFFFF", border: "1.5px solid #E8E5DE",
+                    borderRadius: "10px", cursor: "pointer",
+                    fontFamily: "'DM Sans', sans-serif", fontSize: "14px", color: "#374151",
+                  }}
+                >
+                  {label}
+                </button>
+              ))}
             </div>
           </div>
         )}
         {creatorRated && (
-          <p className="text-center text-sm text-gray-400">Thanks for the feedback!</p>
+          <p style={{ ...dm, textAlign: "center", fontSize: "14px", color: "#9CA3AF" }}>Thanks for the feedback!</p>
         )}
       </div>
     );
   }
 
-  // Layout: 2 options → grid-cols-2, 3-4 → 2x2 grid, 5+ → single column
-  const gridClass =
+  const gridStyle: React.CSSProperties =
     options.length === 2
-      ? "grid grid-cols-2 gap-4"
+      ? { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }
       : options.length <= 4
-      ? "grid grid-cols-2 gap-3"
-      : "flex flex-col gap-3";
+      ? { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }
+      : { display: "flex", flexDirection: "column", gap: "10px" };
 
   return (
-    <div className="space-y-4">
+    <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-red-700 text-sm">
+        <div style={{
+          backgroundColor: "#FEF2F2", border: "1px solid #FECACA",
+          borderRadius: "10px", padding: "12px 16px",
+          ...dm, fontSize: "13px", color: "#DC2626",
+        }}>
           {error}
         </div>
       )}
 
       {/* Context (collapsible) */}
       {context && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl overflow-hidden">
+        <div style={{
+          backgroundColor: "#FFFBEB", border: "1px solid #FDE68A",
+          borderRadius: "12px", overflow: "hidden",
+        }}>
           <button
             type="button"
             onClick={() => setContextExpanded((v) => !v)}
-            className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-amber-800"
+            style={{
+              width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between",
+              padding: "12px 16px",
+              background: "none", border: "none", cursor: "pointer",
+            }}
           >
-            <span>Context from task creator</span>
-            <span className="text-xs opacity-60">{contextExpanded ? "▲ hide" : "▼ show"}</span>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <span>💡</span>
+              <span style={{ ...dm, fontSize: "13px", fontWeight: 600, color: "#92400E" }}>Context from task creator</span>
+            </div>
+            <span style={{ ...dm, fontSize: "11px", color: "#B45309" }}>{contextExpanded ? "▲ hide" : "▼ show"}</span>
           </button>
           {contextExpanded && (
-            <div className="px-4 pb-4 text-sm text-amber-900 leading-relaxed">
+            <div style={{ padding: "0 16px 14px", ...dm, fontSize: "13px", color: "#92400E", lineHeight: 1.5 }}>
               {context}
             </div>
           )}
         </div>
       )}
 
-      {/* Tier-specific feedback prompts (shown before voting) */}
+      {/* Tier feedback */}
       {tier === "reasoned" && (
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Why will you pick this option? <span className="text-red-500">*</span>
+          <label style={{ ...dm, display: "block", fontSize: "13px", fontWeight: 600, color: "#374151", marginBottom: "6px" }}>
+            Why will you pick this option? <span style={{ color: "#DC2626" }}>*</span>
           </label>
           <textarea
             value={feedbackText}
             onChange={(e) => setFeedbackText(e.target.value)}
             rows={2}
             placeholder="1-2 sentences explaining your reasoning..."
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            style={textareaStyle}
           />
         </div>
       )}
 
       {tier === "detailed" && (
-        <div className="space-y-3 bg-gray-50 rounded-xl p-4">
-          <p className="text-sm font-medium text-gray-700">Provide structured feedback before voting:</p>
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">
-              What works? <span className="text-red-500">*</span>
-            </label>
-            <textarea
-              value={feedbackWorks}
-              onChange={(e) => setFeedbackWorks(e.target.value)}
-              rows={2}
-              placeholder="Strengths of your chosen option..."
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">What doesn&apos;t work?</label>
-            <textarea
-              value={feedbackDoesnt}
-              onChange={(e) => setFeedbackDoesnt(e.target.value)}
-              rows={2}
-              placeholder="Weaknesses or concerns..."
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Suggestions</label>
-            <textarea
-              value={feedbackSuggestions}
-              onChange={(e) => setFeedbackSuggestions(e.target.value)}
-              rows={2}
-              placeholder="How would you improve it?"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+        <div style={{
+          backgroundColor: "#F9F8F5", borderRadius: "14px",
+          padding: "16px", display: "flex", flexDirection: "column", gap: "12px",
+        }}>
+          <p style={{ ...dm, fontSize: "13px", fontWeight: 700, color: "#374151", margin: 0 }}>
+            Structured feedback (required before voting)
+          </p>
+          {[
+            { label: "What works?", value: feedbackWorks, onChange: setFeedbackWorks, placeholder: "Strengths of your chosen option...", required: true },
+            { label: "What doesn't work?", value: feedbackDoesnt, onChange: setFeedbackDoesnt, placeholder: "Weaknesses or concerns...", required: false },
+            { label: "Suggestions", value: feedbackSuggestions, onChange: setFeedbackSuggestions, placeholder: "How would you improve it?", required: false },
+          ].map(({ label, value, onChange, placeholder, required }) => (
+            <div key={label}>
+              <label style={{ ...dm, display: "block", fontSize: "12px", fontWeight: 600, color: "#6B7280", marginBottom: "4px" }}>
+                {label} {required && <span style={{ color: "#DC2626" }}>*</span>}
+              </label>
+              <textarea
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                rows={2}
+                placeholder={placeholder}
+                style={textareaStyle}
+              />
+            </div>
+          ))}
         </div>
       )}
 
-      {/* Options grid */}
-      <div className={gridClass}>
-        {options.map((opt) => {
+      {/* Options */}
+      <div style={gridStyle}>
+        {options.map((opt, idx) => {
           const isLoading = voting === opt.option_index;
+          const isFirst = idx === 0;
           return (
             <button
               key={opt.option_index}
               onClick={() => vote(opt.option_index)}
               disabled={voting !== null}
-              className={`border-2 rounded-xl p-4 text-left transition-all ${
-                isLoading
-                  ? "border-blue-500 bg-blue-50 scale-[0.98]"
-                  : "border-gray-200 hover:border-blue-400 hover:shadow-md"
-              } disabled:opacity-60`}
+              style={{
+                border: `2px solid ${isLoading ? "#10B981" : "#E8E5DE"}`,
+                borderRadius: "16px",
+                padding: "18px",
+                textAlign: "left",
+                cursor: voting !== null ? "not-allowed" : "pointer",
+                backgroundColor: isLoading ? "#F0FDF4" : "#FFFFFF",
+                transition: "border-color 0.15s, box-shadow 0.15s",
+                opacity: voting !== null && !isLoading ? 0.5 : 1,
+                display: "flex", flexDirection: "column", gap: "12px",
+              }}
             >
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-semibold text-sm">{opt.label}</span>
-                <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <span style={{ ...dm, fontSize: "14px", fontWeight: 800, color: "#0C0C0C" }}>{opt.label}</span>
+                <span style={{
+                  fontFamily: "'DM Sans', sans-serif", fontSize: "11px", color: "#9CA3AF",
+                  backgroundColor: "#F9F8F5", border: "1px solid #E8E5DE",
+                  borderRadius: "100px", padding: "2px 8px",
+                }}>
                   #{opt.option_index + 1}
                 </span>
               </div>
 
               {isImage(opt.content) ? (
-                <div className="relative w-full h-36 rounded-lg overflow-hidden bg-gray-100">
-                  <Image
-                    src={opt.content}
-                    alt={opt.label}
-                    fill
-                    className="object-cover"
-                    unoptimized
-                  />
+                <div style={{ position: "relative", width: "100%", height: "140px", borderRadius: "10px", overflow: "hidden", backgroundColor: "#F9F8F5" }}>
+                  <Image src={opt.content} alt={opt.label} fill className="object-cover" unoptimized />
                 </div>
               ) : (
-                <p className="text-gray-700 text-sm leading-relaxed">{opt.content}</p>
+                <p style={{ ...dm, fontSize: "13px", color: "#374151", lineHeight: 1.5, margin: 0 }}>{opt.content}</p>
               )}
 
-              {isLoading && (
-                <p className="text-blue-600 text-xs mt-2 font-medium">Submitting...</p>
-              )}
+              <div style={{
+                backgroundColor: isLoading ? "#10B981" : isFirst ? "#0C0C0C" : "#0C0C0C",
+                borderRadius: "10px", padding: "12px",
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
+                <span style={{ ...dm, fontSize: "14px", fontWeight: 700, color: "#FFFFFF" }}>
+                  {isLoading ? "Submitting..." : `Vote for ${opt.label}`}
+                </span>
+              </div>
             </button>
           );
         })}
       </div>
 
       {tier !== "quick" && (
-        <p className="text-xs text-center text-gray-400">
+        <p style={{ ...dm, textAlign: "center", fontSize: "12px", color: "#9CA3AF", margin: 0 }}>
           {tier === "reasoned"
             ? "Write your reason above, then click your choice"
             : "Complete the feedback above, then click your choice"}
@@ -346,4 +364,4 @@ export function MultiOptionJudgment({
   );
 }
 
-export { ReputationBadge };
+export { };

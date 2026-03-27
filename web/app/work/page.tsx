@@ -31,6 +31,8 @@ function formatBounty(task: Task): string {
   return `$${val.toFixed(2)}`;
 }
 
+const dm: React.CSSProperties = { fontFamily: "'DM Sans', sans-serif" };
+
 export default function WorkPage() {
   const [nullifierHash, setNullifierHash] = useState<string | null>(null);
   const [workerWallet, setWorkerWallet] = useState("");
@@ -51,11 +53,9 @@ export default function WorkPage() {
 
   const handleVoted = (taskId: string) => {
     setVotedTaskIds((prev) => new Set([...prev, taskId]));
-    // Return to task list after a short delay
     setTimeout(() => setActiveTask(null), 2500);
   };
 
-  // Resolve task options for display and judgment
   const resolveOptions = (task: Task): TaskOption[] => {
     if (Array.isArray(task.options) && task.options.length > 0) {
       return task.options;
@@ -66,77 +66,173 @@ export default function WorkPage() {
     ];
   };
 
+  // ── Verification gate ──────────────────────────────────────────────
   if (!nullifierHash) {
     return (
-      <div className="max-w-md mx-auto text-center">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight mb-3">
-            Earn USDC for your judgment
-          </h1>
-          <p className="text-gray-500">
-            Vote on comparisons. Each verified vote earns you USDC directly to your
-            wallet. World ID ensures one vote per person — no bots, no duplicates.
-          </p>
-        </div>
+      <div style={{
+        minHeight: "calc(100vh - 64px)",
+        display: "flex", flexDirection: "column",
+        alignItems: "center", justifyContent: "center",
+        padding: "48px 24px", gap: "32px",
+        backgroundColor: "var(--bg)",
+      }}>
+        {/* Card */}
+        <div style={{
+          width: "100%", maxWidth: "440px",
+          backgroundColor: "#FFFFFF",
+          border: "1.5px solid #E8E5DE",
+          borderRadius: "24px",
+          padding: "40px",
+          boxShadow: "0 2px 12px rgba(0,0,0,0.05)",
+          display: "flex", flexDirection: "column", gap: "28px",
+        }}>
+          {/* Header */}
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "14px", textAlign: "center" }}>
+            <div style={{
+              width: "56px", height: "56px",
+              background: "linear-gradient(135deg, #10B981, #3B82F6)",
+              borderRadius: "16px",
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}>
+              <div style={{ width: "22px", height: "22px", backgroundColor: "rgba(255,255,255,0.9)", borderRadius: "100px" }} />
+            </div>
+            <div>
+              <h1 style={{ ...dm, fontSize: "22px", fontWeight: 800, color: "#0C0C0C", margin: "0 0 8px", letterSpacing: "-0.4px" }}>
+                Earn USDC for your judgment
+              </h1>
+              <p style={{ ...dm, fontSize: "14px", color: "#6B7280", margin: 0, lineHeight: 1.5 }}>
+                Vote on comparisons. Each verified vote earns USDC directly to your wallet. One person, one vote — no bots.
+              </p>
+            </div>
+          </div>
 
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1 text-left">
-              Your wallet address (to receive payment)
+          {/* Wallet input */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+            <label style={{ ...dm, fontSize: "13px", fontWeight: 600, color: "#374151" }}>
+              Your wallet address
             </label>
             <input
               type="text"
               value={workerWallet}
               onChange={(e) => setWorkerWallet(e.target.value)}
-              placeholder="0x... (optional, skip to vote without payment)"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono"
+              placeholder="0x... (optional — skip to vote without payment)"
+              style={{
+                width: "100%",
+                backgroundColor: "#F9F8F5",
+                border: "1.5px solid #E8E5DE",
+                borderRadius: "12px",
+                padding: "12px 16px",
+                fontFamily: "'DM Mono', monospace",
+                fontSize: "13px", color: "#0C0C0C",
+                outline: "none", boxSizing: "border-box",
+              }}
             />
           </div>
 
+          {/* World ID button */}
           <WorldIDVerify onVerified={setNullifierHash} />
 
-          <p className="text-xs text-gray-400">
-            World ID proves you are a unique human. Your identity is never revealed.
-          </p>
+          {/* Trust signals */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            {[
+              "Your identity is never revealed — World ID uses ZK proofs",
+              "USDC sent directly to your wallet via x402 on Base",
+              "One vote per task, enforced by nullifier hash",
+            ].map((text, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
+                <div style={{
+                  width: "16px", height: "16px", flexShrink: 0, marginTop: "1px",
+                  backgroundColor: "#D1FAE5", borderRadius: "100px",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                }}>
+                  <div style={{ width: "6px", height: "6px", backgroundColor: "#059669", borderRadius: "100px" }} />
+                </div>
+                <span style={{ ...dm, fontSize: "12px", color: "#6B7280", lineHeight: 1.4 }}>{text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Stats row */}
+        <div style={{ display: "flex", alignItems: "center", gap: "32px" }}>
+          {[
+            { value: "$0.10–$0.50", label: "per vote" },
+            { value: "~30 sec", label: "per task" },
+            { value: "instant", label: "on-chain payout" },
+          ].map((stat, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: "32px" }}>
+              {i > 0 && <div style={{ width: "1px", height: "32px", backgroundColor: "#E8E5DE" }} />}
+              <div style={{ textAlign: "center" }}>
+                <div style={{ ...dm, fontSize: "18px", fontWeight: 800, color: "#0C0C0C" }}>{stat.value}</div>
+                <div style={{ ...dm, fontSize: "12px", color: "#9CA3AF" }}>{stat.label}</div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     );
   }
 
+  // ── Loading ────────────────────────────────────────────────────────
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-40 text-gray-400">
-        Loading tasks...
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "200px" }}>
+        <span style={{ ...dm, color: "#9CA3AF" }}>Loading tasks...</span>
       </div>
     );
   }
 
+  // ── Active task view ───────────────────────────────────────────────
   if (activeTask) {
     const options = resolveOptions(activeTask);
     const tier = activeTask.tier ?? "quick";
     const payout = formatBounty(activeTask);
 
     return (
-      <div className="max-w-2xl mx-auto">
+      <div style={{ maxWidth: "760px", margin: "0 auto", padding: "40px 24px" }}>
         <button
           onClick={() => setActiveTask(null)}
-          className="text-sm text-gray-500 hover:text-gray-900 mb-6 flex items-center gap-1"
+          style={{
+            ...dm, fontSize: "14px", color: "#6B7280",
+            background: "none", border: "none", cursor: "pointer",
+            padding: 0, marginBottom: "24px",
+            display: "flex", alignItems: "center", gap: "4px",
+          }}
         >
           ← Back to tasks
         </button>
 
-        <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
-          <div className="flex items-start justify-between mb-1">
-            <h2 className="font-semibold text-lg flex-1 mr-4">{activeTask.description}</h2>
-            <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
-              <span className="text-sm text-green-600 font-medium">{payout} USDC</span>
-              <TierBadge tier={tier} />
-            </div>
+        {/* Task header */}
+        <div style={{
+          backgroundColor: "#FFFFFF",
+          border: "1.5px solid #E8E5DE",
+          borderRadius: "20px",
+          padding: "24px 28px",
+          display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px",
+          marginBottom: "16px",
+        }}>
+          <div style={{ flex: 1 }}>
+            <h2 style={{ ...dm, fontSize: "20px", fontWeight: 800, color: "#0C0C0C", margin: "0 0 6px", letterSpacing: "-0.3px" }}>
+              {activeTask.description}
+            </h2>
+            <p style={{ ...dm, fontSize: "13px", color: "#9CA3AF", margin: 0 }}>
+              {activeTask.max_workers - activeTask.vote_count} slots remaining
+            </p>
           </div>
-          <p className="text-xs text-gray-400 mb-5">
-            {activeTask.max_workers - activeTask.vote_count} slots remaining
-          </p>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "8px", flexShrink: 0 }}>
+            <span style={{ ...dm, fontSize: "24px", fontWeight: 900, color: "#059669", letterSpacing: "-0.5px" }}>
+              {payout}
+            </span>
+            <TierBadge tier={tier} />
+          </div>
+        </div>
 
+        <div style={{
+          backgroundColor: "#FFFFFF",
+          border: "1.5px solid #E8E5DE",
+          borderRadius: "20px",
+          padding: "24px 28px",
+        }}>
           <MultiOptionJudgment
             taskId={activeTask.id}
             options={options}
@@ -151,60 +247,87 @@ export default function WorkPage() {
     );
   }
 
+  // ── Task list ──────────────────────────────────────────────────────
   const availableTasks = tasks.filter((t) => !votedTaskIds.has(t.id));
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
+    <div style={{ maxWidth: "680px", margin: "0 auto", padding: "40px 24px" }}>
+      {/* Page header */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}>
         <div>
-          <h1 className="text-2xl font-bold">Open tasks</h1>
-          <p className="text-sm text-gray-500 mt-0.5">
-            Verified{" "}
-            <span className="font-mono text-xs">{nullifierHash.slice(0, 10)}...</span>
+          <h1 style={{ ...dm, fontSize: "26px", fontWeight: 800, color: "#0C0C0C", margin: "0 0 4px", letterSpacing: "-0.5px" }}>
+            Open tasks
+          </h1>
+          <p style={{ ...dm, fontSize: "14px", color: "#6B7280", margin: 0 }}>
+            {availableTasks.length} available · Earn USDC for your judgment
           </p>
         </div>
-        <span className="text-sm text-gray-500">{availableTasks.length} available</span>
+        <div style={{
+          display: "flex", alignItems: "center", gap: "6px",
+          backgroundColor: "#F0FDF4", border: "1px solid #BBF7D0",
+          borderRadius: "10px", padding: "8px 14px",
+        }}>
+          <div style={{ width: "7px", height: "7px", backgroundColor: "#10B981", borderRadius: "100px" }} />
+          <span style={{ ...dm, fontSize: "13px", fontWeight: 600, color: "#065F46" }}>
+            World ID verified
+          </span>
+        </div>
       </div>
 
       {availableTasks.length === 0 ? (
-        <div className="text-center py-16 text-gray-400">
-          <p className="text-lg">No open tasks right now</p>
-          <p className="text-sm mt-1">
-            <a href="/" className="underline">
-              Post one
-            </a>{" "}
-            to get the pool started
-          </p>
+        <div style={{ textAlign: "center", padding: "64px 0" }}>
+          <p style={{ ...dm, fontSize: "17px", color: "#6B7280", margin: "0 0 8px" }}>No open tasks right now</p>
+          <a href="/" style={{ ...dm, fontSize: "14px", color: "#10B981", textDecoration: "underline" }}>
+            Post one to get the pool started
+          </a>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
           {availableTasks.map((task) => {
             const tier = task.tier ?? "quick";
             const payout = formatBounty(task);
             const opts = resolveOptions(task);
+            const slotsLeft = task.max_workers - (task.vote_count ?? 0);
 
             return (
               <button
                 key={task.id}
                 onClick={() => setActiveTask(task)}
-                className="w-full text-left bg-white border border-gray-200 rounded-xl p-5 hover:border-gray-300 hover:shadow-sm transition-all"
+                style={{
+                  width: "100%", textAlign: "left",
+                  backgroundColor: "#FFFFFF",
+                  border: "1.5px solid #E8E5DE",
+                  borderRadius: "16px",
+                  padding: "20px 24px",
+                  cursor: "pointer",
+                  transition: "border-color 0.15s, box-shadow 0.15s",
+                  display: "flex", alignItems: "center", gap: "16px",
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.borderColor = "#C4C0B8";
+                  (e.currentTarget as HTMLElement).style.boxShadow = "0 2px 8px rgba(0,0,0,0.06)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.borderColor = "#E8E5DE";
+                  (e.currentTarget as HTMLElement).style.boxShadow = "none";
+                }}
               >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1 min-w-0 mr-4">
-                    <p className="font-medium text-sm truncate">{task.description}</p>
-                    <p className="text-xs text-gray-400 mt-1">
-                      {opts.map((o) => o.label).join(" vs ")}
-                    </p>
-                    <div className="mt-2">
-                      <TierBadge tier={tier} />
-                    </div>
-                  </div>
-                  <div className="text-right flex-shrink-0">
-                    <p className="text-green-600 font-semibold text-sm">{payout}</p>
-                    <p className="text-xs text-gray-400 mt-0.5">
-                      {task.max_workers - (task.vote_count ?? 0)} left
-                    </p>
-                  </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ ...dm, fontSize: "15px", fontWeight: 700, color: "#0C0C0C", margin: "0 0 3px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {task.description}
+                  </p>
+                  <p style={{ ...dm, fontSize: "13px", color: "#9CA3AF", margin: "0 0 10px" }}>
+                    {opts.map((o) => o.label).join(" vs ")}
+                  </p>
+                  <TierBadge tier={tier} />
+                </div>
+                <div style={{ textAlign: "right", flexShrink: 0 }}>
+                  <p style={{ ...dm, fontSize: "20px", fontWeight: 800, color: "#059669", margin: "0 0 2px", letterSpacing: "-0.3px" }}>
+                    {payout}
+                  </p>
+                  <p style={{ ...dm, fontSize: "12px", color: "#9CA3AF", margin: 0 }}>
+                    {slotsLeft} left
+                  </p>
                 </div>
               </button>
             );

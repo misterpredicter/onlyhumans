@@ -3,18 +3,30 @@
 const TIER_INFO = {
   quick: {
     label: "Quick Vote",
-    color: "bg-gray-100 text-gray-600 border-gray-200",
+    color: "#374151",
+    bg: "#F9FAFB",
+    border: "#E5E7EB",
     desc: "Click your pick",
+    selectedBorder: "#0C0C0C",
+    selectedBg: "#F9FAFB",
   },
   reasoned: {
     label: "Reasoned Vote",
-    color: "bg-blue-50 text-blue-700 border-blue-200",
-    desc: "Pick + 1-2 sentence reason",
+    color: "#1D4ED8",
+    bg: "#EFF6FF",
+    border: "#BFDBFE",
+    desc: "Pick + 1–2 sentence reason",
+    selectedBorder: "#1D4ED8",
+    selectedBg: "#EFF6FF",
   },
   detailed: {
     label: "Detailed Review",
-    color: "bg-purple-50 text-purple-700 border-purple-200",
+    color: "#7C3AED",
+    bg: "#F5F3FF",
+    border: "#DDD6FE",
     desc: "Pick + structured feedback",
+    selectedBorder: "#7C3AED",
+    selectedBg: "#F5F3FF",
   },
 } as const;
 
@@ -27,15 +39,22 @@ interface TierBadgeProps {
 
 export function TierBadge({ tier, showPayout = false, payout, size = "sm" }: TierBadgeProps) {
   const info = TIER_INFO[tier as keyof typeof TIER_INFO] ?? TIER_INFO.quick;
-  const textSize = size === "sm" ? "text-xs" : "text-sm";
+  const fontSize = size === "sm" ? "11px" : "13px";
 
   return (
-    <span
-      className={`inline-flex items-center gap-1 font-medium px-2 py-0.5 rounded-full border ${textSize} ${info.color}`}
-    >
+    <span style={{
+      display: "inline-flex", alignItems: "center", gap: "4px",
+      fontFamily: "'DM Sans', sans-serif",
+      fontSize, fontWeight: 600,
+      color: info.color,
+      backgroundColor: info.bg,
+      border: `1px solid ${info.border}`,
+      borderRadius: "100px",
+      padding: "3px 10px",
+    }}>
       {info.label}
       {showPayout && payout && (
-        <span className="opacity-70">· {payout}</span>
+        <span style={{ opacity: 0.7 }}>· {payout}</span>
       )}
     </span>
   );
@@ -58,14 +77,30 @@ export function TierSelector({
             key={t}
             type="button"
             onClick={() => onChange(t)}
-            className={`rounded-xl border-2 p-3 text-left transition-all ${
-              selected
-                ? "border-blue-500 bg-blue-50"
-                : "border-gray-200 hover:border-gray-300"
-            }`}
+            style={{
+              borderRadius: "12px",
+              border: `2px solid ${selected ? info.selectedBorder : "#E8E5DE"}`,
+              backgroundColor: selected ? info.selectedBg : "#FAFAFA",
+              padding: "12px",
+              textAlign: "left",
+              cursor: "pointer",
+              transition: "border-color 0.15s, background-color 0.15s",
+            }}
           >
-            <div className="font-semibold text-sm">{info.label}</div>
-            <div className="text-xs text-gray-500 mt-0.5">{info.desc}</div>
+            <div style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: "13px", fontWeight: 700,
+              color: selected ? info.color : "#374151",
+              marginBottom: "2px",
+            }}>
+              {info.label}
+            </div>
+            <div style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: "11px", color: "#6B7280",
+            }}>
+              {info.desc}
+            </div>
           </button>
         );
       })}

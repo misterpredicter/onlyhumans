@@ -14,6 +14,28 @@ const DEFAULT_OPTIONS: OptionItem[] = [
   { label: "Option B", content: "" },
 ];
 
+const inputStyle: React.CSSProperties = {
+  width: "100%",
+  backgroundColor: "#F9F8F5",
+  border: "1.5px solid #E8E5DE",
+  borderRadius: "10px",
+  padding: "10px 14px",
+  fontFamily: "'DM Sans', sans-serif",
+  fontSize: "14px",
+  color: "#0C0C0C",
+  outline: "none",
+  boxSizing: "border-box",
+};
+
+const labelStyle: React.CSSProperties = {
+  display: "block",
+  fontFamily: "'DM Sans', sans-serif",
+  fontSize: "13px",
+  fontWeight: 600,
+  color: "#374151",
+  marginBottom: "6px",
+};
+
 export function TaskCreator() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -110,81 +132,89 @@ export function TaskCreator() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
       {/* Description */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          What are you comparing?
-        </label>
+        <label style={labelStyle}>What are you comparing?</label>
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           required
           rows={2}
           placeholder="Which landing page converts better?"
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          style={{ ...inputStyle, resize: "vertical" }}
         />
       </div>
 
-      {/* Context (optional) */}
+      {/* Context */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Context for voters{" "}
-          <span className="text-gray-400 font-normal">(optional — helps voters give better judgments)</span>
-        </label>
+        <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
+          <label style={{ ...labelStyle, marginBottom: 0 }}>Context for voters</label>
+          <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "#9CA3AF" }}>optional</span>
+        </div>
         <textarea
           value={context}
           onChange={(e) => setContext(e.target.value)}
           rows={2}
-          placeholder="I'm choosing a logo for my startup. Looking for something that feels premium but approachable."
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="I'm choosing a logo for my startup. Looking for something premium but approachable."
+          style={{ ...inputStyle, resize: "vertical" }}
         />
       </div>
 
-      {/* Tier selector */}
+      {/* Tier */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Feedback depth
-        </label>
+        <label style={labelStyle}>Feedback depth</label>
         <TierSelector
           value={tier}
           onChange={(t) => setTier(t as "quick" | "reasoned" | "detailed")}
         />
       </div>
 
-      {/* Dynamic options */}
+      {/* Options */}
       <div>
-        <div className="flex items-center justify-between mb-2">
-          <label className="block text-sm font-medium text-gray-700">
-            Options ({options.length})
-          </label>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px" }}>
+          <label style={{ ...labelStyle, marginBottom: 0 }}>Options ({options.length})</label>
           {options.length < 6 && (
             <button
               type="button"
               onClick={addOption}
-              className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: "13px", fontWeight: 600,
+                color: "#6366F1", background: "none", border: "none",
+                cursor: "pointer", padding: 0,
+              }}
             >
               + Add option
             </button>
           )}
         </div>
-
-        <div className="space-y-3">
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
           {options.map((opt, idx) => (
-            <div key={idx} className="border border-gray-200 rounded-xl p-3 space-y-2">
-              <div className="flex items-center justify-between">
+            <div key={idx} style={{
+              border: "1.5px solid #E8E5DE", borderRadius: "12px",
+              padding: "12px 14px", display: "flex", flexDirection: "column", gap: "8px",
+            }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <input
                   value={opt.label}
                   onChange={(e) => updateOption(idx, "label", e.target.value)}
                   placeholder={`Option ${String.fromCharCode(65 + idx)} label`}
-                  className="text-sm font-medium border-0 p-0 focus:outline-none focus:ring-0 bg-transparent text-gray-700 flex-1"
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: "13px", fontWeight: 700,
+                    color: "#0C0C0C", background: "none",
+                    border: "none", outline: "none", flex: 1,
+                  }}
                 />
                 {options.length > 2 && (
                   <button
                     type="button"
                     onClick={() => removeOption(idx)}
-                    className="text-gray-300 hover:text-red-500 text-lg leading-none ml-2"
-                    aria-label="Remove option"
+                    style={{
+                      color: "#D1D5DB", background: "none", border: "none",
+                      cursor: "pointer", fontSize: "18px", lineHeight: 1, marginLeft: "8px",
+                    }}
                   >
                     ×
                   </button>
@@ -195,7 +225,7 @@ export function TaskCreator() {
                 onChange={(e) => updateOption(idx, "content", e.target.value)}
                 required
                 placeholder="URL or text content..."
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                style={inputStyle}
               />
             </div>
           ))}
@@ -203,52 +233,53 @@ export function TaskCreator() {
       </div>
 
       {/* Pricing row */}
-      <div className="grid grid-cols-3 gap-3">
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1.4fr", gap: "10px" }}>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Bounty / vote
-          </label>
-          <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">$</span>
+          <label style={labelStyle}>Bounty / vote</label>
+          <div style={{ position: "relative" }}>
+            <span style={{
+              position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)",
+              fontFamily: "'DM Sans', sans-serif", fontSize: "14px", color: "#9CA3AF",
+            }}>$</span>
             <input
               type="number"
               min="0.01"
               step="0.01"
               value={bountyPerVote}
               onChange={(e) => setBountyPerVote(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg pl-7 pr-3 py-2 text-sm"
+              style={{ ...inputStyle, paddingLeft: "26px" }}
             />
           </div>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Max voters
-          </label>
+          <label style={labelStyle}>Max voters</label>
           <input
             type="number"
             min="1"
             max="100"
             value={maxWorkers}
             onChange={(e) => setMaxWorkers(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+            style={inputStyle}
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Your wallet
-          </label>
+          <label style={labelStyle}>Your wallet</label>
           <input
             value={requesterWallet}
             onChange={(e) => setRequesterWallet(e.target.value)}
             required
             placeholder="0x..."
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono"
+            style={{ ...inputStyle, fontFamily: "'DM Mono', monospace", fontSize: "12px" }}
           />
         </div>
       </div>
 
       {error && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-amber-800 text-sm">
+        <div style={{
+          backgroundColor: "#FFFBEB", border: "1px solid #FDE68A",
+          borderRadius: "10px", padding: "12px 16px",
+          fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#92400E",
+        }}>
           {error}
         </div>
       )}
@@ -256,14 +287,29 @@ export function TaskCreator() {
       <button
         type="submit"
         disabled={loading || totalCost < 0.01}
-        className="w-full bg-black text-white py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors disabled:opacity-60"
+        style={{
+          width: "100%",
+          backgroundColor: loading || totalCost < 0.01 ? "#D1D5DB" : "#10B981",
+          color: "#FFFFFF",
+          border: "none",
+          borderRadius: "12px",
+          padding: "16px",
+          fontFamily: "'DM Sans', sans-serif",
+          fontSize: "15px", fontWeight: 700,
+          cursor: loading || totalCost < 0.01 ? "not-allowed" : "pointer",
+          transition: "background-color 0.15s",
+        }}
       >
         {loading
           ? "Creating task..."
           : `Post task — $${totalCost.toFixed(2)} USDC (${workers} votes × $${bounty.toFixed(2)})`}
       </button>
 
-      <p className="text-xs text-center text-gray-400">
+      <p style={{
+        textAlign: "center",
+        fontFamily: "'DM Sans', sans-serif",
+        fontSize: "12px", color: "#9CA3AF", margin: 0,
+      }}>
         Payment processed via x402 on Base Sepolia (testnet)
       </p>
     </form>

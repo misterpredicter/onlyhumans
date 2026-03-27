@@ -4,45 +4,64 @@ interface Props {
   params: Promise<{ id: string }>;
 }
 
+const dm = { fontFamily: "'DM Sans', sans-serif" } as const;
+
 export default async function TaskResultsPage({ params }: Props) {
   const { id } = await params;
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div style={{ maxWidth: "760px", margin: "0 auto", padding: "40px 24px" }}>
       <a
         href="/"
-        className="text-sm text-gray-500 hover:text-gray-900 mb-6 flex items-center gap-1"
+        style={{ ...dm, fontSize: "14px", color: "#6B7280", textDecoration: "none", display: "flex", alignItems: "center", gap: "4px", marginBottom: "24px" }}
       >
-        Back to Human Signal
+        ← Back to Human Signal
       </a>
 
-      <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-xl font-bold">Live results</h1>
+      <div style={{
+        backgroundColor: "#FFFFFF",
+        border: "1.5px solid #E8E5DE",
+        borderRadius: "20px",
+        padding: "28px",
+        marginBottom: "16px",
+      }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}>
+          <h1 style={{ ...dm, fontSize: "22px", fontWeight: 800, color: "#0C0C0C", margin: 0, letterSpacing: "-0.3px" }}>
+            Live results
+          </h1>
           <a
-            href={`/work`}
-            className="text-sm bg-green-50 text-green-700 border border-green-200 px-4 py-1.5 rounded-lg hover:bg-green-100 transition-colors"
+            href="/work"
+            style={{
+              ...dm, fontSize: "13px", fontWeight: 600,
+              color: "#059669", textDecoration: "none",
+              backgroundColor: "#F0FDF4", border: "1px solid #BBF7D0",
+              borderRadius: "8px", padding: "8px 16px",
+            }}
           >
-            Earn USDC by voting
+            Earn USDC by voting →
           </a>
         </div>
-
         <ResultsDashboard taskId={id} />
       </div>
 
-      <div className="mt-6 bg-gray-50 rounded-xl p-4 text-xs text-gray-500 space-y-1">
-        <p>
-          <span className="font-medium">Sybil resistance:</span> Each vote is
-          authenticated via World ID ZKP. One unique human = one vote per task.
-        </p>
-        <p>
-          <span className="font-medium">Payments:</span> Workers paid automatically
-          via ERC-20 USDC transfer on Base Sepolia.
-        </p>
-        <p>
-          <span className="font-medium">Task ID:</span>{" "}
-          <span className="font-mono">{id}</span>
-        </p>
+      {/* Meta */}
+      <div style={{
+        backgroundColor: "#FFFFFF", border: "1.5px solid #E8E5DE",
+        borderRadius: "14px", padding: "16px 20px",
+        display: "flex", flexDirection: "column", gap: "6px",
+      }}>
+        <div style={{ display: "flex", gap: "6px" }}>
+          <span style={{ ...dm, fontSize: "12px", fontWeight: 600, color: "#374151" }}>Sybil resistance:</span>
+          <span style={{ ...dm, fontSize: "12px", color: "#6B7280" }}>Each vote authenticated via World ID ZKP. One unique human = one vote per task.</span>
+        </div>
+        <div style={{ display: "flex", gap: "6px" }}>
+          <span style={{ ...dm, fontSize: "12px", fontWeight: 600, color: "#374151" }}>Payments:</span>
+          <span style={{ ...dm, fontSize: "12px", color: "#6B7280" }}>Workers paid automatically via ERC-20 USDC transfer on Base Sepolia.</span>
+        </div>
+        <div style={{ display: "flex", gap: "6px" }}>
+          <span style={{ ...dm, fontSize: "12px", fontWeight: 600, color: "#374151" }}>Task ID:</span>
+          <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "12px", color: "#6B7280" }}>{id}</span>
+        </div>
       </div>
     </div>
   );
