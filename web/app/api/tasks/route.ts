@@ -144,7 +144,7 @@ export async function POST(req: NextRequest) {
       getX402Server(),
       undefined,
       undefined,
-      false // syncFacilitatorOnStart
+      true // syncFacilitatorOnStart — required for facilitator to know about exact scheme
     );
     return await handler(req);
   } catch (error) {

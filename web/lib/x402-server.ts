@@ -6,7 +6,7 @@ let _server: ReturnType<typeof createServer> | null = null;
 
 function createServer() {
   const facilitatorClient = new HTTPFacilitatorClient({
-    url: "https://facilitator.x402.org",
+    url: "https://x402.org/facilitator",
   });
   const server = new x402ResourceServer(facilitatorClient);
   registerExactEvmScheme(server);
