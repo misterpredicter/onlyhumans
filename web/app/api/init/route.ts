@@ -1,11 +1,16 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { initializeDatabase } from "@/lib/db";
 
-// Dev-only endpoint: GET /api/init to create tables
-// Remove or protect before production
-export async function GET() {
+// GET /api/init — create database tables (idempotent)
+// In production, requires ?key= matching INIT_SECRET env var.
+// In dev, works without a key.
+export async function GET(req: NextRequest) {
   if (process.env.NODE_ENV === "production") {
-    return NextResponse.json({ error: "Not available in production" }, { status: 403 });
+    const key = req.nextUrl.searchParams.get("key");
+    const secret = process.env.INIT_SECRET;
+    if (!secret || key !== secret) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
   }
 
   try {

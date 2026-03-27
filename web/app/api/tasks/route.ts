@@ -122,12 +122,18 @@ async function createTaskHandler(req: NextRequest): Promise<NextResponse> {
 
 // POST /api/tasks?total=5.00
 // x402 charges the total upfront. Bounty per vote + max workers in body.
+// Set DEMO_MODE=true to bypass x402 payment gate (for demos/testing only).
 export async function POST(req: NextRequest) {
   const totalParam = req.nextUrl.searchParams.get("total");
   const totalCost = parseFloat(totalParam ?? "1.00");
 
   if (isNaN(totalCost) || totalCost < 0.01) {
     return NextResponse.json({ error: "Invalid total" }, { status: 400 });
+  }
+
+  // Demo mode: skip x402 payment gate, call handler directly
+  if (process.env.DEMO_MODE === "true") {
+    return createTaskHandler(req);
   }
 
   const paymentConfig = getPaymentConfig(totalCost);
