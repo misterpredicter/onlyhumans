@@ -26,11 +26,10 @@ interface Task {
   options?: TaskOption[];
 }
 
-const TIER_PAYOUTS: Record<string, string> = {
-  quick: "$0.08",
-  reasoned: "$0.20",
-  detailed: "$0.50",
-};
+function formatBounty(task: Task): string {
+  const val = parseFloat(String(task.bounty_per_vote));
+  return `$${val.toFixed(2)}`;
+}
 
 export default function WorkPage() {
   const [nullifierHash, setNullifierHash] = useState<string | null>(null);
@@ -80,21 +79,6 @@ export default function WorkPage() {
           </p>
         </div>
 
-        {/* Tier payout table */}
-        <div className="bg-gray-50 rounded-2xl p-5 mb-6 text-left space-y-2.5">
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
-            Earn by feedback quality
-          </p>
-          {(["quick", "reasoned", "detailed"] as const).map((t) => (
-            <div key={t} className="flex items-center justify-between">
-              <TierBadge tier={t} showPayout={false} />
-              <span className="text-green-600 font-semibold text-sm">
-                {TIER_PAYOUTS[t]}
-              </span>
-            </div>
-          ))}
-        </div>
-
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1 text-left">
@@ -130,7 +114,7 @@ export default function WorkPage() {
   if (activeTask) {
     const options = resolveOptions(activeTask);
     const tier = activeTask.tier ?? "quick";
-    const payout = TIER_PAYOUTS[tier] ?? "$0.08";
+    const payout = formatBounty(activeTask);
 
     return (
       <div className="max-w-2xl mx-auto">
@@ -146,7 +130,7 @@ export default function WorkPage() {
             <h2 className="font-semibold text-lg flex-1 mr-4">{activeTask.description}</h2>
             <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
               <span className="text-sm text-green-600 font-medium">{payout} USDC</span>
-              <TierBadge tier={tier} showPayout={false} />
+              <TierBadge tier={tier} />
             </div>
           </div>
           <p className="text-xs text-gray-400 mb-5">
@@ -196,7 +180,7 @@ export default function WorkPage() {
         <div className="space-y-3">
           {availableTasks.map((task) => {
             const tier = task.tier ?? "quick";
-            const payout = TIER_PAYOUTS[tier] ?? "$0.08";
+            const payout = formatBounty(task);
             const opts = resolveOptions(task);
 
             return (
@@ -212,7 +196,7 @@ export default function WorkPage() {
                       {opts.map((o) => o.label).join(" vs ")}
                     </p>
                     <div className="mt-2">
-                      <TierBadge tier={tier} showPayout={false} />
+                      <TierBadge tier={tier} />
                     </div>
                   </div>
                   <div className="text-right flex-shrink-0">

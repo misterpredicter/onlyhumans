@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { TierSelector, TIER_PRICES } from "@/components/TierBadge";
+import { TierSelector } from "@/components/TierBadge";
 
 interface OptionItem {
   label: string;
@@ -25,6 +25,7 @@ export function TaskCreator() {
   const [options, setOptions] = useState<OptionItem[]>(DEFAULT_OPTIONS);
   const [requesterWallet, setRequesterWallet] = useState("");
   const [maxWorkers, setMaxWorkers] = useState("20");
+  const [bountyPerVote, setBountyPerVote] = useState("0.10");
 
   const addOption = () => {
     if (options.length >= 6) return;
@@ -45,6 +46,10 @@ export function TaskCreator() {
     );
   };
 
+  const bounty = parseFloat(bountyPerVote) || 0;
+  const workers = parseInt(maxWorkers) || 0;
+  const totalCost = bounty * workers;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -56,24 +61,31 @@ export function TaskCreator() {
       return;
     }
 
+    if (bounty < 0.01) {
+      setError("Bounty must be at least $0.01 per vote.");
+      setLoading(false);
+      return;
+    }
+
     try {
-      const res = await fetch(`/api/tasks?tier=${tier}`, {
+      const res = await fetch(`/api/tasks?total=${totalCost.toFixed(2)}`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           description,
           context: context.trim() || null,
           options: options.map((o) => ({ label: o.label, content: o.content })),
-          max_workers: parseInt(maxWorkers),
+          max_workers: workers,
+          bounty_per_vote: bounty,
           requester_wallet: requesterWallet,
+          tier,
         }),
       });
 
       if (res.status === 402) {
         const paymentInfo = await res.json();
-        const price = TIER_PRICES[tier];
         setError(
-          `x402 gate active — payment required: ${price} USDC on Base Sepolia. ` +
+          `x402 gate active — payment required: $${totalCost.toFixed(2)} USDC on Base Sepolia. ` +
             `Use @x402/fetch with wrapFetchWithPayment() to pay automatically. ` +
             (paymentInfo ? `Response: ${JSON.stringify(paymentInfo).slice(0, 120)}` : "")
         );
@@ -96,8 +108,6 @@ export function TaskCreator() {
       setLoading(false);
     }
   };
-
-  const priceLabel = TIER_PRICES[tier];
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
@@ -134,7 +144,7 @@ export function TaskCreator() {
       {/* Tier selector */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Feedback tier
+          Feedback depth
         </label>
         <TierSelector
           value={tier}
@@ -192,8 +202,24 @@ export function TaskCreator() {
         </div>
       </div>
 
-      {/* Settings row */}
-      <div className="grid grid-cols-2 gap-4">
+      {/* Pricing row */}
+      <div className="grid grid-cols-3 gap-3">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Bounty / vote
+          </label>
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">$</span>
+            <input
+              type="number"
+              min="0.01"
+              step="0.01"
+              value={bountyPerVote}
+              onChange={(e) => setBountyPerVote(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg pl-7 pr-3 py-2 text-sm"
+            />
+          </div>
+        </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Max voters
@@ -229,10 +255,12 @@ export function TaskCreator() {
 
       <button
         type="submit"
-        disabled={loading}
+        disabled={loading || totalCost < 0.01}
         className="w-full bg-black text-white py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors disabled:opacity-60"
       >
-        {loading ? "Creating task..." : `Post task — ${priceLabel} USDC`}
+        {loading
+          ? "Creating task..."
+          : `Post task — $${totalCost.toFixed(2)} USDC (${workers} votes × $${bounty.toFixed(2)})`}
       </button>
 
       <p className="text-xs text-center text-gray-400">

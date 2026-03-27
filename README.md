@@ -3,15 +3,15 @@
 **Sybil-resistant A/B preference oracle built on World ID + x402 + Base Sepolia**
 
 Post a judgment task. Verified humans vote (one person, one vote via World ID ZKP).
-Requesters pay $0.50 USDC via x402 to post. Workers earn $0.08 USDC per vote automatically.
+Requesters set bounty per vote + max voters, pay total upfront via x402. Workers earn the bounty automatically per vote.
 
 ---
 
 ## Architecture
 
 ```
-Requester → POST /api/tasks → 402 → pays $0.50 → task created → XMTP broadcast
-Worker → World ID ZKP → nullifier stored → votes → treasury sends $0.08 USDC
+Requester → POST /api/tasks?total=X → 402 → pays bounty×voters → task created → XMTP broadcast
+Worker → World ID ZKP → nullifier stored → votes → treasury sends bounty USDC
 ```
 
 **Stack:** Next.js 15 / Neon Postgres / @worldcoin/idkit / @x402/next / viem / Base Sepolia
@@ -109,7 +109,7 @@ npm start
 
 | Method | Path | Auth | Purpose |
 |--------|------|------|---------|
-| POST | /api/tasks | x402 $0.50 | Create judgment task |
+| POST | /api/tasks?total=X | x402 variable | Create judgment task (bounty × voters) |
 | GET | /api/tasks | — | List open tasks |
 | GET | /api/tasks/:id | — | Task + live results |
 | POST | /api/tasks/:id/vote | World ID nullifier | Submit vote + trigger payment |

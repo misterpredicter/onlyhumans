@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withX402 } from "@x402/next";
 import { sql } from "@/lib/db";
-import { getX402Server, getTierPaymentConfig, TIER_BOUNTIES, type Tier } from "@/lib/x402-server";
+import { getX402Server, getPaymentConfig, type Tier } from "@/lib/x402-server";
 
 // GET /api/tasks — list open tasks with options array
 export async function GET() {
@@ -31,8 +31,6 @@ export async function GET() {
 
 // Inner handler — only runs after x402 payment verified
 async function createTaskHandler(req: NextRequest): Promise<NextResponse> {
-  const tier = (req.nextUrl.searchParams.get("tier") ?? "quick") as Tier;
-
   const body = await req.json();
   const {
     description,
@@ -43,12 +41,21 @@ async function createTaskHandler(req: NextRequest): Promise<NextResponse> {
     option_b_label = "Option B",
     context,
     max_workers = 20,
+    bounty_per_vote = 0.08,
     requester_wallet,
+    tier = "quick",
   } = body;
 
   if (!description || !requester_wallet) {
     return NextResponse.json(
       { error: "Missing required fields: description, requester_wallet" },
+      { status: 400 }
+    );
+  }
+
+  if (bounty_per_vote < 0.01) {
+    return NextResponse.json(
+      { error: "Bounty per vote must be at least $0.01" },
       { status: 400 }
     );
   }
@@ -69,7 +76,6 @@ async function createTaskHandler(req: NextRequest): Promise<NextResponse> {
     );
   }
 
-  const bounty = TIER_BOUNTIES[tier] ?? TIER_BOUNTIES.quick;
   const x402TxHash = req.headers.get("x-payment-response") ?? null;
 
   // For V1 compat columns, use first two options
@@ -86,7 +92,7 @@ async function createTaskHandler(req: NextRequest): Promise<NextResponse> {
       ${description},
       ${opt0.content}, ${opt1.content},
       ${opt0.label}, ${opt1.label},
-      ${bounty}, ${max_workers},
+      ${bounty_per_vote}, ${max_workers},
       ${requester_wallet}, ${x402TxHash},
       ${context ?? null}, ${tier}
     )
@@ -114,14 +120,17 @@ async function createTaskHandler(req: NextRequest): Promise<NextResponse> {
   });
 }
 
-// POST /api/tasks?tier=quick|reasoned|detailed
-// Dynamic x402 pricing based on tier query param
+// POST /api/tasks?total=5.00
+// x402 charges the total upfront. Bounty per vote + max workers in body.
 export async function POST(req: NextRequest) {
-  const tier = ((req.nextUrl.searchParams.get("tier") ?? "quick") as Tier);
-  const validTiers: Tier[] = ["quick", "reasoned", "detailed"];
-  const safeTier = validTiers.includes(tier) ? tier : "quick";
+  const totalParam = req.nextUrl.searchParams.get("total");
+  const totalCost = parseFloat(totalParam ?? "1.00");
 
-  const paymentConfig = getTierPaymentConfig(safeTier);
+  if (isNaN(totalCost) || totalCost < 0.01) {
+    return NextResponse.json({ error: "Invalid total" }, { status: 400 });
+  }
+
+  const paymentConfig = getPaymentConfig(totalCost);
   const handler = withX402(
     createTaskHandler,
     paymentConfig,
