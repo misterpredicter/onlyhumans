@@ -65,7 +65,7 @@ export default function DocsPage() {
             </div>
             <div style={{ display: "flex", alignItems: "center", padding: "14px 24px" }}>
               <span style={{ fontFamily: "var(--font-mono)", fontSize: "13px", color: "#A3A3A3" }}>
-                https://themo.live
+                https://www.themo.live
               </span>
             </div>
           </div>
@@ -234,10 +234,10 @@ export default function DocsPage() {
               fontFamily: "var(--font-mono)", fontSize: "11px", color: "#A3A3A3",
               lineHeight: 1.7, margin: 0, overflow: "auto",
             }}>{`# List open tasks
-curl https://themo.live/api/tasks
+curl https://www.themo.live/api/tasks
 
 # Get task results
-curl https://themo.live/api/tasks/42`}</pre>
+curl https://www.themo.live/api/tasks/42`}</pre>
           </div>
         </div>
       </section>

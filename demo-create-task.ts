@@ -20,7 +20,7 @@ const BUYER_PRIVATE_KEY = "0x61944c75ae1539e940a956336e71145dcabfe1ed7a755a686e8
 const BUYER_ADDRESS = "0xfc271e50E7B1DF02C4430882Ae67C045CD724fa9";
 
 // ── Config ──────────────────────────────────────────────────────────────
-const APP_URL = process.env.APP_URL ?? "https://themo.live";
+const APP_URL = process.env.APP_URL ?? "https://www.themo.live";
 
 // ── Task content ────────────────────────────────────────────────────────
 const task = {

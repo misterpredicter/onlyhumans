@@ -136,14 +136,22 @@ export async function POST(req: NextRequest) {
     return createTaskHandler(req);
   }
 
-  const paymentConfig = getPaymentConfig(totalCost);
-  const handler = withX402(
-    createTaskHandler,
-    paymentConfig,
-    getX402Server(),
-    undefined,
-    undefined,
-    false // syncFacilitatorOnStart
-  );
-  return handler(req);
+  try {
+    const paymentConfig = getPaymentConfig(totalCost);
+    const handler = withX402(
+      createTaskHandler,
+      paymentConfig,
+      getX402Server(),
+      undefined,
+      undefined,
+      false // syncFacilitatorOnStart
+    );
+    return await handler(req);
+  } catch (error) {
+    console.error("x402 handler error:", error);
+    return NextResponse.json(
+      { error: "Payment gate error", detail: String(error) },
+      { status: 500 }
+    );
+  }
 }

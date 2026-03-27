@@ -93,7 +93,7 @@ Broadcasts new tasks to registered workers via XMTP / World Chat.
 # XMTP_WALLET_KEY=0x...      (new wallet for agent)
 # XMTP_DB_ENCRYPTION_KEY=... (32-byte hex, generate: openssl rand -hex 32)
 # DATABASE_URL=...            (same as web)
-# APP_URL=https://themo.live
+# APP_URL=https://www.themo.live
 # XMTP_ENV=production
 
 cd agent
