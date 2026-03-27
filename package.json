@@ -1,0 +1,9 @@
+{
+  "name": "human-signal",
+  "private": true,
+  "workspaces": ["web", "agent"],
+  "scripts": {
+    "dev": "npm run dev --workspace=web",
+    "build": "npm run build --workspace=web"
+  }
+}
