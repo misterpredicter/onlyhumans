@@ -52,6 +52,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               }}>Human Signal</span>
             </a>
             <nav style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <a href="/docs" style={{
+                fontFamily: "var(--font-sans)", fontSize: "14px", fontWeight: 500,
+                color: "#A3A3A3", textDecoration: "none",
+                padding: "8px 16px",
+              }}>
+                Docs
+              </a>
               <a href="/work" style={{
                 fontFamily: "var(--font-sans)", fontSize: "14px", fontWeight: 500,
                 color: "#A3A3A3", textDecoration: "none",
