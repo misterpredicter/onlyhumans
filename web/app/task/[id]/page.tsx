@@ -4,7 +4,7 @@ interface Props {
   params: Promise<{ id: string }>;
 }
 
-const dm = { fontFamily: "'DM Sans', sans-serif" } as const;
+const dm = { fontFamily: "var(--font-sans), sans-serif" } as const;
 
 export default async function TaskResultsPage({ params }: Props) {
   const { id } = await params;
@@ -60,7 +60,7 @@ export default async function TaskResultsPage({ params }: Props) {
         </div>
         <div style={{ display: "flex", gap: "6px" }}>
           <span style={{ ...dm, fontSize: "12px", fontWeight: 600, color: "#374151" }}>Task ID:</span>
-          <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "12px", color: "#6B7280" }}>{id}</span>
+          <span style={{ fontFamily: "var(--font-mono), monospace", fontSize: "12px", color: "#6B7280" }}>{id}</span>
         </div>
       </div>
     </div>

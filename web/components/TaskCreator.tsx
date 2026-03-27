@@ -20,7 +20,7 @@ const inputStyle: React.CSSProperties = {
   border: "1.5px solid #E8E5DE",
   borderRadius: "10px",
   padding: "10px 14px",
-  fontFamily: "'DM Sans', sans-serif",
+  fontFamily: "var(--font-sans), sans-serif",
   fontSize: "14px",
   color: "#0C0C0C",
   outline: "none",
@@ -29,7 +29,7 @@ const inputStyle: React.CSSProperties = {
 
 const labelStyle: React.CSSProperties = {
   display: "block",
-  fontFamily: "'DM Sans', sans-serif",
+  fontFamily: "var(--font-sans), sans-serif",
   fontSize: "13px",
   fontWeight: 600,
   color: "#374151",
@@ -150,7 +150,7 @@ export function TaskCreator() {
       <div>
         <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
           <label style={{ ...labelStyle, marginBottom: 0 }}>Context for voters</label>
-          <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "#9CA3AF" }}>optional</span>
+          <span style={{ fontFamily: "var(--font-sans), sans-serif", fontSize: "12px", color: "#9CA3AF" }}>optional</span>
         </div>
         <textarea
           value={context}
@@ -179,7 +179,7 @@ export function TaskCreator() {
               type="button"
               onClick={addOption}
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "var(--font-sans), sans-serif",
                 fontSize: "13px", fontWeight: 600,
                 color: "#6366F1", background: "none", border: "none",
                 cursor: "pointer", padding: 0,
@@ -201,7 +201,7 @@ export function TaskCreator() {
                   onChange={(e) => updateOption(idx, "label", e.target.value)}
                   placeholder={`Option ${String.fromCharCode(65 + idx)} label`}
                   style={{
-                    fontFamily: "'DM Sans', sans-serif",
+                    fontFamily: "var(--font-sans), sans-serif",
                     fontSize: "13px", fontWeight: 700,
                     color: "#0C0C0C", background: "none",
                     border: "none", outline: "none", flex: 1,
@@ -239,7 +239,7 @@ export function TaskCreator() {
           <div style={{ position: "relative" }}>
             <span style={{
               position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)",
-              fontFamily: "'DM Sans', sans-serif", fontSize: "14px", color: "#9CA3AF",
+              fontFamily: "var(--font-sans), sans-serif", fontSize: "14px", color: "#9CA3AF",
             }}>$</span>
             <input
               type="number"
@@ -269,7 +269,7 @@ export function TaskCreator() {
             onChange={(e) => setRequesterWallet(e.target.value)}
             required
             placeholder="0x..."
-            style={{ ...inputStyle, fontFamily: "'DM Mono', monospace", fontSize: "12px" }}
+            style={{ ...inputStyle, fontFamily: "var(--font-mono), monospace", fontSize: "12px" }}
           />
         </div>
       </div>
@@ -278,7 +278,7 @@ export function TaskCreator() {
         <div style={{
           backgroundColor: "#FFFBEB", border: "1px solid #FDE68A",
           borderRadius: "10px", padding: "12px 16px",
-          fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#92400E",
+          fontFamily: "var(--font-sans), sans-serif", fontSize: "13px", color: "#92400E",
         }}>
           {error}
         </div>
@@ -294,7 +294,7 @@ export function TaskCreator() {
           border: "none",
           borderRadius: "12px",
           padding: "16px",
-          fontFamily: "'DM Sans', sans-serif",
+          fontFamily: "var(--font-sans), sans-serif",
           fontSize: "15px", fontWeight: 700,
           cursor: loading || totalCost < 0.01 ? "not-allowed" : "pointer",
           transition: "background-color 0.15s",
@@ -307,7 +307,7 @@ export function TaskCreator() {
 
       <p style={{
         textAlign: "center",
-        fontFamily: "'DM Sans', sans-serif",
+        fontFamily: "var(--font-sans), sans-serif",
         fontSize: "12px", color: "#9CA3AF", margin: 0,
       }}>
         Payment processed via x402 on Base Sepolia (testnet)

@@ -26,7 +26,7 @@ interface VoteResult {
   optionIndex: number;
 }
 
-const dm: React.CSSProperties = { fontFamily: "'DM Sans', sans-serif" };
+const dm: React.CSSProperties = { fontFamily: "var(--font-sans), sans-serif" };
 
 const textareaStyle: React.CSSProperties = {
   width: "100%",
@@ -34,7 +34,7 @@ const textareaStyle: React.CSSProperties = {
   border: "1.5px solid #E8E5DE",
   borderRadius: "10px",
   padding: "10px 14px",
-  fontFamily: "'DM Sans', sans-serif",
+  fontFamily: "var(--font-sans), sans-serif",
   fontSize: "14px",
   color: "#0C0C0C",
   outline: "none",
@@ -163,7 +163,7 @@ export function MultiOptionJudgment({
                 +${result.amount.toFixed(2)} USDC sent to your wallet
               </p>
               {result.tx && (
-                <p style={{ fontFamily: "'DM Mono', monospace", fontSize: "12px", color: "#9CA3AF", margin: 0 }}>
+                <p style={{ fontFamily: "var(--font-mono), monospace", fontSize: "12px", color: "#9CA3AF", margin: 0 }}>
                   tx: {result.tx.slice(0, 22)}...
                 </p>
               )}
@@ -189,7 +189,7 @@ export function MultiOptionJudgment({
                     padding: "10px 20px",
                     backgroundColor: "#FFFFFF", border: "1.5px solid #E8E5DE",
                     borderRadius: "10px", cursor: "pointer",
-                    fontFamily: "'DM Sans', sans-serif", fontSize: "14px", color: "#374151",
+                    fontFamily: "var(--font-sans), sans-serif", fontSize: "14px", color: "#374151",
                   }}
                 >
                   {label}
@@ -323,7 +323,7 @@ export function MultiOptionJudgment({
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <span style={{ ...dm, fontSize: "14px", fontWeight: 800, color: "#0C0C0C" }}>{opt.label}</span>
                 <span style={{
-                  fontFamily: "'DM Sans', sans-serif", fontSize: "11px", color: "#9CA3AF",
+                  fontFamily: "var(--font-sans), sans-serif", fontSize: "11px", color: "#9CA3AF",
                   backgroundColor: "#F9F8F5", border: "1px solid #E8E5DE",
                   borderRadius: "100px", padding: "2px 8px",
                 }}>

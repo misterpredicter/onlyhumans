@@ -44,7 +44,7 @@ export function TierBadge({ tier, showPayout = false, payout, size = "sm" }: Tie
   return (
     <span style={{
       display: "inline-flex", alignItems: "center", gap: "4px",
-      fontFamily: "'DM Sans', sans-serif",
+      fontFamily: "var(--font-sans), sans-serif",
       fontSize, fontWeight: 600,
       color: info.color,
       backgroundColor: info.bg,
@@ -88,7 +88,7 @@ export function TierSelector({
             }}
           >
             <div style={{
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "var(--font-sans), sans-serif",
               fontSize: "13px", fontWeight: 700,
               color: selected ? info.color : "#374151",
               marginBottom: "2px",
@@ -96,7 +96,7 @@ export function TierSelector({
               {info.label}
             </div>
             <div style={{
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "var(--font-sans), sans-serif",
               fontSize: "11px", color: "#6B7280",
             }}>
               {info.desc}
