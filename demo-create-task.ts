@@ -10,9 +10,9 @@
  *   npx tsx demo-create-task.ts
  */
 
-import { createEvmClient } from "@x402/evm/client";
 import { toClientEvmSigner } from "@x402/evm";
-import { wrapFetchWithPayment } from "@x402/fetch";
+import { registerExactEvmScheme } from "@x402/evm/exact/client";
+import { wrapFetchWithPayment, x402Client } from "@x402/fetch";
 import { privateKeyToAccount } from "viem/accounts";
 
 // ── Buyer wallet (fund this with testnet USDC on Base Sepolia) ──────────
@@ -24,12 +24,11 @@ const APP_URL = process.env.APP_URL ?? "https://themo.live";
 
 // ── Task content ────────────────────────────────────────────────────────
 const task = {
-  description: "Which landing page headline would make you most likely to sign up for a new payments app?",
-  context: "We're launching a peer-to-peer payments app targeting 18-30 year olds. Need to pick a hero headline for the landing page. Looking for the option that creates the strongest emotional pull to sign up.",
+  description: "Which design for Human Signal's homepage is better?",
+  context: "We're choosing between two homepage designs for Human Signal. Design A is our current polished version. Design B is an alternative direction. Which one would make you trust the product more?",
   options: [
-    { label: "Option A", content: "Send money anywhere, instantly" },
-    { label: "Option B", content: "The wallet your friends already use" },
-    { label: "Option C", content: "Zero fees. Zero friction. Just pay." },
+    { label: "Design A", content: `${APP_URL}/demo/design-a.svg` },
+    { label: "Design B", content: `${APP_URL}/demo/design-b.svg` },
   ],
   tier: "reasoned",
   bounty_per_vote: 0.20,
@@ -41,9 +40,10 @@ const totalCost = task.bounty_per_vote * task.max_workers;
 
 async function main() {
   console.log("Creating x402 payment client...");
-  const account = privateKeyToAccount(BUYER_PRIVATE_KEY);
+  const account = privateKeyToAccount(BUYER_PRIVATE_KEY as `0x${string}`);
   const signer = toClientEvmSigner(account);
-  const client = createEvmClient({ signer });
+  const client = new x402Client();
+  registerExactEvmScheme(client, signer);
   const paidFetch = wrapFetchWithPayment(fetch, client);
 
   console.log(`Buyer wallet: ${BUYER_ADDRESS}`);

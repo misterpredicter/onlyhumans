@@ -332,8 +332,8 @@ export function MultiOptionJudgment({
               </div>
 
               {isImage(opt.content) ? (
-                <div style={{ position: "relative", width: "100%", height: "140px", borderRadius: "10px", overflow: "hidden", backgroundColor: "#F9F8F5" }}>
-                  <Image src={opt.content} alt={opt.label} fill className="object-cover" unoptimized />
+                <div style={{ position: "relative", width: "100%", height: options.length <= 2 ? "280px" : "180px", borderRadius: "10px", overflow: "hidden", backgroundColor: "#F9F8F5" }}>
+                  <Image src={opt.content} alt={opt.label} fill className="object-contain" unoptimized />
                 </div>
               ) : (
                 <p style={{ ...dm, fontSize: "13px", color: "#374151", lineHeight: 1.5, margin: 0 }}>{opt.content}</p>
