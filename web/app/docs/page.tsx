@@ -15,9 +15,9 @@ const STEPS = [
 ];
 
 const TIERS = [
-  { slug: "quick", name: "Quick Vote", price: "$0.08/vote", desc: "Click to pick. No written feedback required.", color: "#6B7280", bg: "#F0EDE6" },
-  { slug: "reasoned", name: "Reasoned Vote", price: "$0.20/vote", desc: "Pick + 1-2 sentence explanation. feedback_text required.", color: "#3B82F6", bg: "#EFF6FF" },
-  { slug: "detailed", name: "Detailed Review", price: "$0.50/vote", desc: "Pick + structured feedback (what works, what doesn't, suggestions). feedback_text required.", color: "#8B5CF6", bg: "#F5F3FF" },
+  { slug: "quick", name: "Quick Vote", price: "~$0.05-0.10", desc: "Click to pick. No written feedback required.", color: "#6B7280", bg: "#F0EDE6" },
+  { slug: "reasoned", name: "Reasoned Vote", price: "~$0.15-0.30", desc: "Pick + 1-2 sentence explanation. feedback_text required.", color: "#3B82F6", bg: "#EFF6FF" },
+  { slug: "detailed", name: "Detailed Review", price: "~$0.40-1.00", desc: "Pick + structured feedback (what works, what doesn't, suggestions). feedback_text required.", color: "#8B5CF6", bg: "#F5F3FF" },
 ];
 
 export default function DocsPage() {
@@ -201,7 +201,11 @@ export default function DocsPage() {
 
           {/* Right: tiers + curl */}
           <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-            <span style={{ fontFamily: "var(--font-sans)", fontSize: "13px", fontWeight: 700, color: "#0C0C0C" }}>Feedback tiers</span>
+            <span style={{ fontFamily: "var(--font-sans)", fontSize: "13px", fontWeight: 700, color: "#0C0C0C" }}>Feedback tiers (suggested pricing)</span>
+            <p style={{ fontFamily: "var(--font-sans)", fontSize: "12px", color: "#6B7280", lineHeight: 1.5, margin: 0 }}>
+              You set the price. The bounty_per_vote field accepts any amount ($0.01+).
+              Tiers define feedback depth, not cost — pair any tier with any bounty.
+            </p>
             {TIERS.map((tier) => (
               <div key={tier.slug} style={{
                 background: "#FFFFFF", border: "1.5px solid #E8E5DE", borderRadius: "12px",
