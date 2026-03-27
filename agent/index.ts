@@ -3,7 +3,7 @@ import { Wallet } from "ethers";
 import { sql } from "@vercel/postgres";
 
 const POLL_INTERVAL_MS = 30_000;
-const APP_URL = process.env.APP_URL ?? "https://your-app.vercel.app";
+const APP_URL = process.env.APP_URL ?? "https://themo.live";
 
 let lastTaskCreatedAt: Date = new Date(0);
 
