@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { EconomicsBreakdown } from "@/components/EconomicsBreakdown";
 
 const BASE_URL = "https://www.themo.live";
 const LOCAL_URL = "http://localhost:3000";
