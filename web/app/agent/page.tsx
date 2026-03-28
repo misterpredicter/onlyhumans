@@ -5,6 +5,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { CopyButton } from "@/components/CopyButton";
 
 const BASE = "https://www.themo.live";
 
@@ -95,10 +96,10 @@ export default function AgentPage() {
           </p>
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "16px" }} className="docs-grid-3col">
-            {/* curl */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-              <span style={{ ...mono, fontSize: "12px", fontWeight: 500, color: "#6B7280" }}>curl</span>
-              <pre style={codeBlock}>{`curl -X POST ${BASE}/api/tasks \\
+            {[
+              {
+                label: "curl",
+                code: `curl -X POST ${BASE}/api/tasks \\
   -H "content-type: application/json" \\
   -d '{
     "description": "Which logo?",
@@ -108,13 +109,11 @@ export default function AgentPage() {
     ],
     "requester_wallet": "0x1234...",
     "callback_url": "https://you.com/hook"
-  }'`}</pre>
-            </div>
-
-            {/* Python */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-              <span style={{ ...mono, fontSize: "12px", fontWeight: 500, color: "#6B7280" }}>Python</span>
-              <pre style={codeBlock}>{`import requests
+  }'`,
+              },
+              {
+                label: "Python",
+                code: `import requests
 
 r = requests.post(
   "${BASE}/api/tasks",
@@ -128,13 +127,11 @@ r = requests.post(
     "callback_url": "https://you.com/hook"
   }
 )
-print(r.json()["task_id"])`}</pre>
-            </div>
-
-            {/* TypeScript */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-              <span style={{ ...mono, fontSize: "12px", fontWeight: 500, color: "#6B7280" }}>TypeScript</span>
-              <pre style={codeBlock}>{`const res = await fetch(
+print(r.json()["task_id"])`,
+              },
+              {
+                label: "TypeScript",
+                code: `const res = await fetch(
   "${BASE}/api/tasks",
   {
     method: "POST",
@@ -150,8 +147,30 @@ print(r.json()["task_id"])`}</pre>
     }),
   }
 );
-const { task_id } = await res.json();`}</pre>
-            </div>
+const { task_id } = await res.json();`,
+              },
+            ].map(({ label, code }) => (
+              <div key={label} style={{ display: "flex", flexDirection: "column", gap: "0" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    padding: "10px 14px",
+                    background: "#161616",
+                    borderRadius: "14px 14px 0 0",
+                    border: "1px solid rgba(255,255,255,0.06)",
+                    borderBottom: "none",
+                  }}
+                >
+                  <span style={{ ...mono, fontSize: "11px", fontWeight: 600, color: "rgba(255,255,255,0.45)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>
+                    {label}
+                  </span>
+                  <CopyButton code={code} tone="dark" />
+                </div>
+                <pre style={{ ...codeBlock, borderRadius: "0 0 14px 14px" }}>{code}</pre>
+              </div>
+            ))}
           </div>
         </div>
       </section>
