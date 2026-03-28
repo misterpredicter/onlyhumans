@@ -644,7 +644,7 @@ export function DocsPageClient() {
       .catch(() => setStatus(null));
   }, []);
 
-  const liveStatus = status ?? {
+  const defaults = {
     status: "operational",
     tasks_active: 0,
     tasks_completed: 0,
@@ -660,6 +660,12 @@ export function DocsPageClient() {
       platform_fund: "9%",
       founder: "1%",
     },
+  };
+  const liveStatus = {
+    ...defaults,
+    ...(status && !(status as any).error ? status : {}),
+    pricing: status?.pricing ?? defaults.pricing,
+    economics: status?.economics ?? defaults.economics,
   };
 
   const statusExample = `{
