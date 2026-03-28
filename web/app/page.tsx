@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { ScrollReveal } from "@/components/ScrollReveal";
 
 interface Stats {
   task_count: number;
@@ -176,6 +177,7 @@ export default function Home() {
 
       {/* Why Now */}
       <section className="page-shell">
+        <ScrollReveal>
         <div className="section-shell">
           <p className="section-kicker">Why now</p>
           <h2 className="section-title" style={{ fontSize: "clamp(32px, 4vw, 48px)", marginBottom: "12px" }}>
@@ -187,7 +189,7 @@ export default function Home() {
 
           <div className="metric-grid">
             {WHY_NOW.map((item) => (
-              <div key={item.label} className="metric-card premium-card animate-fade-in-up">
+              <div key={item.label} className="metric-card premium-card">
                 <div className="soft-label">{item.label}</div>
                 <p className="metric-card__value">{item.value}</p>
                 <p className="metric-card__label">{item.sub}</p>
@@ -215,8 +217,10 @@ export default function Home() {
             </div>
           </div>
         </div>
+        </ScrollReveal>
 
         {/* Four Human Roles */}
+        <ScrollReveal delay={100}>
         <div className="section-shell">
           <p className="section-kicker">Who does what</p>
           <h2 className="section-title" style={{ fontSize: "clamp(32px, 4vw, 48px)", marginBottom: "12px" }}>
@@ -228,7 +232,7 @@ export default function Home() {
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "16px" }}>
             {HUMAN_ROLES.map((item) => (
-              <div key={item.role} className="surface-card animate-fade-in-up" style={{ padding: "22px" }}>
+              <div key={item.role} className="surface-card" style={{ padding: "22px" }}>
                 <div
                   style={{
                     display: "inline-flex",
@@ -256,8 +260,10 @@ export default function Home() {
             ))}
           </div>
         </div>
+        </ScrollReveal>
 
         {/* How agents participate */}
+        <ScrollReveal delay={100}>
         <div className="section-shell">
           <div className="feed-grid">
             <div>
@@ -321,8 +327,10 @@ export default function Home() {
             </div>
           </div>
         </div>
+        </ScrollReveal>
 
         {/* CTA */}
+        <ScrollReveal>
         <div className="section-shell" style={{ textAlign: "center" }}>
           <div
             style={{
@@ -360,6 +368,7 @@ export default function Home() {
             </div>
           </div>
         </div>
+        </ScrollReveal>
       </section>
     </>
   );
