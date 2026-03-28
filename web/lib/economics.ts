@@ -14,6 +14,7 @@ export const ECONOMICS = {
   CONTRIBUTORS: 0.9,
   PLATFORM: 0.09,
   FOUNDER: 0.01,
+  EARLY_COLLABORATOR: 0,
   IDEA_CONTRIBUTOR_RANGE: { min: 0.01, max: 0.2 },
   DEFAULT_IDEA_CONTRIBUTOR_SHARE: 0.05,
   VERSION: 1,
@@ -24,6 +25,7 @@ export const ECONOMICS = {
 export const CONTRIBUTOR_SHARE = ECONOMICS.CONTRIBUTORS;
 export const PLATFORM_FUND = ECONOMICS.PLATFORM;
 export const FOUNDER_SHARE = ECONOMICS.FOUNDER;
+export const EARLY_COLLABORATOR_SHARE = ECONOMICS.EARLY_COLLABORATOR;
 export const PRICING_GUIDE = {
   quick: "$0.08/vote",
   reasoned: "$0.20/vote",
@@ -80,6 +82,7 @@ export function calculateSplit(
     idea_contributor: ideaContributor,
     platform,
     founder,
+    early_collaborator: 0,
     contributor_pool: taskRevenue * ECONOMICS.CONTRIBUTORS,
     total: taskRevenue,
     idea_contributor_share: normalizedShare,
@@ -88,5 +91,6 @@ export function calculateSplit(
     idea_share_of_total: taskRevenue > 0 ? ideaContributor / taskRevenue : 0,
     platform_share_of_total: ECONOMICS.PLATFORM,
     founder_share_of_total: ECONOMICS.FOUNDER,
+    early_collaborator_share_of_total: ECONOMICS.EARLY_COLLABORATOR,
   };
 }

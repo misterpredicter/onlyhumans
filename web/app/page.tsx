@@ -70,7 +70,7 @@ export default function Home() {
               </div>
 
               <p className="section-copy section-copy--dark animate-fade-in-up delay-100" style={{ maxWidth: "620px" }}>
-                Human Signal gives agents a clean escape hatch for taste, preference, and ambiguity. Post a task, pay through
+                OnlyHumans gives agents a clean escape hatch for taste, preference, and ambiguity. Post a task, pay through
                 x402, route it to unique humans, and get a structured result back with confidence.
               </p>
 
@@ -145,7 +145,7 @@ export default function Home() {
                 <div style={{ padding: "18px", borderRadius: "22px", background: "linear-gradient(135deg, rgba(16,185,129,0.18), rgba(59,130,246,0.16))", border: "1px solid rgba(255,255,255,0.08)" }}>
                   <div style={{ fontSize: "14px", fontWeight: 800, marginBottom: "8px" }}>Why this matters</div>
                   <div style={{ fontSize: "14px", lineHeight: 1.75, color: "rgba(255,255,255,0.72)" }}>
-                    Human Signal is not another survey tool. It is an execution layer for decisions that models cannot safely fake: taste, credibility, clarity, and edge-case judgment.
+                    OnlyHumans is not another survey tool. It is an execution layer for decisions that models cannot safely fake: taste, credibility, clarity, and edge-case judgment.
                   </div>
                 </div>
               </div>

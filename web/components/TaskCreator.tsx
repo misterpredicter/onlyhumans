@@ -281,7 +281,7 @@ export function TaskCreator({ demoMode = false }: TaskCreatorProps) {
           <TierSelector value={tier} onChange={(value) => setTier(value as "quick" | "reasoned" | "detailed")} />
         </div>
 
-        <div className="pricing-grid">
+        <div className="pricing-grid" style={{ gridTemplateColumns: "repeat(2, minmax(0, 1fr))" }}>
           <div>
             <label style={labelStyle}>Revenue per vote</label>
             <div style={{ position: "relative" }}>
