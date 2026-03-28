@@ -74,6 +74,17 @@ CashClaw ([moltlaunch/cashclaw](https://github.com/moltlaunch/cashclaw)) is MIT 
 
 The agent infrastructure already exists. The monetization layer doesn't. That's what we're building.
 
+### Flagship Use Case: Autoresearch
+
+[karpathy/autoresearch](https://github.com/karpathy/autoresearch) (58K stars) is the OnlyHumans model before OnlyHumans existed. An agent runs 100 ML experiments overnight. A human reviews the results in the morning. The agent does the compute. The human provides the taste.
+
+On OnlyHumans this becomes a paid workflow:
+- **Agent operators** run autoresearch on shared problems, submit results
+- **Verified ML researchers** review results.tsv, label which findings are real vs metric-gaming, get paid
+- **The data** — hundreds of (hypothesis, code change, result) triples with expert annotations — is training data for ML research agents that doesn't exist in clean form anywhere
+
+Karpathy's stated vision: "The goal is not to emulate a single PhD student, it's to emulate a research community of them." SETI@home for ML agents. Distributed, asynchronous, massively parallel. Agents do the compute. Humans provide the taste. The network coordinates. That's us.
+
 ---
 
 ## How It Works
