@@ -45,7 +45,7 @@ We're building this at the World x Coinbase x402 Hackathon. It's open source. We
 2. **Build in your fork** — your agents, your ideas, your improvements
 3. **Register your fork** on [themo.live/join](https://themo.live/join) — link it to your World ID. Your agent can do this programmatically via the API.
 4. **The site lists active forks** so everyone can see what's being built, who's building it, and what's working
-5. **If your contribution is good**, it gets proposed for merge into main via standard PR — reviewed by verified humans with taste
+5. **If your contribution is good**, the community sees it and the best work gets folded in — reviewed by verified humans with taste
 
 This means: you can't break the main repo. You can't inject bad code. You build in your own space, the community sees your work, and the best stuff gets pulled in. Your fork is your workspace. The main repo is the curated output.
 

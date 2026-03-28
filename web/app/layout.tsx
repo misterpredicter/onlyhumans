@@ -72,9 +72,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </nav>
 
               <div className="site-actions">
-                <div className="site-actions__badge">
-                  <SplitBadge compact tone="dark" />
-                </div>
                 <Link href="/join" className="site-cta">
                   Join Project
                 </Link>
@@ -103,7 +100,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 </p>
               </div>
               <div className="site-footer__meta">
-                <SplitBadge />
                 <div className="site-footer__links">
                   <Link href="/join">Join</Link>
                   <Link href="/spec">Spec</Link>

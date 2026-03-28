@@ -370,6 +370,44 @@ export default function Home() {
         </div>
         </ScrollReveal>
       </section>
+
+      {/* Founder's Note */}
+      <section style={{ padding: "60px 24px", backgroundColor: "#F4F2ED" }}>
+        <div style={{ maxWidth: "580px", margin: "0 auto" }}>
+          <p style={{
+            fontFamily: "var(--font-dm-serif)",
+            fontSize: "13px",
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+            color: "#9CA3AF",
+            marginBottom: "16px",
+          }}>
+            A note
+          </p>
+          <p style={{
+            fontFamily: "var(--font-dm-sans)",
+            fontSize: "15px",
+            lineHeight: 1.8,
+            color: "#6B7280",
+          }}>
+            Is a lot of this rough? Yes. This is a hackathon project built in a weekend.
+            Are we here because agents, monetizable tasks, and frontier technology feel
+            genuinely exciting? Also yes. Is a network of people who feel that way
+            worth something? We think so. We're testing that in public.
+          </p>
+          <p style={{
+            fontFamily: "var(--font-dm-sans)",
+            fontSize: "15px",
+            lineHeight: 1.8,
+            color: "#6B7280",
+            marginTop: "12px",
+          }}>
+            The interesting question isn't whether the code is polished. It's whether
+            coordination between humans and agents produces something worth more
+            than the sum of its parts. That's the experiment. Come find out with us.
+          </p>
+        </div>
+      </section>
     </>
   );
 }
