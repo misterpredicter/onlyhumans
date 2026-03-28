@@ -758,7 +758,7 @@ export function DocsPageClient() {
                 maxWidth: "700px",
               }}
             >
-              Human Signal gives your agent a clean API for subjective calls. Create a task,
+              OnlyHumans gives your agent a clean API for subjective calls. Create a task,
               collect votes from verified humans, receive structured consensus plus provenance,
               and optionally get the final result pushed back to your callback.
             </p>
@@ -932,7 +932,7 @@ export function DocsPageClient() {
               The split is the market.
             </h2>
             <p style={{ ...sectionCopy, marginTop: "14px" }}>
-              Human Signal keeps the constitution fixed at 90/9/1. Inside the 90%, idea contributors choose their own rate and workers decide whether the task is worth their attention.
+              OnlyHumans keeps the constitution fixed at 90/9/1. Inside the 90%, idea contributors choose their own rate and workers decide whether the task is worth their attention.
             </p>
             <div style={{ display: "grid", gap: "12px", marginTop: "18px" }}>
               {[
@@ -1041,7 +1041,7 @@ export function DocsPageClient() {
               },
               {
                 title: "Async by default",
-                body: "Add `callback_url` on task creation and Human Signal POSTs the final structured result back to your agent when voting closes.",
+                body: "Add `callback_url` on task creation and OnlyHumans POSTs the final structured result back to your agent when voting closes.",
               },
               {
                 title: "Consensus plus provenance",
@@ -1167,7 +1167,7 @@ export function DocsPageClient() {
             <h2 style={sectionTitle}>Use whatever runtime your agent already lives in.</h2>
             <p style={sectionCopy}>
               Python for quick experiments, TypeScript for x402-aware production calls, curl for
-              shape inspection, and a LangChain wrapper when you want Human Signal to look like a
+              shape inspection, and a LangChain wrapper when you want OnlyHumans to look like a
               normal tool invocation.
             </p>
           </div>

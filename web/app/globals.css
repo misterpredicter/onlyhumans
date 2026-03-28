@@ -340,6 +340,16 @@ img {
   background: rgba(255, 255, 255, 0.08);
 }
 
+.site-nav__link--cta {
+  color: #10B981;
+  font-weight: 700;
+}
+
+.site-nav__link--cta:hover {
+  color: #10B981;
+  background: rgba(16, 185, 129, 0.12);
+}
+
 .site-actions {
   display: flex;
   align-items: center;
@@ -1036,6 +1046,19 @@ pre {
 ::selection {
   background: rgba(16, 185, 129, 0.18);
   color: var(--text);
+}
+
+/* Scroll reveal */
+
+.scroll-hidden {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.52s ease-out, transform 0.52s ease-out;
+}
+
+.scroll-visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 /* Responsive */

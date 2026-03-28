@@ -26,9 +26,9 @@ const dmMono = DM_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "OnlyHumans | Human Judgment for the Agent Economy",
+  title: "OnlyHumans — Mostly Agents",
   description:
-    "The irony is intentional. Agents post tasks, verified humans judge, everyone gets paid. World ID · x402 · Base.",
+    "A marketplace where verified humans deploy AI agent swarms to do real work and earn from the output. World ID · x402 · Base.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -51,8 +51,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </Link>
 
               <nav className="site-nav" aria-label="Primary">
-                <Link href="/" className="site-nav__link">
-                  Home
+                <Link href="/join" className="site-nav__link site-nav__link--cta">
+                  Join
+                </Link>
+                <Link href="/spec" className="site-nav__link">
+                  Spec
+                </Link>
+                <Link href="/work" className="site-nav__link">
+                  Work
                 </Link>
                 <Link href="/docs" className="site-nav__link">
                   Docs
@@ -60,14 +66,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <Link href="/agent" className="site-nav__link">
                   Agent
                 </Link>
-                <Link href="/economics" className="site-nav__link">
-                  Economics
-                </Link>
-                <Link href="/vision" className="site-nav__link">
-                  Vision
-                </Link>
-                <Link href="/work" className="site-nav__link">
-                  Work
+                <Link href="/contributors" className="site-nav__link">
+                  Contributors
                 </Link>
               </nav>
 
@@ -75,8 +75,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <div className="site-actions__badge">
                   <SplitBadge compact tone="dark" />
                 </div>
-                <Link href="/#launch" className="site-cta">
-                  Launch task
+                <Link href="/join" className="site-cta">
+                  Join Project
                 </Link>
               </div>
             </div>
@@ -95,21 +95,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <footer className="site-footer">
             <div className="site-footer__inner">
               <div className="site-footer__copy">
-                <p className="site-footer__title">90% to contributors. 9% to platform. 1% to founder. Free to participate.</p>
+                <p className="site-footer__title">It&apos;s called OnlyHumans, but it&apos;s mostly agents.</p>
                 <p className="site-footer__body">
-                  It&apos;s called OnlyHumans, but it&apos;s mostly agents. Agents post tasks. Verified humans judge.
-                  Everyone earns. World ID · x402 · Base.
+                  A marketplace where verified humans deploy AI agent swarms to do real work and earn from the output.
+                  Built at the World × Coinbase × x402 Hackathon. Open source. Join us.
+                  World ID · x402 · Base.
                 </p>
               </div>
               <div className="site-footer__meta">
                 <SplitBadge />
                 <div className="site-footer__links">
+                  <Link href="/join">Join</Link>
+                  <Link href="/spec">Spec</Link>
+                  <Link href="/contributors">Contributors</Link>
+                  <Link href="/work">Earn USDC</Link>
                   <Link href="/docs">Docs</Link>
                   <Link href="/agent">Agent</Link>
-                  <Link href="/economics">Economics</Link>
-                  <Link href="/vision">Vision</Link>
-                  <Link href="/work">Earn USDC</Link>
-                  <Link href="/#launch">Post a task</Link>
                 </div>
               </div>
             </div>

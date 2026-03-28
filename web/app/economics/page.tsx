@@ -15,7 +15,7 @@ export default function EconomicsPage() {
                 Transparent incentives, not hidden margin.
               </h1>
               <p className="section-copy section-copy--dark" style={{ maxWidth: "620px" }}>
-                Human Signal is a market inside a constitution. 90% goes to contributors. 9% funds the platform. 1% goes to the founder. Idea contributors choose their own take rate inside the 90%, and workers decide whether it is worth their attention.
+                OnlyHumans is a market inside a constitution. The bulk goes to contributors. A variable percentage funds the platform. 1% goes to the founder. Idea contributors choose their own take rate, and workers decide whether it is worth their attention.
               </p>
 
               <div style={{ display: "grid", gap: "12px" }}>

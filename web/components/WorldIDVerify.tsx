@@ -148,7 +148,7 @@ export function WorldIDVerify({ onVerified }: Props) {
 
         <div style={{ display: "grid", gap: "8px" }}>
           {[
-            "Zero-knowledge proof. No identity data exposed to Human Signal.",
+            "Zero-knowledge proof. No identity data exposed to OnlyHumans.",
             "Nullifier hash prevents duplicate votes on the same task.",
           ].map((item) => (
             <div key={item} style={{ display: "flex", alignItems: "center", gap: "9px", fontSize: "12px", color: "#6B7280" }}>

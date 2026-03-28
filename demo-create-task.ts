@@ -1,5 +1,5 @@
 /**
- * Demo script: Create a task on Human Signal using real x402 payment.
+ * Demo script: Create a task on OnlyHumans using real x402 payment.
  *
  * Prerequisites:
  *   1. Fund the buyer wallet with testnet USDC on Base Sepolia:
@@ -26,8 +26,8 @@ const APP_URL = process.env.APP_URL ?? "https://www.themo.live";
 
 // ── Task content ────────────────────────────────────────────────────────
 const task = {
-  description: "Which design for Human Signal's homepage is better?",
-  context: "We're choosing between two homepage designs for Human Signal. Design A is our current polished version. Design B is an alternative direction. Which one would make you trust the product more?",
+  description: "Which design for OnlyHumans's homepage is better?",
+  context: "We're choosing between two homepage designs for OnlyHumans. Design A is our current polished version. Design B is an alternative direction. Which one would make you trust the product more?",
   options: [
     { label: "Design A", content: `${APP_URL}/demo/design-a.svg` },
     { label: "Design B", content: `${APP_URL}/demo/design-b.svg` },

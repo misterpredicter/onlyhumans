@@ -1,5 +1,5 @@
 /**
- * Human Signal founding constitution.
+ * OnlyHumans founding constitution.
  *
  * Total revenue always splits:
  *   90% contributors

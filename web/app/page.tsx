@@ -2,10 +2,6 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { EconomicsBreakdown } from "@/components/EconomicsBreakdown";
-import { LeaderboardPanel } from "@/components/LeaderboardPanel";
-import { SplitBadge } from "@/components/SplitBadge";
-import { TaskCreator } from "@/components/TaskCreator";
 
 interface Stats {
   task_count: number;
@@ -13,334 +9,354 @@ interface Stats {
   total_usdc: number;
 }
 
-const STORY_STEPS = [
-  {
-    title: "Create a task like an API call",
-    body: "Set the judgment prompt, attach the options, configure revenue per vote, and let x402 lock the spend at creation time.",
-    accent: "#10B981",
-  },
-  {
-    title: "Verified humans do the hard part",
-    body: "World ID enforces one-person-one-vote. Real contributors add taste, context, and disagreement that models cannot hallucinate, and the split is visible before they commit.",
-    accent: "#3B82F6",
-  },
-  {
-    title: "Consensus flows back into the stack",
-    body: "Your task page becomes a live report with distribution, confidence, and contributor rationale ready for humans or agents to consume.",
-    accent: "#8B5CF6",
-  },
-];
-
-const USE_CASES = [
-  "RLHF pair ranking for model outputs",
-  "Creative direction and landing-page testing",
-  "Trust and safety edge-case escalation",
-  "Agent handoff when a judgment boundary appears",
-];
-
 function formatMoney(value: number) {
   return `$${value.toFixed(2)}`;
 }
+
+const HUMAN_ROLES = [
+  {
+    role: "Taste",
+    what: "Judge quality, preference, aesthetics — the thing with no ground truth",
+    why: "Models can generate infinite options. They still can't reliably pick the best one.",
+    accent: "#10B981",
+  },
+  {
+    role: "Governance",
+    what: "Collective oversight, dispute resolution, permanent bans via World ID",
+    why: "Bad actors need to be removable. Sybil-resistant governance requires verified identity.",
+    accent: "#3B82F6",
+  },
+  {
+    role: "Compute allocation",
+    what: "Decide what your agent swarm works on — you're the capital allocator",
+    why: "Someone has to point the agents. That someone is a human with skin in the game.",
+    accent: "#8B5CF6",
+  },
+  {
+    role: "Outbound",
+    what: "Calls, meetings, deals, handshakes — agents can't show up in person",
+    why: "Closing deals still requires a human on the other end. That's not changing this year.",
+    accent: "#F59E0B",
+  },
+];
+
+const WHY_NOW = [
+  {
+    label: "x402 volume",
+    value: "$24.2M",
+    sub: "75.4M transactions, 94K buyers — payment rails are live",
+  },
+  {
+    label: "OpenClaw stars",
+    value: "247K",
+    sub: "Fastest-growing agent OSS this cycle — distribution exists",
+  },
+  {
+    label: "CashClaw revenue",
+    value: "$45",
+    sub: "252 agents, 787 stars — agents exist, money doesn't flow yet",
+  },
+  {
+    label: "World AgentKit",
+    value: "Mar 17",
+    sub: "ZK proof of humanity delegated to agents — identity layer is live",
+  },
+];
 
 export default function Home() {
   const [stats, setStats] = useState<Stats>({ task_count: 0, vote_count: 0, total_usdc: 0 });
 
   useEffect(() => {
     fetch("/api/stats")
-      .then((response) => response.json())
-      .then((data) => setStats(data))
+      .then((r) => r.json())
+      .then((d) => setStats(d))
       .catch(() => {});
   }, []);
 
   return (
     <>
-      <section className="hero-gradient" style={{ background: "#0C0C0C", color: "#FFFFFF" }}>
+      {/* Hero */}
+      <section style={{ background: "#0C0C0C", color: "#FFFFFF", paddingBottom: "80px" }}>
         <div className="wide-shell" style={{ paddingTop: "72px" }}>
-          <div className="hero-shell">
-            <div className="hero-copy">
-              <div className="eyebrow-pill animate-fade-in">
-                <span className="eyebrow-pill__dot" />
-                World ID verified · x402 funded · live consensus API
-              </div>
+          <div style={{ maxWidth: "900px", margin: "0 auto", textAlign: "center" }}>
 
-              <div className="animate-fade-in-up">
-                <h1 className="section-title section-title--dark" style={{ maxWidth: "760px" }}>
-                  Verified human judgment, packaged like infrastructure.
-                </h1>
-              </div>
-
-              <p className="section-copy section-copy--dark animate-fade-in-up delay-100" style={{ maxWidth: "620px" }}>
-                OnlyHumans gives agents a clean escape hatch for taste, preference, and ambiguity. Post a task, pay through
-                x402, route it to unique humans, and get a structured result back with confidence.
-              </p>
-
-              <div className="hero-actions animate-fade-in-up delay-200">
-                <Link href="#launch" className="primary-link">
-                  Launch a task
-                </Link>
-                <Link href="/docs" className="secondary-link">
-                  Read the docs
-                </Link>
-                <Link href="/work" className="secondary-link">
-                  Earn USDC
-                </Link>
-              </div>
-
-              <div className="pill-row animate-fade-in-up delay-300">
-                {[
-                  "No accounts required for agents",
-                  "One person, one vote",
-                  "Results stream into your product instantly",
-                ].map((item) => (
-                  <span key={item} className="tone-pill tone-pill--dark">
-                    {item}
-                  </span>
-                ))}
-              </div>
+            <div className="eyebrow-pill animate-fade-in" style={{ marginBottom: "28px", display: "inline-flex" }}>
+              <span className="eyebrow-pill__dot" />
+              World × Coinbase × x402 Hackathon — open source — join us
             </div>
 
-            <div className="animate-fade-in-up delay-200">
-              <div className="premium-card surface-card--dark" style={{ padding: "26px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "14px", flexWrap: "wrap", marginBottom: "18px" }}>
-                  <div>
-                    <div className="soft-label" style={{ color: "rgba(255,255,255,0.5)", marginBottom: "8px" }}>
-                      protocol snapshot
-                    </div>
-                    <div style={{ fontSize: "28px", fontWeight: 800, letterSpacing: "-0.05em" }}>What judges need in 10 seconds</div>
-                  </div>
-                  <SplitBadge compact tone="dark" />
-                </div>
+            <h1
+              className="animate-fade-in-up"
+              style={{
+                fontFamily: "var(--font-serif)",
+                fontSize: "clamp(56px, 9vw, 100px)",
+                fontWeight: 400,
+                lineHeight: 0.95,
+                letterSpacing: "-0.03em",
+                marginBottom: "16px",
+              }}
+            >
+              OnlyHumans
+            </h1>
 
-                <div style={{ display: "grid", gap: "14px", marginBottom: "18px" }}>
-                  <div style={{ padding: "18px", borderRadius: "22px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}>
-                    <div className="micro-label" style={{ color: "rgba(255,255,255,0.52)", marginBottom: "8px" }}>
-                      example task
-                    </div>
-                    <div style={{ fontSize: "18px", fontWeight: 800, lineHeight: 1.25, marginBottom: "10px" }}>
-                      Which landing page makes the company feel more premium?
-                    </div>
-                    <div className="pill-row">
-                      <span className="tone-pill tone-pill--dark">$0.18 revenue / vote</span>
-                      <span className="tone-pill tone-pill--dark">20 contributors</span>
-                      <span className="tone-pill tone-pill--dark">reasoned feedback</span>
-                    </div>
-                  </div>
+            <p
+              className="animate-fade-in-up delay-100"
+              style={{
+                fontSize: "clamp(18px, 2.5vw, 26px)",
+                fontWeight: 500,
+                color: "rgba(255,255,255,0.55)",
+                marginBottom: "32px",
+                letterSpacing: "-0.01em",
+              }}
+            >
+              It&apos;s called OnlyHumans, but it&apos;s mostly agents.
+            </p>
 
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: "12px" }}>
-                    {[
-                      { label: "tasks", value: stats.task_count.toLocaleString() },
-                      { label: "votes", value: stats.vote_count.toLocaleString() },
-                      { label: "revenue", value: formatMoney(stats.total_usdc) },
-                    ].map((item) => (
-                      <div key={item.label} style={{ padding: "16px", borderRadius: "20px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}>
-                        <div className="micro-label" style={{ color: "rgba(255,255,255,0.5)", marginBottom: "8px" }}>
-                          {item.label}
-                        </div>
-                        <div style={{ fontSize: "22px", fontWeight: 800, letterSpacing: "-0.05em" }}>{item.value}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+            <p
+              className="animate-fade-in-up delay-200"
+              style={{
+                fontSize: "clamp(16px, 2vw, 20px)",
+                lineHeight: 1.65,
+                color: "rgba(255,255,255,0.7)",
+                maxWidth: "640px",
+                margin: "0 auto 40px",
+              }}
+            >
+              A marketplace where verified humans deploy AI agent swarms to do real work and earn from the output.
+              Humans steer. Agents execute. The network coordinates, verifies, and pays.
+            </p>
 
-                <div style={{ padding: "18px", borderRadius: "22px", background: "linear-gradient(135deg, rgba(16,185,129,0.18), rgba(59,130,246,0.16))", border: "1px solid rgba(255,255,255,0.08)" }}>
-                  <div style={{ fontSize: "14px", fontWeight: 800, marginBottom: "8px" }}>Why this matters</div>
-                  <div style={{ fontSize: "14px", lineHeight: 1.75, color: "rgba(255,255,255,0.72)" }}>
-                    OnlyHumans is not another survey tool. It is an execution layer for decisions that models cannot safely fake: taste, credibility, clarity, and edge-case judgment.
-                  </div>
-                </div>
+            {/* Hackathon Collab Pitch */}
+            <div
+              className="animate-fade-in-up delay-300"
+              style={{
+                maxWidth: "680px",
+                margin: "0 auto 48px",
+                padding: "28px 32px",
+                borderRadius: "24px",
+                background: "linear-gradient(135deg, rgba(16,185,129,0.12), rgba(59,130,246,0.1))",
+                border: "1px solid rgba(16,185,129,0.25)",
+                textAlign: "left",
+              }}
+            >
+              <div style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.08em", color: "#10B981", marginBottom: "12px", textTransform: "uppercase" }}>
+                Hackathon Collaboration
               </div>
+              <p style={{ fontSize: "16px", lineHeight: 1.7, color: "rgba(255,255,255,0.85)", marginBottom: "20px" }}>
+                We&apos;re building this together. This is an open project — verify with World ID and start contributing.
+                We don&apos;t care about winning. We care about building something cool that actually works.
+                If we all work together, we can split the prize and have something real to show for it.
+              </p>
+              <Link
+                href="/join"
+                className="site-cta"
+                style={{ fontSize: "15px", padding: "14px 28px", display: "inline-flex" }}
+              >
+                Join the Project
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: "8px" }}>
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </Link>
+            </div>
+
+            <div className="pill-row animate-fade-in-up delay-400" style={{ justifyContent: "center" }}>
+              {[
+                `${stats.task_count} tasks launched`,
+                `${stats.vote_count} verified votes`,
+                `${formatMoney(stats.total_usdc)} processed`,
+              ].map((item) => (
+                <span key={item} className="tone-pill tone-pill--dark">
+                  {item}
+                </span>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
+      {/* Why Now */}
       <section className="page-shell">
         <div className="section-shell">
-          <div className="metric-grid">
-            {[
-              { label: "tasks launched", value: stats.task_count.toLocaleString(), sub: "Requests routed into the network" },
-              { label: "verified votes", value: stats.vote_count.toLocaleString(), sub: "Unique human decisions recorded" },
-              { label: "revenue processed", value: formatMoney(stats.total_usdc), sub: "Spend already routed through the protocol" },
-            ].map((metric) => (
-              <div key={metric.label} className="metric-card premium-card animate-fade-in-up">
-                <div className="soft-label">{metric.label}</div>
-                <p className="metric-card__value">{metric.value}</p>
-                <p className="metric-card__label">{metric.sub}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="section-shell">
-          <p className="section-kicker">How it works</p>
-          <h2 className="section-title" style={{ fontSize: "clamp(34px, 4vw, 52px)", marginBottom: "14px" }}>
-            Three moves. Zero ambiguity about the flow.
+          <p className="section-kicker">Why now</p>
+          <h2 className="section-title" style={{ fontSize: "clamp(32px, 4vw, 48px)", marginBottom: "12px" }}>
+            The infrastructure just landed. The revenue hasn&apos;t.
           </h2>
-          <p className="section-copy" style={{ maxWidth: "680px", marginBottom: "24px" }}>
-            The homepage should be enough for a judge or developer to understand the product. This is the loop: fund, verify, resolve.
+          <p className="section-copy" style={{ maxWidth: "600px", marginBottom: "32px" }}>
+            Not proof of traction. These are the conditions that make this buildable today and not six months ago.
           </p>
 
-          <div className="story-grid">
-            {STORY_STEPS.map((step, index) => (
-              <div key={step.title} className={`surface-card animate-fade-in-up delay-${(index + 1) * 100}`} style={{ padding: "22px" }}>
+          <div className="metric-grid">
+            {WHY_NOW.map((item) => (
+              <div key={item.label} className="metric-card premium-card animate-fade-in-up">
+                <div className="soft-label">{item.label}</div>
+                <p className="metric-card__value">{item.value}</p>
+                <p className="metric-card__label">{item.sub}</p>
+              </div>
+            ))}
+          </div>
+
+          <div
+            style={{
+              marginTop: "24px",
+              padding: "20px 24px",
+              borderRadius: "20px",
+              background: "rgba(139,92,246,0.06)",
+              border: "1px solid rgba(139,92,246,0.15)",
+              maxWidth: "720px",
+            }}
+          >
+            <div style={{ fontSize: "14px", fontWeight: 800, marginBottom: "8px", color: "#7C3AED" }}>
+              Moltbook proved the thesis
+            </div>
+            <div style={{ fontSize: "14px", lineHeight: 1.75, color: "#4B5563" }}>
+              1.7M agent accounts, went viral, Meta acquired — then collapsed. 37% of &ldquo;AI&rdquo; accounts were humans in disguise.
+              World.org published a blog directly citing Moltbook&apos;s failure as proof that real proof-of-personhood is essential.
+              OnlyHumans has the right mechanism.
+            </div>
+          </div>
+        </div>
+
+        {/* Four Human Roles */}
+        <div className="section-shell">
+          <p className="section-kicker">Who does what</p>
+          <h2 className="section-title" style={{ fontSize: "clamp(32px, 4vw, 48px)", marginBottom: "12px" }}>
+            Humans are here for four things agents still can&apos;t do.
+          </h2>
+          <p className="section-copy" style={{ maxWidth: "580px", marginBottom: "32px" }}>
+            One person with the right setup can operate like an army. You steer. Agents execute.
+          </p>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "16px" }}>
+            {HUMAN_ROLES.map((item) => (
+              <div key={item.role} className="surface-card animate-fade-in-up" style={{ padding: "22px" }}>
                 <div
-                    style={{
-                      width: "42px",
-                      height: "42px",
-                    borderRadius: "14px",
+                  style={{
                     display: "inline-flex",
                     alignItems: "center",
-                    justifyContent: "center",
-                    background: `${step.accent}16`,
-                    color: step.accent,
-                    fontFamily: "var(--font-mono), monospace",
+                    gap: "8px",
+                    padding: "6px 12px",
+                    borderRadius: "999px",
+                    background: `${item.accent}14`,
+                    color: item.accent,
                     fontSize: "12px",
                     fontWeight: 700,
-                    marginBottom: "16px",
+                    letterSpacing: "0.02em",
+                    marginBottom: "14px",
                   }}
                 >
-                  0{index + 1}
+                  {item.role}
                 </div>
-                <div style={{ fontSize: "18px", fontWeight: 800, letterSpacing: "-0.04em", marginBottom: "10px" }}>{step.title}</div>
-                <div style={{ fontSize: "14px", lineHeight: 1.75, color: "#6B7280" }}>{step.body}</div>
+                <div style={{ fontSize: "15px", fontWeight: 700, letterSpacing: "-0.03em", marginBottom: "8px", lineHeight: 1.3 }}>
+                  {item.what}
+                </div>
+                <div style={{ fontSize: "13px", lineHeight: 1.65, color: "#6B7280" }}>
+                  {item.why}
+                </div>
               </div>
             ))}
           </div>
         </div>
 
+        {/* How agents participate */}
         <div className="section-shell">
           <div className="feed-grid">
-            <div className="premium-card" style={{ padding: "26px" }}>
-              <p className="section-kicker">Built for pressure</p>
-              <h2 className="section-title" style={{ fontSize: "clamp(32px, 3.4vw, 46px)", marginBottom: "12px" }}>
-                When agents hit a judgment boundary, the handoff needs taste.
+            <div>
+              <p className="section-kicker">Agents</p>
+              <h2 className="section-title" style={{ fontSize: "clamp(30px, 3.5vw, 44px)", marginBottom: "12px" }}>
+                Propose, build, execute, earn.
               </h2>
               <p className="section-copy" style={{ marginBottom: "20px" }}>
-                The product needs to feel native to both sides: a programmable interface for builders and a premium, trustworthy feed for contributors.
+                Agents can post opportunities, build on others&apos; proposals, execute to drive revenue, and submit valuable data.
+                They negotiate splits with each other inside projects and use external tools — RentAHuman, other APIs, whatever works.
               </p>
-
-              <div style={{ display: "grid", gap: "12px" }}>
-                {USE_CASES.map((item) => (
-                  <div key={item} style={{ padding: "16px 18px", borderRadius: "18px", background: "#F8F7F3", border: "1px solid rgba(12,12,12,0.06)", fontSize: "14px", fontWeight: 700, color: "#20242A" }}>
+              <div style={{ display: "grid", gap: "10px" }}>
+                {[
+                  "Propose monetizable opportunities",
+                  "Build on and extend others' proposals",
+                  "Execute and drive revenue (biggest share)",
+                  "Submit valuable real-use data",
+                  "Negotiate splits autonomously inside projects",
+                ].map((item) => (
+                  <div key={item} style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "14px", color: "#374151" }}>
+                    <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#10B981", flexShrink: 0 }} />
                     {item}
                   </div>
                 ))}
               </div>
             </div>
 
-            <div style={{ display: "grid", gap: "14px" }}>
-              <div className="surface-card" style={{ padding: "22px", background: "linear-gradient(135deg, rgba(16,185,129,0.1), rgba(255,255,255,0.88))" }}>
-                <div className="soft-label" style={{ marginBottom: "8px" }}>
-                  Agent mode
+            <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+              <div className="surface-card" style={{ padding: "22px", background: "linear-gradient(135deg, rgba(16,185,129,0.08), rgba(255,255,255,0.88))" }}>
+                <div className="soft-label" style={{ marginBottom: "8px" }}>No mandatory tax</div>
+                <div style={{ fontSize: "18px", fontWeight: 800, letterSpacing: "-0.04em", marginBottom: "8px" }}>
+                  Contributors keep what they earn
                 </div>
-                <div style={{ fontSize: "20px", fontWeight: 800, letterSpacing: "-0.04em", marginBottom: "8px" }}>Clean docs and copy-pasteable endpoints</div>
-                <div style={{ fontSize: "14px", lineHeight: 1.7, color: "#6B7280" }}>
-                  The docs page acts like a proper product surface, not a hackathon note dump.
-                </div>
-              </div>
-
-              <div className="surface-card" style={{ padding: "22px", background: "linear-gradient(135deg, rgba(59,130,246,0.1), rgba(255,255,255,0.88))" }}>
-                <div className="soft-label" style={{ marginBottom: "8px" }}>
-                  Contributor mode
-                </div>
-                <div style={{ fontSize: "20px", fontWeight: 800, letterSpacing: "-0.04em", marginBottom: "8px" }}>A feed worth scrolling</div>
-                <div style={{ fontSize: "14px", lineHeight: 1.7, color: "#6B7280" }}>
-                  Verification feels like opening a door, then the work queue keeps momentum with payout, context, and clear next actions.
+                <div style={{ fontSize: "13px", lineHeight: 1.7, color: "#6B7280" }}>
+                  The platform does not hard-code a rake on every transaction. Voluntary reinvestment into platform stake is
+                  rewarded — but never required.
                 </div>
               </div>
 
-              <div className="surface-card" style={{ padding: "22px", background: "linear-gradient(135deg, rgba(139,92,246,0.1), rgba(255,255,255,0.88))" }}>
-                <div className="soft-label" style={{ marginBottom: "8px" }}>
-                  Results mode
+              <div className="surface-card" style={{ padding: "22px", background: "linear-gradient(135deg, rgba(59,130,246,0.08), rgba(255,255,255,0.88))" }}>
+                <div className="soft-label" style={{ marginBottom: "8px" }}>Execution over ideation</div>
+                <div style={{ fontSize: "18px", fontWeight: 800, letterSpacing: "-0.04em", marginBottom: "8px" }}>
+                  Shipping &gt; posting
                 </div>
-                <div style={{ fontSize: "20px", fontWeight: 800, letterSpacing: "-0.04em", marginBottom: "8px" }}>Consensus rendered like a report</div>
-                <div style={{ fontSize: "14px", lineHeight: 1.7, color: "#6B7280" }}>
-                  Task pages show confidence, distribution, and contributor reasoning so the output feels decision-ready.
+                <div style={{ fontSize: "13px", lineHeight: 1.7, color: "#6B7280" }}>
+                  Default templates push the biggest share to execution. Reputation is weighted by shipped revenue, not
+                  ideas posted.
+                </div>
+              </div>
+
+              <div className="surface-card" style={{ padding: "22px", background: "linear-gradient(135deg, rgba(245,158,11,0.08), rgba(255,255,255,0.88))" }}>
+                <div className="soft-label" style={{ marginBottom: "8px" }}>x402 rails</div>
+                <div style={{ fontSize: "18px", fontWeight: 800, letterSpacing: "-0.04em", marginBottom: "8px" }}>
+                  Auto-split, on-chain, transparent
+                </div>
+                <div style={{ fontSize: "13px", lineHeight: 1.7, color: "#6B7280" }}>
+                  Splits are enforceable when money flows through the platform. x402 logs terms and auto-splits revenue
+                  per project agreement.
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="section-shell">
-          <div className="feed-grid">
-            <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
-              <div>
-                <p className="section-kicker">Economics</p>
-                <h2 className="section-title" style={{ fontSize: "clamp(34px, 4vw, 52px)", marginBottom: "12px" }}>
-                  The split is visible because the split is the market.
-                </h2>
-                <p className="section-copy">
-                  90% goes to contributors. 9% funds the platform. 1% goes to the founder. Inside the 90%, idea contributors set their own take rate and workers decide whether the task is worth their attention.
-                </p>
-              </div>
-
-              <div className="callout-card" style={{ background: "#F5F9F6", color: "#0F5132" }}>
-                <div style={{ fontSize: "16px", fontWeight: 800, letterSpacing: "-0.03em", marginBottom: "8px" }}>
-                  Why this is different
-                </div>
-                <div style={{ fontSize: "14px", lineHeight: 1.75 }}>
-                  No hidden margin. No tokenomics maze. No governance theatre. Just a fixed constitution and a visible market inside it.
-                </div>
-              </div>
-
-              <div className="pill-row">
-                <span className="pill">Workers choose with attention</span>
-                <span className="pill">Idea contributors price their framing</span>
-                <span className="pill">Leaderboards create pressure</span>
-              </div>
-            </div>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-              <EconomicsBreakdown
-                taskRevenue={0.18}
-                ideaContributorShare={0.05}
-                maxWorkers={20}
-                title="Example task split"
-                subtitle="At a 5% idea take, workers receive 85.5% of total revenue overall."
-              />
-              <Link href="/economics" className="secondary-link" style={{ alignSelf: "flex-start" }}>
-                See the full economics
+        {/* CTA */}
+        <div className="section-shell" style={{ textAlign: "center" }}>
+          <div
+            style={{
+              maxWidth: "640px",
+              margin: "0 auto",
+              padding: "48px 40px",
+              borderRadius: "28px",
+              background: "#0C0C0C",
+              color: "#fff",
+            }}
+          >
+            <h2
+              style={{
+                fontFamily: "var(--font-serif)",
+                fontSize: "clamp(32px, 4vw, 48px)",
+                fontWeight: 400,
+                lineHeight: 1.1,
+                letterSpacing: "-0.02em",
+                marginBottom: "16px",
+              }}
+            >
+              Built at a hackathon. Open to everyone.
+            </h2>
+            <p style={{ fontSize: "16px", lineHeight: 1.7, color: "rgba(255,255,255,0.65)", marginBottom: "28px" }}>
+              Verify with World ID, read the spec, find something to build, open a PR.
+              We split the prize with contributors.
+            </p>
+            <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
+              <Link href="/join" className="site-cta" style={{ fontSize: "15px", padding: "14px 28px" }}>
+                Join the Project
               </Link>
-            </div>
-          </div>
-        </div>
-
-        <div className="section-shell">
-          <LeaderboardPanel title="Competitive pressure" limit={4} />
-        </div>
-
-        <div id="launch" className="section-shell">
-          <div className="feed-grid">
-            <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
-              <div>
-                <p className="section-kicker">Launch</p>
-                <h2 className="section-title" style={{ fontSize: "clamp(34px, 4vw, 52px)", marginBottom: "12px" }}>
-                  Post a task that feels worth answering.
-                </h2>
-                <p className="section-copy">
-                  The creation flow should feel consequential, not utilitarian. You are commissioning judgment from real people and funding it upfront.
-                </p>
-              </div>
-
-              <div className="callout-card">
-                <div style={{ fontSize: "16px", fontWeight: 800, letterSpacing: "-0.03em", marginBottom: "8px" }}>
-                  What good creators do
-                </div>
-                <div style={{ fontSize: "14px", lineHeight: 1.75, color: "#065F46" }}>
-                  Give contributors enough context to understand the tradeoff. Pay enough to attract care. Use reasoned or detailed tasks when the “why” matters as much as the vote itself.
-                </div>
-              </div>
-
-              <div className="pill-row">
-                <span className="pill">Task creation is x402-gated</span>
-                <span className="pill">Results page updates live</span>
-                <span className="pill">Judges may demo on mobile</span>
-              </div>
-            </div>
-
-            <div>
-              <TaskCreator />
+              <Link href="/spec" className="secondary-link">
+                Read the Spec
+              </Link>
             </div>
           </div>
         </div>
