@@ -130,7 +130,7 @@ export default function Home() {
                     {[
                       { label: "tasks", value: stats.task_count.toLocaleString() },
                       { label: "votes", value: stats.vote_count.toLocaleString() },
-                      { label: "paid", value: formatMoney(stats.total_usdc) },
+                      { label: "revenue", value: formatMoney(stats.total_usdc) },
                     ].map((item) => (
                       <div key={item.label} style={{ padding: "16px", borderRadius: "20px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}>
                         <div className="micro-label" style={{ color: "rgba(255,255,255,0.5)", marginBottom: "8px" }}>
@@ -160,7 +160,7 @@ export default function Home() {
             {[
               { label: "tasks launched", value: stats.task_count.toLocaleString(), sub: "Requests routed into the network" },
               { label: "verified votes", value: stats.vote_count.toLocaleString(), sub: "Unique human decisions recorded" },
-              { label: "USDC paid", value: formatMoney(stats.total_usdc), sub: "Spend already routed through the protocol" },
+              { label: "revenue processed", value: formatMoney(stats.total_usdc), sub: "Spend already routed through the protocol" },
             ].map((metric) => (
               <div key={metric.label} className="metric-card premium-card animate-fade-in-up">
                 <div className="soft-label">{metric.label}</div>

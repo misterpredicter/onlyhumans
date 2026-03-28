@@ -150,7 +150,7 @@ export async function POST(
       VALUES (
         ${voteId}, ${id}, ${bounty}, ${split.worker},
         ${split.idea_contributor}, ${split.platform}, ${split.founder},
-        ${split.early_collaborator}, ${ideaShare}
+        0, ${ideaShare}
       )
     `;
 
@@ -207,7 +207,6 @@ export async function POST(
         idea_contributor_accrued: split.idea_contributor,
         platform_accrued: split.platform,
         founder_accrued: split.founder,
-        early_collaborator_accrued: split.early_collaborator,
       },
     });
   } catch (error) {

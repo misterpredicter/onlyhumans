@@ -24,6 +24,11 @@ export const ECONOMICS = {
 export const CONTRIBUTOR_SHARE = ECONOMICS.CONTRIBUTORS;
 export const PLATFORM_FUND = ECONOMICS.PLATFORM;
 export const FOUNDER_SHARE = ECONOMICS.FOUNDER;
+export const PRICING_GUIDE = {
+  quick: "$0.08/vote",
+  reasoned: "$0.20/vote",
+  detailed: "$0.50/vote",
+} as const;
 
 function normalizeIdeaContributorShare(ideaContributorShare: number) {
   if (Number.isFinite(ideaContributorShare)) {

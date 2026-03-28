@@ -44,7 +44,7 @@ export async function GET() {
         economics: {
           contributor_share: `${Math.round(CONTRIBUTOR_SHARE * 100)}%`,
           platform_fund: `${Math.round(PLATFORM_FUND * 100)}%`,
-          founder: `${Math.round((ECONOMICS.FOUNDER + ECONOMICS.EARLY_COLLABORATOR) * 100)}%`,
+          founder: `${Math.round(ECONOMICS.FOUNDER * 100)}%`,
         },
       },
       {

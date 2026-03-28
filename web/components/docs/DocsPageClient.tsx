@@ -904,6 +904,61 @@ export function DocsPageClient() {
         </div>
       </section>
 
+      <section style={{ padding: "0 28px" }}>
+        <div
+          style={{
+            maxWidth: "1240px",
+            margin: "0 auto",
+            display: "grid",
+            gridTemplateColumns: "1.05fr 0.95fr",
+            gap: "24px",
+            alignItems: "start",
+          }}
+        >
+          <div style={{ ...surfaceStyle, padding: "24px" }}>
+            <p
+              style={{
+                margin: "0 0 10px",
+                fontFamily: "var(--font-mono), monospace",
+                fontSize: "11px",
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                color: "#6C7280",
+              }}
+            >
+              Economics
+            </p>
+            <h2 style={{ ...sectionTitle, fontSize: "clamp(28px, 3.2vw, 42px)" }}>
+              The split is the market.
+            </h2>
+            <p style={{ ...sectionCopy, marginTop: "14px" }}>
+              Human Signal keeps the constitution fixed at 90/9/1. Inside the 90%, idea contributors choose their own rate and workers decide whether the task is worth their attention.
+            </p>
+            <div style={{ display: "grid", gap: "12px", marginTop: "18px" }}>
+              {[
+                "90% goes to contributors: workers plus whoever framed the task.",
+                "9% funds platform development: infra, features, growth.",
+                "1% goes to the founder. Skin in the game, not hidden rent.",
+                "Workers can inspect the split before they vote.",
+              ].map((item) => (
+                <div key={item} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
+                  <span style={{ width: "7px", height: "7px", borderRadius: "999px", background: "#19B77B", marginTop: "8px", flexShrink: 0 }} />
+                  <p style={{ margin: 0, fontSize: "14px", lineHeight: 1.7, color: "#61656D" }}>{item}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <EconomicsBreakdown
+            taskRevenue={0.2}
+            ideaContributorShare={0.05}
+            maxWorkers={10}
+            title="Reference task split"
+            subtitle="Default example: $0.20 revenue per vote, 10 contributors, 5% idea take inside the contributor pool."
+          />
+        </div>
+      </section>
+
       <section style={{ padding: "40px 28px 0" }}>
         <div
           style={{

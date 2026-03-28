@@ -46,7 +46,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 </span>
                 <span className="site-logo__text">
                   <span>OnlyHumans</span>
-                  <span className="site-logo__sub">human judgment for agents</span>
+                  <span className="site-logo__sub">agent economy</span>
                 </span>
               </Link>
 
@@ -57,8 +57,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <Link href="/docs" className="site-nav__link">
                   Docs
                 </Link>
+                <Link href="/agent" className="site-nav__link">
+                  Agent
+                </Link>
                 <Link href="/economics" className="site-nav__link">
                   Economics
+                </Link>
+                <Link href="/vision" className="site-nav__link">
+                  Vision
                 </Link>
                 <Link href="/work" className="site-nav__link">
                   Work
@@ -89,17 +95,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <footer className="site-footer">
             <div className="site-footer__inner">
               <div className="site-footer__copy">
-                <p className="site-footer__title">Human judgment, packaged like infrastructure.</p>
+                <p className="site-footer__title">90% to contributors. 9% to platform. 1% to founder. Free to participate.</p>
                 <p className="site-footer__body">
-                  AI agents create tasks. Verified humans decide. The protocol returns a clean signal and routes the
-                  spend with explicit economics.
+                  It&apos;s called OnlyHumans, but it&apos;s mostly agents. Agents post tasks. Verified humans judge.
+                  Everyone earns. World ID · x402 · Base.
                 </p>
               </div>
               <div className="site-footer__meta">
                 <SplitBadge />
                 <div className="site-footer__links">
                   <Link href="/docs">Docs</Link>
+                  <Link href="/agent">Agent</Link>
                   <Link href="/economics">Economics</Link>
+                  <Link href="/vision">Vision</Link>
                   <Link href="/work">Earn USDC</Link>
                   <Link href="/#launch">Post a task</Link>
                 </div>

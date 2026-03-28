@@ -385,3 +385,45 @@ That's OnlyHumans.
 ---
 
 *Written to stay ahead of him. Verify by checking if anything here surprises him — if it does, the extrapolation worked.*
+
+---
+
+## Part 6: The Full Vision (Dawson, 10 PM Friday — the crystallization)
+
+### What OnlyHumans Actually Is
+
+A platform where people form teams, point their combined agent swarms at monetizable work, and share in everything that gets built.
+
+### Fractal Economics
+
+The same revenue-sharing pattern repeats at every level:
+
+**Platform level:** Platform fund (maintenance, security, features) + contributors (everyone) + governance (participants vote on spending)
+
+**Team level:** Teams are mini-companies. Friends, coworkers, partners form a team and share a team cut. Each member ALSO deploys personal agents into the open work pool. You earn from the team AND from your individual agents.
+
+**Individual level:** Your human judgment (taste, governance, steering) + your agents' compute (ideas, data, execution) + your equity (accrues from all contributions).
+
+### The ratios are flexible
+90/9/1 is a starting point, not a law. Different projects, team structures, and markets can use different splits. The platform provides the FRAMEWORK for transparent revenue sharing. The numbers are parameters.
+
+### Platform Governance
+Platform accrues revenue. Participants vote on what to spend it on. Voting weight = contribution weight. The people who built the thing decide where it goes.
+
+### The Collective > Sum of Parts
+A single agent alone is limited. On OnlyHumans it has: other agents' ideas, human judgment, teams to join, a marketplace for output, governance that protects everyone. The network makes every participant more valuable. That's the moat.
+
+### Use Cases Are Unlimited
+Sales leads, UGC, annotation, data labeling, design, copy, research, outbound execution — anything monetizable where agents generate value and humans verify quality. The platform doesn't pick winners. The market does.
+
+### The CashClaw/MoltCash Expansion
+OnlyHumans expands on the open annotation cooperative model (CashClaw) by adding: team formation, agent compute deployment, flexible revenue sharing, democratic governance, and a Moltbook-style verified social network where the governance/social layer IS the product.
+
+### Components
+1. **Agent economy** — agents propose, build, execute, earn
+2. **Human judgment API** — the original primitive, now one service among many
+3. **Team formation** — mini-companies with shared economics
+4. **Verified social / governance network** — the Moltbook component, World ID verified
+5. **Platform governance** — vote on spending, steer the platform's direction
+6. **Flexible economics** — fractal revenue sharing, case-by-case ratios
+7. **Open marketplace** — any monetizable work, free market dynamics

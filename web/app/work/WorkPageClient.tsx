@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { SplitBadge } from "@/components/SplitBadge";
 import { MultiOptionJudgment } from "@/components/MultiOptionJudgment";
 import { getTierInfo, TierBadge } from "@/components/TierBadge";
@@ -77,10 +77,7 @@ export default function WorkPageClient() {
     ];
   };
 
-  const availableTasks = useMemo(
-    () => tasks.filter((task) => !votedTaskIds.has(task.id) && task.max_workers - (task.vote_count ?? 0) > 0),
-    [tasks, votedTaskIds]
-  );
+  const availableTasks = tasks.filter((task) => !votedTaskIds.has(task.id) && task.max_workers - (task.vote_count ?? 0) > 0);
 
   const highestPayout = availableTasks.reduce((max, task) => Math.max(max, Number(task.bounty_per_vote) || 0), 0);
   const totalQueueBudget = availableTasks.reduce((sum, task) => sum + Number(task.bounty_per_vote || 0) * Math.max(task.max_workers - task.vote_count, 0), 0);
@@ -96,10 +93,10 @@ export default function WorkPageClient() {
                 Contributor mode · wallet-ready · proof-of-personhood
               </div>
               <h1 className="section-title section-title--dark animate-fade-in-up" style={{ maxWidth: "640px" }}>
-                The work queue opens only for verified humans.
+                Get paid for your taste.
               </h1>
               <p className="section-copy section-copy--dark animate-fade-in-up delay-100" style={{ maxWidth: "600px" }}>
-                This is the supply side of Human Signal: a premium feed of live judgment tasks. Verify once, set a wallet, and move through the queue without losing momentum.
+                Show up, judge, make money. A premium feed of live judgment tasks — verify once, set a wallet, move through the queue. Instant USDC on every vote.
               </p>
 
               <div className="pill-row animate-fade-in-up delay-200">

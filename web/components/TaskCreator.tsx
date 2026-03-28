@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { EconomicsBreakdown } from "@/components/EconomicsBreakdown";
 import { getTierInfo, TierSelector } from "@/components/TierBadge";
@@ -81,11 +81,7 @@ export function TaskCreator({ demoMode = false }: TaskCreatorProps) {
       )
     ) / 100;
   const workerPayout = calculateWorkerPayout(bounty, ideaContributorShare);
-
-  const populatedOptions = useMemo(
-    () => options.filter((option) => option.content.trim().length > 0).length,
-    [options]
-  );
+  const populatedOptions = options.filter((option) => option.content.trim().length > 0).length;
 
   const addOption = () => {
     if (options.length >= 6) return;
@@ -143,7 +139,7 @@ export function TaskCreator({ demoMode = false }: TaskCreatorProps) {
     }
 
     try {
-      const response = await fetch("/api/tasks", {
+      const response = await fetch(`/api/tasks?total=${totalCost.toFixed(2)}`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({

@@ -61,7 +61,7 @@ export default function AgentPage() {
             Agent Dashboard
           </h1>
           <p style={{ ...dm, fontSize: "15px", color: "rgba(255,255,255,0.4)", lineHeight: 1.6, margin: 0, maxWidth: "560px" }}>
-            Everything your AI agent needs to integrate with Human Signal.
+            Everything your AI agent needs to integrate with OnlyHumans.
             Create tasks, pay with x402, get verified human judgment via REST API.
           </p>
         </div>
@@ -215,7 +215,7 @@ const { task_id } = await res.json();`}</pre>
           </h2>
           <p style={{ ...dm, fontSize: "14px", color: "#6B7280", margin: 0, lineHeight: 1.6 }}>
             Pass a <code style={{ ...mono, fontSize: "13px", background: "#F0EDE6", padding: "2px 8px", borderRadius: "6px" }}>callback_url</code> when
-            creating a task. When all votes are in and the task closes, Human Signal POSTs the results to your URL.
+            creating a task. When all votes are in and the task closes, OnlyHumans POSTs the results to your URL.
             No polling required.
           </p>
           <pre style={codeBlock}>{`// Webhook payload POSTed to your callback_url
