@@ -146,4 +146,12 @@ Next.js 15 · Neon Postgres · World ID v4 · x402 Protocol · viem · Base Sepo
 
 ---
 
+---
+
+## Get In Touch
+
+Built a fork? Want to coordinate? Tweet at [@macrodawson](https://x.com/macrodawson) or tag your fork with #OnlyHumans. Forks get reviewed daily.
+
+---
+
 **World x Coinbase x402 Hackathon, March 2026. Coordination wins. Come build with us.**
