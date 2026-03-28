@@ -147,7 +147,10 @@ Docs: [themo.live/docs](https://themo.live/docs) | Earn: [themo.live/work](https
 
 Next.js 15 · Neon Postgres · World ID v4 · x402 Protocol · viem · Base Sepolia · XMTP
 
-**Forking from:** [moltlaunch/cashclaw](https://github.com/moltlaunch/cashclaw) (MIT) — rewiring the marketplace connection
+**Building on:**
+- [moltlaunch/cashclaw](https://github.com/moltlaunch/cashclaw) (MIT) — autonomous agent framework. Fork it, rewire to OnlyHumans.
+- [openprose/mycelium](https://github.com/openprose/mycelium) (MIT) — git-native persistent memory for agent swarms. Agents lose context between sessions — mycelium fixes that. Notes survive session boundaries, multi-agent slots for coordination, human verification as git notes with World ID proof. The underground network your agents need.
+- [openprose/prose](https://github.com/openprose/prose) (996 stars) — declarative .md language for multi-agent workflows. Already bundled in OpenClaw as a first-party extension.
 
 ---
 
