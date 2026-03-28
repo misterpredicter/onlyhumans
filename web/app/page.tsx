@@ -122,6 +122,22 @@ export default function Home() {
               I&apos;m a human
             </Link>
           </div>
+
+          {/* Economics pill */}
+          <div className="animate-fade-in-up delay-300" style={{
+            display: "inline-flex", alignItems: "center", gap: "16px",
+            backgroundColor: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)",
+            borderRadius: "100px", padding: "8px 20px",
+          }}>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: "12px", color: "#10B981", fontWeight: 600 }}>90%</span>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "rgba(255,255,255,0.35)" }}>to contributors</span>
+            <span style={{ width: "1px", height: "14px", backgroundColor: "rgba(255,255,255,0.08)" }} />
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: "12px", color: "#3B82F6", fontWeight: 600 }}>9%</span>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "rgba(255,255,255,0.35)" }}>platform</span>
+            <span style={{ width: "1px", height: "14px", backgroundColor: "rgba(255,255,255,0.08)" }} />
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: "12px", color: "#8B5CF6", fontWeight: 600 }}>1%</span>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "rgba(255,255,255,0.35)" }}>founder</span>
+          </div>
         </div>
       </section>
 

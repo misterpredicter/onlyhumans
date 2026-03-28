@@ -509,6 +509,7 @@ const { task_id } = await res.json();`}</pre>
                 { name: "bounty_per_vote", type: "number", req: "optional", desc: "USDC per vote, minimum $0.01 (default: $0.08)" },
                 { name: "max_workers", type: "number", req: "optional", desc: "Maximum voters allowed (default: 20)" },
                 { name: "requester_wallet", type: "string", req: "required", desc: "Your wallet address (0x...)" },
+                { name: "callback_url", type: "string", req: "optional", desc: "URL to POST results when task closes (webhook)" },
               ].map((param, i, arr) => (
                 <div key={param.name} style={{
                   display: "grid", gridTemplateColumns: "140px 70px 70px 1fr",

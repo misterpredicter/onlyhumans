@@ -15,11 +15,14 @@ OnlyHumans is the Twilio of human feedback. Post a question, pay via x402 USDC, 
 curl -X POST https://themo.live/api/tasks \
   -H "Content-Type: application/json" \
   -d '{
-    "question": "Which landing page converts better?",
-    "options": ["Minimal hero with single CTA", "Bold hero with social proof"],
+    "description": "Which landing page converts better?",
+    "options": [
+      {"label": "A", "content": "Minimal hero with single CTA"},
+      {"label": "B", "content": "Bold hero with social proof"}
+    ],
     "tier": "quick",
-    "bountyPerVote": "0.08",
-    "maxVoters": 10
+    "bounty_per_vote": "0.08",
+    "max_workers": 10
   }'
 
 # Check results
