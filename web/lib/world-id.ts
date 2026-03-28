@@ -25,10 +25,32 @@ export async function verifyWorldIdProof(proof: WorldIdProof): Promise<VerifyRes
     {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ ...proof, action }),
+      body: JSON.stringify({
+        action,
+        signal: proof.signal || "",
+        responses: [
+          {
+            proof: proof.proof,
+            merkle_root: proof.merkle_root,
+            nullifier_hash: proof.nullifier_hash,
+            verification_level: proof.verification_level,
+          },
+        ],
+      }),
     }
   );
 
   const data = await response.json();
+
+  // v4 API returns { responses: [{ success, nullifier_hash, ... }] }
+  if (data.responses && data.responses.length > 0) {
+    const r = data.responses[0];
+    return {
+      success: r.success ?? false,
+      nullifier_hash: r.nullifier_hash ?? proof.nullifier_hash,
+      detail: r.detail,
+    };
+  }
+
   return data as VerifyResult;
 }
