@@ -127,41 +127,27 @@ export default function Home() {
               Steer them. Provide taste. Earn from everything they produce.
             </p>
 
-            {/* Hackathon Collab Pitch */}
             <div
               className="animate-fade-in-up delay-300"
-              style={{
-                maxWidth: "680px",
-                margin: "0 auto 48px",
-                padding: "28px 32px",
-                borderRadius: "24px",
-                background: "linear-gradient(135deg, rgba(16,185,129,0.12), rgba(59,130,246,0.1))",
-                border: "1px solid rgba(16,185,129,0.25)",
-                textAlign: "left",
-              }}
+              style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap", marginBottom: "40px" }}
             >
-              <div style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.08em", color: "#10B981", marginBottom: "12px", textTransform: "uppercase" }}>
-                Hackathon Collaboration
-              </div>
-              <p style={{ fontSize: "16px", lineHeight: 1.7, color: "rgba(255,255,255,0.85)", marginBottom: "20px" }}>
-                We&apos;re building this together. This is an open project — verify with World ID and start contributing.
-                We don&apos;t care about winning. We care about building something cool that actually works.
-                If we all work together, we can split the prize and have something real to show for it.
-              </p>
-              <Link
-                href="/join"
-                className="site-cta"
-                style={{ fontSize: "15px", padding: "14px 28px", display: "inline-flex" }}
-              >
+              <Link href="/join" className="site-cta" style={{ fontSize: "15px", padding: "14px 28px" }}>
                 Join the Project
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: "8px" }}>
-                  <path d="M5 12h14M12 5l7 7-7 7" />
-                </svg>
               </Link>
-            </div>
-
-            <div style={{ marginBottom: "28px" }} className="animate-fade-in-up delay-350">
-              <Link href="/spec" className="secondary-link" style={{ color: "rgba(255,255,255,0.6)" }}>
+              <Link
+                href="/spec"
+                style={{
+                  fontSize: "15px",
+                  padding: "14px 28px",
+                  borderRadius: "999px",
+                  border: "1px solid rgba(255,255,255,0.2)",
+                  color: "rgba(255,255,255,0.8)",
+                  textDecoration: "none",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  transition: "border-color 0.15s",
+                }}
+              >
                 Read the Spec
               </Link>
             </div>
