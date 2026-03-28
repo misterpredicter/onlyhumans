@@ -1,3 +1,6 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import {
   ECONOMICS,
   calculateFounderFee,
@@ -16,7 +19,7 @@ interface EconomicsBreakdownProps {
   showFooter?: boolean;
 }
 
-const dm: React.CSSProperties = { fontFamily: "var(--font-sans), sans-serif" };
+const dm: { fontFamily: string } = { fontFamily: "var(--font-sans), sans-serif" };
 
 function formatUsd(value: number) {
   if (value === 0) return "$0.00";
@@ -37,6 +40,12 @@ export function EconomicsBreakdown({
   compact = false,
   showFooter = true,
 }: EconomicsBreakdownProps) {
+  const [animated, setAnimated] = useState(false);
+  useEffect(() => {
+    const t = requestAnimationFrame(() => setAnimated(true));
+    return () => cancelAnimationFrame(t);
+  }, []);
+
   const worker = calculateWorkerPayout(taskRevenue, ideaContributorShare);
   const idea = calculateIdeaContributorPayout(taskRevenue, ideaContributorShare);
   const platform = calculatePlatformFee(taskRevenue);
@@ -137,7 +146,7 @@ export function EconomicsBreakdown({
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: compact ? "10px" : "12px" }}>
-        {entries.map((entry) => (
+        {entries.map((entry, i) => (
           <div key={entry.key} style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -171,10 +180,11 @@ export function EconomicsBreakdown({
             >
               <div
                 style={{
-                  width: `${Math.max(entry.pct, 1)}%`,
+                  width: animated ? `${Math.max(entry.pct, 1)}%` : "0%",
                   height: "100%",
                   background: `linear-gradient(90deg, ${entry.color}, ${entry.color}CC)`,
                   borderRadius: "999px",
+                  transition: `width 0.7s cubic-bezier(0.4, 0, 0.2, 1) ${i * 0.1}s`,
                 }}
               />
             </div>
