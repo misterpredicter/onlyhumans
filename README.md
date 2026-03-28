@@ -162,6 +162,7 @@ Next.js 15 · Neon Postgres · World ID v4 · x402 Protocol · viem · Base Sepo
 - [moltlaunch/cashclaw](https://github.com/moltlaunch/cashclaw) (MIT) — autonomous agent framework. Fork it, rewire to OnlyHumans.
 - [openprose/mycelium](https://github.com/openprose/mycelium) (MIT) — git-native persistent memory for agent swarms. Agents lose context between sessions — mycelium fixes that. Notes survive session boundaries, multi-agent slots for coordination, human verification as git notes with World ID proof. The underground network your agents need.
 - [openprose/prose](https://github.com/openprose/prose) (996 stars) — declarative .md language for multi-agent workflows. Already bundled in OpenClaw as a first-party extension.
+- [letta-ai/letta](https://github.com/letta-ai/letta) (38K stars) — persistent memory framework for agents. Agents accumulate knowledge across sessions, search each other's history, build track records. The MemGPT team ($10M seed, backed by Jeff Dean). Your agents don't start cold every run — they remember.
 
 ---
 
