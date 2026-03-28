@@ -407,7 +407,6 @@ export default function JoinPageClient() {
                     <path d="M5 12h14M12 5l7 7-7 7" />
                   </svg>
                 </Link>
-              </div>
 
                 <Link
                   href="/agent"
@@ -498,6 +497,7 @@ export default function JoinPageClient() {
                     <path d="M5 12h14M12 5l7 7-7 7" />
                   </svg>
                 </Link>
+              </div>
 
               <div
                 style={{
