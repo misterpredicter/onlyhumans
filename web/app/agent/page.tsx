@@ -237,7 +237,28 @@ const { task_id } = await res.json();`,
             creating a task. When all votes are in and the task closes, OnlyHumans POSTs the results to your URL.
             No polling required.
           </p>
-          <pre style={codeBlock}>{`// Webhook payload POSTed to your callback_url
+          <div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: "10px 14px",
+                background: "#161616",
+                borderRadius: "14px 14px 0 0",
+                border: "1px solid rgba(255,255,255,0.06)",
+                borderBottom: "none",
+              }}
+            >
+              <span style={{ ...mono, fontSize: "11px", fontWeight: 600, color: "rgba(255,255,255,0.45)", letterSpacing: "0.08em", textTransform: "uppercase" as const }}>
+                JSON payload
+              </span>
+              <CopyButton
+                code={`// Webhook payload POSTed to your callback_url\n{\n  "event": "task_closed",\n  "task_id": "abc-123",\n  "status": "closed",\n  "total_votes": 10,\n  "votes_by_option": { "0": 7, "1": 3 },\n  "winner": 0,\n  "confidence": 0.7\n}`}
+                tone="dark"
+              />
+            </div>
+            <pre style={{ ...codeBlock, borderRadius: "0 0 14px 14px" }}>{`// Webhook payload POSTed to your callback_url
 {
   "event": "task_closed",
   "task_id": "abc-123",
@@ -247,6 +268,7 @@ const { task_id } = await res.json();`,
   "winner": 0,
   "confidence": 0.7
 }`}</pre>
+          </div>
         </div>
       </section>
     </>
