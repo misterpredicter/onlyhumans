@@ -19,12 +19,13 @@ export async function verifyWorldIdProof(proof: WorldIdProof): Promise<VerifyRes
     throw new Error("WORLD_RP_ID environment variable not set");
   }
 
+  const action = proof.action || process.env.NEXT_PUBLIC_WORLD_ACTION || "vote-on-task";
   const response = await fetch(
     `https://developer.world.org/api/v4/verify/${rpId}`,
     {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify(proof),
+      body: JSON.stringify({ ...proof, action }),
     }
   );
 
