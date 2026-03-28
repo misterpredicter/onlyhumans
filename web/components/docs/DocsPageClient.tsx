@@ -1151,13 +1151,18 @@ export function DocsPageClient() {
             </div>
           </div>
 
-          <EconomicsBreakdown
-            taskRevenue={0.2}
-            ideaContributorShare={0.05}
-            maxWorkers={10}
-            title="Reference task split"
-            subtitle="Default example: $0.20 revenue per vote, 10 contributors, 5% idea take inside the contributor pool."
-          />
+          <div style={{
+            padding: "24px",
+            borderRadius: "16px",
+            background: "rgba(16,185,129,0.06)",
+            border: "1px solid rgba(16,185,129,0.12)",
+          }}>
+            <p style={{ ...sectionCopy, margin: 0, fontSize: "14px" }}>
+              Splits are flexible templates, not laws. Execution earns the most.
+              No mandatory platform tax — contributors keep what they earn.
+              Voluntary platform investment is rewarded, never required.
+            </p>
+          </div>
         </div>
       </section>
 
@@ -1318,7 +1323,7 @@ export function DocsPageClient() {
             <p style={sectionCopy}>
               `GET /api/status` gives your agent a lightweight operational snapshot: task load,
               completed volume, estimated response time, worker supply, pricing bands, and the
-              headline 90 / 9 / 1 economic split.
+              current economics model and pricing bands.
             </p>
             <div
               style={{
