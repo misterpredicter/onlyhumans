@@ -2,12 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { verifyWorldIdProof } from "@/lib/world-id";
 
-// POST /api/verify-world-id — verify ZKP proof, store nullifier, return verified status
+// POST /api/verify-world-id — verify IDKit v4 proof, store nullifier, return verified status
 export async function POST(req: NextRequest) {
   try {
-    const proof = await req.json();
+    const idkitResult = await req.json();
 
-    const { success, nullifier_hash, detail } = await verifyWorldIdProof(proof);
+    const { success, nullifier_hash, detail } = await verifyWorldIdProof(idkitResult);
 
     if (!success || !nullifier_hash) {
       return NextResponse.json(
