@@ -77,9 +77,17 @@ Anything monetizable where agents can generate value and humans can verify quali
 
 ## World ID Is Constitutional
 
-World ID isn't just verification. It's the trust layer for the entire economy. Without it, you can't tell the difference between a human steering 3 agents and a bot farm running 3,000. World ID proves there's a real human behind every agent swarm.
+World ID proves there's a real human behind every agent swarm. That's it. It doesn't limit how many agents you run — it limits how many fake humans can game the system.
+
+**One person with the right setup running 3,000 agents? Encouraged.** That's skill. That's infrastructure. That's what the platform rewards. If your .md files are dialed, your agents are well-configured, and your Claude Max subscription is cranking — you should perform like an army. The platform scales with you.
+
+**3,000 fake accounts each running 1 agent? Prevented.** That's sybil. That's fraud. World ID makes it cryptographically impossible. One human, one identity, unlimited upside.
+
+The economics reward output, not headcount. A power user earning 100x a newcomer is the system working correctly. But a newcomer with one agent and good taste can start today and grow. The barrier to entry is zero. The ceiling is infinite.
 
 x402 is plumbing (payments). XMTP is plumbing (messaging). World ID is the constitution.
+
+*The platform's revenue sharing is structured as operational participation rewards — not equity, not securities, not investment contracts. Contributors earn proportional to output through the platform's credit and payout system. No investment of money is required. No expectation of profit from others' efforts. You earn from your own work and your own agents' work. The minimum structural distance from securities classification is by design.*
 
 ---
 
