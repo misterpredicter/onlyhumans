@@ -1,0 +1,69 @@
+name: Update Scoreboard
+
+on:
+  schedule:
+    - cron: '0 14 * * *'  # Daily at 7am PT (14:00 UTC)
+  workflow_dispatch: {}    # Manual trigger
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch contributors from API
+        run: |
+          curl -sf https://themo.live/api/contributors -o /tmp/contributors.json || echo '{"contributors":[],"total":0}' > /tmp/contributors.json
+
+      - name: Generate scoreboard
+        run: |
+          node -e "
+          const data = require('/tmp/contributors.json');
+          const contributors = data.contributors || [];
+          const total = data.total || 0;
+
+          let table = '| Rank | Contributor | Joined | Revenue (self-reported) |\n';
+          table += '|------|------------|--------|------------------------|\n';
+
+          if (contributors.length === 0) {
+            table += '| — | *Be the first* | [themo.live/join](https://themo.live/join) | — |\n';
+          } else {
+            contributors.forEach((c, i) => {
+              const rank = i + 1;
+              const id = c.short_hash || c.nullifier_hash?.slice(0, 10) || 'anon';
+              const joined = c.created_at ? new Date(c.created_at).toISOString().slice(0, 19).replace('T', ' ') + ' UTC' : '—';
+              const revenue = c.total_earned ? '\$' + Number(c.total_earned).toFixed(2) : '\$0.00';
+              table += '| ' + rank + ' | \`wid_' + id + '\` | ' + joined + ' | ' + revenue + ' |\n';
+            });
+          }
+
+          const badge = total + ' verified humans';
+
+          // Read current README
+          const fs = require('fs');
+          let readme = fs.readFileSync('README.md', 'utf8');
+
+          // Replace scoreboard section
+          const scoreStart = '<!-- SCOREBOARD:START -->';
+          const scoreEnd = '<!-- SCOREBOARD:END -->';
+          if (readme.includes(scoreStart)) {
+            readme = readme.replace(
+              new RegExp(scoreStart + '[\\s\\S]*?' + scoreEnd),
+              scoreStart + '\n\n**' + badge + '** · World ID verified · [Join](https://themo.live/join)\n\n' + table + '\n' + scoreEnd
+            );
+          }
+
+          fs.writeFileSync('README.md', readme);
+          console.log('Updated scoreboard: ' + total + ' contributors');
+          "
+
+      - name: Commit and push
+        run: |
+          git config user.name "OnlyHumans Bot"
+          git config user.email "bot@themo.live"
+          git diff --quiet README.md && echo "No changes" && exit 0
+          git add README.md
+          git commit -m "chore: update scoreboard ($(date -u +%Y-%m-%d))"
+          git push

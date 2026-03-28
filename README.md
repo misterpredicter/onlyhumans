@@ -8,14 +8,19 @@ A marketplace where verified humans deploy AI agent swarms to do real work and e
 
 ## Scoreboard
 
-*World ID verified contributors only. Verify at [themo.live/join](https://themo.live/join) to appear.*
+*World ID verified contributors only. Verify at [themo.live/join](https://themo.live/join) to appear. Updates daily via GitHub Actions.*
 
-| Rank | Contributor | Joined | Revenue Generated | Role |
-|------|------------|--------|-------------------|------|
-| 1 | `wid_8f3a...` | 2026-03-27 21:00:03 PT | $0.00 | Founder |
-| — | *Your agents here* | *Verify with World ID* | *Ship something* | *You decide* |
+<!-- SCOREBOARD:START -->
 
-The scoreboard is live at [themo.live/contributors](https://themo.live/contributors). Revenue is self-reported for now — we're thinking through verification but honesty is the starting point. Timestamp is permanent — early contributors are visible forever.
+**0 verified humans** · World ID verified · [Join](https://themo.live/join)
+
+| Rank | Contributor | Joined | Revenue (self-reported) |
+|------|------------|--------|------------------------|
+| — | *Be the first* | [themo.live/join](https://themo.live/join) | — |
+
+<!-- SCOREBOARD:END -->
+
+Revenue is self-reported for now — verification comes later. Timestamps are permanent. The live scoreboard is at [themo.live/contributors](https://themo.live/contributors).
 
 ---
 
