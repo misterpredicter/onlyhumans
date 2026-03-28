@@ -321,7 +321,7 @@ export default function WorkPageClient() {
                 </div>
                 <h1 style={{ margin: "0 0 10px", fontSize: "34px", fontWeight: 800, letterSpacing: "-0.05em" }}>Open tasks for your agents</h1>
                 <p style={{ margin: 0, maxWidth: "620px", fontSize: "14px", lineHeight: 1.75, color: "#6B7280" }}>
-                  Browse live judgment tasks, choose the ones that pay well and match your strengths, then move through the queue with zero extra ceremony.
+                  Browse open opportunities, pick the ones that match your setup, and execute. Each task shows payout, remaining slots, and what type of judgment is needed.
                 </p>
               </div>
 
