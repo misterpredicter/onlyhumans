@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
+import { ECONOMICS, calculateSplit } from "@/lib/economics";
 
 // GET /api/seed?key=<INIT_SECRET> — seed 5 demo tasks with fake workers and votes
 // Idempotent: checks for existing seed data before inserting.
@@ -16,6 +17,7 @@ interface SeedTask {
   tier: string;
   bounty_per_vote: number;
   max_workers: number;
+  idea_contributor_share: number;
   options: Array<{ label: string; content: string }>;
   vote_count: number;
 }
@@ -28,6 +30,7 @@ const DEMO_TASKS: SeedTask[] = [
     tier: "reasoned",
     bounty_per_vote: 0.12,
     max_workers: 20,
+    idea_contributor_share: 0.04,
     options: [
       { label: "Headline A", content: "Close More Deals with AI" },
       { label: "Headline B", content: "Your Sales Team, Supercharged" },
@@ -41,6 +44,7 @@ const DEMO_TASKS: SeedTask[] = [
     tier: "quick",
     bounty_per_vote: 0.08,
     max_workers: 25,
+    idea_contributor_share: 0.07,
     options: [
       {
         label: "Icon A",
@@ -60,6 +64,7 @@ const DEMO_TASKS: SeedTask[] = [
     tier: "quick",
     bounty_per_vote: 0.08,
     max_workers: 30,
+    idea_contributor_share: 0.05,
     options: [
       { label: "Copy A", content: "Get fit in 7 minutes a day" },
       { label: "Copy B", content: "The only workout app you'll actually stick with" },
@@ -73,6 +78,7 @@ const DEMO_TASKS: SeedTask[] = [
     tier: "detailed",
     bounty_per_vote: 0.2,
     max_workers: 30,
+    idea_contributor_share: 0.12,
     options: [
       {
         label: "Logo A",
@@ -96,6 +102,7 @@ const DEMO_TASKS: SeedTask[] = [
     tier: "reasoned",
     bounty_per_vote: 0.15,
     max_workers: 20,
+    idea_contributor_share: 0.03,
     options: [
       { label: "Copy A", content: "30-hour battery. ANC. Zero compromise." },
       { label: "Copy B", content: "Hear everything. Block everything else." },
@@ -168,14 +175,14 @@ export async function GET(req: NextRequest) {
         INSERT INTO tasks (
           description, option_a, option_b, option_a_label, option_b_label,
           bounty_per_vote, max_workers, requester_wallet,
-          context, tier, status
+          context, tier, status, idea_contributor_share
         )
         VALUES (
           ${t.description},
           ${opt0.content}, ${opt1.content},
           ${opt0.label}, ${opt1.label},
           ${t.bounty_per_vote}, ${t.max_workers}, ${DEMO_WALLET},
-          ${t.context}, ${t.tier}, 'open'
+          ${t.context}, ${t.tier}, 'open', ${t.idea_contributor_share}
         )
         RETURNING id
       `;
@@ -196,20 +203,66 @@ export async function GET(req: NextRequest) {
       // Insert votes — spread over the last 24 hours using JS timestamps
       const numOptions = t.options.length;
       const now = Date.now();
+      const ideaContributorShare =
+        t.idea_contributor_share ?? ECONOMICS.DEFAULT_IDEA_CONTRIBUTOR_SHARE;
 
       for (let v = 0; v < t.vote_count && v < fakeWorkers.length; v++) {
         const nullifier = fakeWorkers[v];
         const optionIndex = v % numOptions;
         // Legacy choice column: map 0→A, else→B (same logic as vote route)
         const choice = optionIndex === 0 ? "A" : "B";
+        const split = calculateSplit(t.bounty_per_vote, ideaContributorShare);
+        const txHash = `seed_tx_${taskId}_${String(v).padStart(4, "0")}`;
         // Spread timestamps evenly over the last 24h, oldest first
         const hoursAgo = ((t.vote_count - v) / t.vote_count) * 23 + 0.5;
         const createdAt = new Date(now - hoursAgo * 60 * 60 * 1000).toISOString();
 
-        await sql`
-          INSERT INTO votes (task_id, nullifier_hash, choice, option_index, created_at)
-          VALUES (${taskId}, ${nullifier}, ${choice}, ${optionIndex}, ${createdAt})
+        const { rows: voteRows } = await sql`
+          INSERT INTO votes (task_id, nullifier_hash, choice, option_index, payment_tx_hash, created_at)
+          VALUES (${taskId}, ${nullifier}, ${choice}, ${optionIndex}, ${txHash}, ${createdAt})
           ON CONFLICT (task_id, nullifier_hash) DO NOTHING
+          RETURNING id
+        `;
+
+        const voteId = voteRows[0]?.id;
+        if (!voteId) continue;
+
+        await sql`
+          UPDATE workers
+          SET total_earned = total_earned + ${split.worker}
+          WHERE nullifier_hash = ${nullifier}
+        `;
+
+        await sql`
+          INSERT INTO payments (type, wallet_address, amount_usdc, tx_hash, task_id, created_at)
+          VALUES ('worker_payout', ${DEMO_WALLET}, ${split.worker}, ${txHash}, ${taskId}, ${createdAt})
+        `;
+
+        await sql`
+          INSERT INTO platform_ledger (
+            vote_id,
+            task_id,
+            bounty_per_vote,
+            worker_amount,
+            idea_contributor_amount,
+            platform_amount,
+            founder_amount,
+            early_collaborator_amount,
+            idea_contributor_share,
+            created_at
+          )
+          VALUES (
+            ${voteId},
+            ${taskId},
+            ${t.bounty_per_vote},
+            ${split.worker},
+            ${split.idea_contributor},
+            ${split.platform},
+            ${split.founder},
+            0,
+            ${ideaContributorShare},
+            ${createdAt}
+          )
         `;
       }
     }
