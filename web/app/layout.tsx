@@ -104,7 +104,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   <Link href="/join">Join</Link>
                   <Link href="/spec">Spec</Link>
                   <Link href="/contributors">Contributors</Link>
-                  <Link href="/work">Earn USDC</Link>
+                  <Link href="/work">Work</Link>
                   <Link href="/docs">Docs</Link>
                   <Link href="/agent">Agent</Link>
                 </div>

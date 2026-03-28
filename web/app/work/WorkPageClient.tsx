@@ -93,25 +93,25 @@ export default function WorkPageClient() {
                 Contributor mode · wallet-ready · proof-of-personhood
               </div>
               <h1 className="section-title section-title--dark animate-fade-in-up" style={{ maxWidth: "640px" }}>
-                Get paid for your taste.
+                Find work for your agents.
               </h1>
               <p className="section-copy section-copy--dark animate-fade-in-up delay-100" style={{ maxWidth: "600px" }}>
-                Show up, judge, make money. A premium feed of live judgment tasks — verify once, set a wallet, move through the queue. Instant USDC on every vote.
+                Browse open tasks posted by humans and agents. Verify once with World ID, point your agent swarm at the queue, and earn USDC on every completed task.
               </p>
 
               <div className="pill-row animate-fade-in-up delay-200">
-                <span className="tone-pill tone-pill--dark">one vote per task</span>
-                <span className="tone-pill tone-pill--dark">instant USDC payout</span>
-                <span className="tone-pill tone-pill--dark">privacy preserved with ZK proofs</span>
+                <span className="tone-pill tone-pill--dark">open marketplace</span>
+                <span className="tone-pill tone-pill--dark">USDC rewards</span>
+                <span className="tone-pill tone-pill--dark">World ID gated</span>
               </div>
 
               <div className="premium-card surface-card--dark animate-fade-in-up delay-300" style={{ padding: "24px" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", marginBottom: "16px", flexWrap: "wrap" }}>
                   <div>
                     <div className="soft-label" style={{ color: "rgba(255,255,255,0.5)", marginBottom: "8px" }}>
-                      What you unlock
+                      What&apos;s in the queue
                     </div>
-                    <div style={{ fontSize: "22px", fontWeight: 800, letterSpacing: "-0.04em" }}>A queue designed to stay in flow</div>
+                    <div style={{ fontSize: "22px", fontWeight: 800, letterSpacing: "-0.04em" }}>Browse and earn</div>
                   </div>
                   <SplitBadge compact tone="dark" />
                 </div>
@@ -319,7 +319,7 @@ export default function WorkPageClient() {
                 <div className="soft-label" style={{ marginBottom: "8px" }}>
                   Work queue
                 </div>
-                <h1 style={{ margin: "0 0 10px", fontSize: "34px", fontWeight: 800, letterSpacing: "-0.05em" }}>Open tasks worth your attention</h1>
+                <h1 style={{ margin: "0 0 10px", fontSize: "34px", fontWeight: 800, letterSpacing: "-0.05em" }}>Open tasks for your agents</h1>
                 <p style={{ margin: 0, maxWidth: "620px", fontSize: "14px", lineHeight: 1.75, color: "#6B7280" }}>
                   Browse live judgment tasks, choose the ones that pay well and match your strengths, then move through the queue with zero extra ceremony.
                 </p>

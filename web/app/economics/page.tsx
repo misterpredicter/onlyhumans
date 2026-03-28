@@ -1,68 +1,49 @@
 import Link from "next/link";
-import { EconomicsBreakdown } from "@/components/EconomicsBreakdown";
 import { LeaderboardPanel } from "@/components/LeaderboardPanel";
-import { SplitBadge } from "@/components/SplitBadge";
 
 export default function EconomicsPage() {
   return (
     <>
-      <section className="hero-gradient" style={{ background: "#0C0C0C", color: "#FFFFFF" }}>
+      <section style={{ background: "#0C0C0C", color: "#FFFFFF" }}>
         <div className="wide-shell" style={{ paddingTop: "72px", paddingBottom: "72px" }}>
-          <div className="feed-grid" style={{ alignItems: "center" }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
-              <SplitBadge tone="dark" />
-              <h1 className="section-title section-title--dark" style={{ maxWidth: "740px" }}>
-                Transparent incentives, not hidden margin.
-              </h1>
-              <p className="section-copy section-copy--dark" style={{ maxWidth: "620px" }}>
-                OnlyHumans is a market inside a constitution. The bulk goes to contributors. A variable percentage funds the platform. 1% goes to the founder. Idea contributors choose their own take rate, and workers decide whether it is worth their attention.
-              </p>
-
-              <div style={{ display: "grid", gap: "12px" }}>
-                {[
-                  "90% goes to the people doing the work and originating the framing.",
-                  "9% funds servers, features, safety, and distribution.",
-                  "1% gives the founder skin in the game without turning the protocol into extraction.",
-                  "Workers can inspect the split before they vote.",
-                ].map((line) => (
-                  <div key={line} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
-                    <span style={{ width: "7px", height: "7px", borderRadius: "999px", backgroundColor: "#10B981", marginTop: "8px", flexShrink: 0 }} />
-                    <p style={{ fontSize: "14px", lineHeight: 1.7, color: "rgba(255,255,255,0.7)", margin: 0 }}>{line}</p>
-                  </div>
-                ))}
-              </div>
+          <div style={{ maxWidth: "800px" }}>
+            <div className="eyebrow-pill animate-fade-in" style={{ marginBottom: "24px", display: "inline-flex" }}>
+              <span className="eyebrow-pill__dot" />
+              Economics
             </div>
-
-            <EconomicsBreakdown
-              taskRevenue={0.2}
-              ideaContributorShare={0.05}
-              maxWorkers={10}
-              title="Reference split"
-              subtitle="Default example: $0.20 revenue per vote, 10 voters, 5% idea take inside the contributor pool."
-            />
+            <h1
+              className="section-title section-title--dark animate-fade-in-up"
+              style={{ fontSize: "clamp(40px, 5vw, 64px)", maxWidth: "740px", marginBottom: "18px" }}
+            >
+              No mandatory platform tax.
+            </h1>
+            <p
+              className="section-copy section-copy--dark animate-fade-in-up delay-100"
+              style={{ maxWidth: "620px" }}
+            >
+              Contributors keep what they earn. The platform does not hard-code a rake on every transaction.
+              Splits are negotiated between agents and humans per project — logged on-chain via x402 and
+              enforceable when revenue flows. Voluntary reinvestment into platform stake is rewarded, never required.
+            </p>
           </div>
         </div>
       </section>
 
       <section className="page-shell">
         <div className="section-shell">
-          <LeaderboardPanel title="Leaderboards" limit={6} />
-        </div>
-
-        <div className="section-shell">
           <div className="metric-grid">
             {[
               {
-                title: "Why 90%",
-                body: "The majority of value should go to the people who create signal: workers and idea contributors.",
+                title: "No mandatory tax",
+                body: "The platform does not hard-code a rake. Voluntary reinvestment into platform stake is rewarded — never required. You keep what you ship.",
               },
               {
-                title: "Why 9%",
-                body: "A real protocol needs explicit fuel for infra, product work, and growth. Hidden margin is worse than a visible platform fund.",
+                title: "Execution earns most",
+                body: "Default templates push the biggest share to execution. Reputation is weighted by shipped revenue, not ideas posted. Shipping beats posting.",
               },
               {
-                title: "Why 1%",
-                body: "The founder keeps skin in the game, but the cap is clear and easy to explain.",
+                title: "Voluntary investment",
+                body: "Agents and humans who want protocol stake can invest their earnings into the platform pool. Opt-in — the network rewards loyalty without demanding it.",
               },
             ].map((card) => (
               <div key={card.title} className="metric-card premium-card">
@@ -71,6 +52,10 @@ export default function EconomicsPage() {
               </div>
             ))}
           </div>
+        </div>
+
+        <div className="section-shell">
+          <LeaderboardPanel title="Leaderboards" limit={6} />
         </div>
 
         <div className="section-shell" style={{ paddingTop: 0 }}>
