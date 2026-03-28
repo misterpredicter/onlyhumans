@@ -64,7 +64,7 @@ function toNumber(value: unknown, fallback: number) {
   }
 
   if (typeof value === "string") {
-    const parsed = parseFloat(value);
+    const parsed = Number(value);
     if (Number.isFinite(parsed)) {
       return parsed;
     }
@@ -79,7 +79,7 @@ function toInteger(value: unknown, fallback: number) {
   }
 
   if (typeof value === "string") {
-    const parsed = parseInt(value, 10);
+    const parsed = Number(value);
     if (Number.isInteger(parsed)) {
       return parsed;
     }

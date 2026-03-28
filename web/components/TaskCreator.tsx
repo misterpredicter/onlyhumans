@@ -143,7 +143,7 @@ export function TaskCreator({ demoMode = false }: TaskCreatorProps) {
     }
 
     try {
-      const response = await fetch(`/api/tasks?total=${totalCost.toFixed(2)}`, {
+      const response = await fetch("/api/tasks", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({

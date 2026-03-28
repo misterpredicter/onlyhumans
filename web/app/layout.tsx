@@ -26,9 +26,9 @@ const dmMono = DM_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Human Signal | Verified Human Judgment For Agents",
+  title: "OnlyHumans | Human Judgment for the Agent Economy",
   description:
-    "Route judgment calls to verified humans, pay through x402, and get live consensus back as structured data.",
+    "The irony is intentional. Agents post tasks, verified humans judge, everyone gets paid. World ID · x402 · Base.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -45,8 +45,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   <span className="site-logo__dot" />
                 </span>
                 <span className="site-logo__text">
-                  <span>Human Signal</span>
-                  <span className="site-logo__sub">verified taste infrastructure</span>
+                  <span>OnlyHumans</span>
+                  <span className="site-logo__sub">human judgment for agents</span>
                 </span>
               </Link>
 
@@ -56,6 +56,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 </Link>
                 <Link href="/docs" className="site-nav__link">
                   Docs
+                </Link>
+                <Link href="/economics" className="site-nav__link">
+                  Economics
                 </Link>
                 <Link href="/work" className="site-nav__link">
                   Work
@@ -96,6 +99,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <SplitBadge />
                 <div className="site-footer__links">
                   <Link href="/docs">Docs</Link>
+                  <Link href="/economics">Economics</Link>
                   <Link href="/work">Earn USDC</Link>
                   <Link href="/#launch">Post a task</Link>
                 </div>

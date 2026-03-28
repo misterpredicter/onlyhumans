@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { EconomicsBreakdown } from "@/components/EconomicsBreakdown";
-import { WorldIDVerify } from "@/components/WorldIDVerify";
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
+import { SplitBadge } from "@/components/SplitBadge";
 import { MultiOptionJudgment } from "@/components/MultiOptionJudgment";
-import { TierBadge } from "@/components/TierBadge";
-import { ECONOMICS, calculateWorkerPayout } from "@/lib/economics";
+import { getTierInfo, TierBadge } from "@/components/TierBadge";
+import { WorldIDVerify } from "@/components/WorldIDVerify";
 
 interface TaskOption {
   option_index: number;
@@ -26,14 +26,22 @@ interface Task {
   tier?: string;
   context?: string | null;
   options?: TaskOption[];
-  idea_contributor_share?: number | string | null;
+  created_at?: string;
 }
 
-function formatBounty(task: Task): string {
-  const ideaContributorShare = Number(
-    task.idea_contributor_share ?? ECONOMICS.DEFAULT_IDEA_CONTRIBUTOR_SHARE
-  );
-  return `$${calculateWorkerPayout(parseFloat(String(task.bounty_per_vote)), ideaContributorShare).toFixed(2)}`;
+function formatBounty(task: Task) {
+  return `$${parseFloat(String(task.bounty_per_vote)).toFixed(2)}`;
+}
+
+function formatRelativeDate(value?: string) {
+  if (!value) return "just now";
+
+  const diffMs = Date.now() - new Date(value).getTime();
+  const diffHours = Math.round(diffMs / (1000 * 60 * 60));
+  if (diffHours <= 1) return "new";
+  if (diffHours < 24) return `${diffHours}h ago`;
+  const diffDays = Math.round(diffHours / 24);
+  return `${diffDays}d ago`;
 }
 
 export default function WorkPageClient() {
@@ -46,396 +54,407 @@ export default function WorkPageClient() {
 
   useEffect(() => {
     fetch("/api/tasks")
-      .then((r) => r.json())
-      .then(({ tasks: t }) => { setTasks(t ?? []); setLoading(false); })
+      .then((response) => response.json())
+      .then(({ tasks: nextTasks }) => {
+        setTasks(nextTasks ?? []);
+        setLoading(false);
+      })
       .catch(() => setLoading(false));
   }, []);
 
   const handleVoted = (taskId: string) => {
-    setVotedTaskIds((prev) => new Set([...prev, taskId]));
-    setTimeout(() => setActiveTask(null), 2500);
+    setVotedTaskIds((previous) => new Set([...previous, taskId]));
   };
 
   const resolveOptions = (task: Task): TaskOption[] => {
-    if (Array.isArray(task.options) && task.options.length > 0) return task.options;
+    if (Array.isArray(task.options) && task.options.length > 0) {
+      return task.options;
+    }
+
     return [
       { option_index: 0, label: task.option_a_label, content: task.option_a },
       { option_index: 1, label: task.option_b_label, content: task.option_b },
     ];
   };
 
-  // ── Verification gate ───────────────────────────────────────────
+  const availableTasks = useMemo(
+    () => tasks.filter((task) => !votedTaskIds.has(task.id) && task.max_workers - (task.vote_count ?? 0) > 0),
+    [tasks, votedTaskIds]
+  );
+
+  const highestPayout = availableTasks.reduce((max, task) => Math.max(max, Number(task.bounty_per_vote) || 0), 0);
+  const totalQueueBudget = availableTasks.reduce((sum, task) => sum + Number(task.bounty_per_vote || 0) * Math.max(task.max_workers - task.vote_count, 0), 0);
+
   if (!nullifierHash) {
     return (
-      <div style={{
-        minHeight: "calc(100vh - 64px)",
-        backgroundColor: "#0C0C0C",
-        display: "flex", flexDirection: "column",
-        alignItems: "center", justifyContent: "center",
-        padding: "48px 24px", gap: "40px",
-        position: "relative", overflow: "hidden",
-      }}>
-        {/* Subtle background gradient */}
-        <div style={{
-          position: "absolute", top: "-30%", left: "-20%",
-          width: "140%", height: "160%",
-          background: "radial-gradient(ellipse at 40% 40%, rgba(16, 185, 129, 0.06) 0%, transparent 60%), radial-gradient(ellipse at 60% 60%, rgba(59, 130, 246, 0.04) 0%, transparent 60%)",
-          pointerEvents: "none",
-        }} />
-
-        <div className="animate-fade-in-up" style={{
-          width: "100%", maxWidth: "440px",
-          backgroundColor: "#FFFFFF",
-          borderRadius: "28px", padding: "44px 36px",
-          boxShadow: "0 4px 24px rgba(0,0,0,0.12), 0 24px 80px rgba(0,0,0,0.24)",
-          display: "flex", flexDirection: "column", gap: "28px",
-          position: "relative",
-        }}>
-          {/* Icon + heading */}
-          <div style={{ textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: "16px" }}>
-            <div className="animate-float" style={{
-              width: "60px", height: "60px",
-              background: "linear-gradient(135deg, #10B981 0%, #3B82F6 100%)",
-              borderRadius: "18px",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              boxShadow: "0 8px 24px rgba(16, 185, 129, 0.3)",
-            }}>
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                <path d="M2 17l10 5 10-5" />
-                <path d="M2 12l10 5 10-5" />
-              </svg>
-            </div>
-            <div>
-              <h1 style={{
-                fontFamily: "var(--font-sans)", fontSize: "24px", fontWeight: 800,
-                color: "#0C0C0C", margin: "0 0 10px", letterSpacing: "-0.5px",
-              }}>
-                Earn USDC for your judgment
+      <section className="hero-gradient" style={{ background: "#0C0C0C", color: "#FFFFFF", minHeight: "calc(100vh - 74px)" }}>
+        <div className="wide-shell" style={{ paddingTop: "64px", paddingBottom: "72px" }}>
+          <div className="feed-grid" style={{ alignItems: "center" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
+              <div className="eyebrow-pill animate-fade-in">
+                <span className="eyebrow-pill__dot" />
+                Contributor mode · wallet-ready · proof-of-personhood
+              </div>
+              <h1 className="section-title section-title--dark animate-fade-in-up" style={{ maxWidth: "640px" }}>
+                The work queue opens only for verified humans.
               </h1>
-              <p style={{ fontFamily: "var(--font-sans)", fontSize: "15px", color: "#6B7280", margin: 0, lineHeight: 1.6 }}>
-                Vote on comparisons. Each verified vote earns USDC directly to your wallet.
+              <p className="section-copy section-copy--dark animate-fade-in-up delay-100" style={{ maxWidth: "600px" }}>
+                This is the supply side of Human Signal: a premium feed of live judgment tasks. Verify once, set a wallet, and move through the queue without losing momentum.
               </p>
-            </div>
-          </div>
 
-          {/* Wallet */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-            <label style={{ fontFamily: "var(--font-sans)", fontSize: "13px", fontWeight: 600, color: "#374151" }}>
-              Your wallet address
-            </label>
-            <input
-              type="text"
-              value={workerWallet}
-              onChange={(e) => setWorkerWallet(e.target.value)}
-              placeholder="0x... (optional — skip to vote without payment)"
-              className="input-field"
-              style={{ fontFamily: "var(--font-mono)", fontSize: "13px" }}
-            />
-          </div>
+              <div className="pill-row animate-fade-in-up delay-200">
+                <span className="tone-pill tone-pill--dark">one vote per task</span>
+                <span className="tone-pill tone-pill--dark">instant USDC payout</span>
+                <span className="tone-pill tone-pill--dark">privacy preserved with ZK proofs</span>
+              </div>
 
-          {/* World ID */}
-          <WorldIDVerify onVerified={setNullifierHash} />
-
-          {/* Trust signals */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-            {[
-              { text: "Your identity is never revealed — World ID uses ZK proofs", icon: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" },
-              { text: "USDC sent directly to your wallet via x402 on Base", icon: "M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" },
-              { text: "One vote per task, enforced by nullifier hash", icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" },
-            ].map((item, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
-                <div style={{
-                  width: "28px", height: "28px", marginTop: "0px", flexShrink: 0,
-                  backgroundColor: "#F0FDF4", borderRadius: "8px",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d={item.icon} />
-                  </svg>
+              <div className="premium-card surface-card--dark animate-fade-in-up delay-300" style={{ padding: "24px" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", marginBottom: "16px", flexWrap: "wrap" }}>
+                  <div>
+                    <div className="soft-label" style={{ color: "rgba(255,255,255,0.5)", marginBottom: "8px" }}>
+                      What you unlock
+                    </div>
+                    <div style={{ fontSize: "22px", fontWeight: 800, letterSpacing: "-0.04em" }}>A queue designed to stay in flow</div>
+                  </div>
+                  <SplitBadge compact tone="dark" />
                 </div>
-                <span style={{ fontFamily: "var(--font-sans)", fontSize: "13px", color: "#6B7280", lineHeight: 1.55 }}>
-                  {item.text}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
 
-        {/* Stats row */}
-        <div className="animate-fade-in-up delay-200 stats-row" style={{ display: "flex", alignItems: "center", gap: "0" }}>
-          {[
-            { value: "$0.07-$0.45", label: "worker pay" },
-            { value: "~30 sec", label: "per task" },
-            { value: "visible", label: "split before you vote" },
-          ].map((stat, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center" }}>
-              {i > 0 && <div className="divider" style={{ width: "1px", height: "32px", backgroundColor: "rgba(255,255,255,0.1)", margin: "0 32px" }} />}
-              <div style={{ textAlign: "center" }}>
-                <div style={{ fontFamily: "var(--font-sans)", fontSize: "22px", fontWeight: 800, color: "#FFFFFF", letterSpacing: "-0.3px" }}>{stat.value}</div>
-                <div style={{ fontFamily: "var(--font-sans)", fontSize: "12px", color: "rgba(255,255,255,0.35)" }}>{stat.label}</div>
+                <div style={{ display: "grid", gap: "12px" }}>
+                  {[
+                    "Open each task with payout, remaining slots, and feedback depth visible at a glance.",
+                    "Vote once. Your nullifier blocks duplicates automatically without exposing identity.",
+                    "See results settle in real time as the consensus report updates.",
+                  ].map((item) => (
+                    <div key={item} style={{ padding: "16px 18px", borderRadius: "20px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", fontSize: "14px", lineHeight: 1.7, color: "rgba(255,255,255,0.74)" }}>
+                      {item}
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
-          ))}
+
+            <div className="animate-fade-in-up delay-200">
+              <div className="premium-card" style={{ padding: "26px", background: "linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(248,250,247,0.92) 100%)" }}>
+                <div style={{ marginBottom: "18px" }}>
+                  <div className="soft-label" style={{ marginBottom: "8px" }}>
+                    Unlock work
+                  </div>
+                  <div style={{ fontSize: "28px", fontWeight: 800, letterSpacing: "-0.05em", marginBottom: "10px" }}>Verify and enter the queue</div>
+                  <div style={{ fontSize: "14px", lineHeight: 1.7, color: "#6B7280" }}>
+                    Add a wallet if you want payment routed automatically, then open World ID to prove you are unique.
+                  </div>
+                </div>
+
+                <div style={{ display: "grid", gap: "16px" }}>
+                  <div>
+                    <label style={{ display: "block", marginBottom: "8px", fontSize: "13px", fontWeight: 700, color: "#20242A" }}>Wallet address</label>
+                    <input
+                      type="text"
+                      value={workerWallet}
+                      onChange={(event) => setWorkerWallet(event.target.value)}
+                      placeholder="0x... (optional for demo voting)"
+                      className="input-field"
+                      style={{ fontFamily: "var(--font-mono), monospace", fontSize: "13px" }}
+                    />
+                  </div>
+
+                  <WorldIDVerify onVerified={setNullifierHash} />
+
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: "10px" }}>
+                    {[
+                      { label: "payouts", value: "$0.10+" },
+                      { label: "speed", value: "~30 sec" },
+                      { label: "rail", value: "Base" },
+                    ].map((item) => (
+                      <div key={item.label} style={{ padding: "14px", borderRadius: "18px", background: "#F6F4EE" }}>
+                        <div className="micro-label" style={{ marginBottom: "6px" }}>
+                          {item.label}
+                        </div>
+                        <div style={{ fontSize: "14px", fontWeight: 800, letterSpacing: "-0.03em" }}>{item.value}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
     );
   }
 
-  // ── Loading ─────────────────────────────────────────────────────
   if (loading) {
     return (
-      <div style={{
-        maxWidth: "680px", margin: "0 auto", padding: "40px 24px",
-      }}>
-        <div style={{ marginBottom: "28px" }}>
-          <div className="skeleton" style={{ height: "28px", width: "180px", marginBottom: "8px" }} />
-          <div className="skeleton" style={{ height: "16px", width: "240px" }} />
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-          {[1, 2, 3].map((i) => (
-            <div key={i} style={{
-              backgroundColor: "#FFFFFF", border: "1px solid #E8E5DE",
-              borderRadius: "16px", padding: "20px 24px",
-            }}>
-              <div className="skeleton" style={{ height: "18px", width: "60%", marginBottom: "8px" }} />
-              <div className="skeleton" style={{ height: "14px", width: "40%", marginBottom: "12px" }} />
-              <div className="skeleton" style={{ height: "22px", width: "80px", borderRadius: "100px" }} />
-            </div>
-          ))}
+      <div className="page-shell">
+        <div className="feed-grid">
+          <div style={{ display: "grid", gap: "14px" }}>
+            <div className="skeleton" style={{ height: "140px", borderRadius: "28px" }} />
+            {[1, 2, 3].map((index) => (
+              <div key={index} className="skeleton" style={{ height: "154px", borderRadius: "26px" }} />
+            ))}
+          </div>
+          <div className="skeleton" style={{ height: "260px", borderRadius: "28px" }} />
         </div>
       </div>
     );
   }
 
-  // ── Active task ─────────────────────────────────────────────────
   if (activeTask) {
     const options = resolveOptions(activeTask);
     const tier = activeTask.tier ?? "quick";
     const payout = formatBounty(activeTask);
-    const ideaContributorShare = Number(
-      activeTask.idea_contributor_share ?? ECONOMICS.DEFAULT_IDEA_CONTRIBUTOR_SHARE
-    );
+    const slotsRemaining = Math.max(activeTask.max_workers - activeTask.vote_count, 0);
+    const tierInfo = getTierInfo(tier);
 
     return (
-      <div className="animate-fade-in" style={{ maxWidth: "760px", margin: "0 auto", padding: "40px 24px" }}>
-        <button onClick={() => setActiveTask(null)} style={{
-          fontFamily: "var(--font-sans)", fontSize: "14px", color: "#6B7280",
-          background: "none", border: "none", cursor: "pointer",
-          padding: "4px 0", marginBottom: "24px", display: "flex", alignItems: "center", gap: "6px",
-          transition: "color 0.15s",
-        }}
-          onMouseEnter={(e) => { e.currentTarget.style.color = "#0C0C0C"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.color = "#6B7280"; }}
+      <div className="page-shell">
+        <button
+          type="button"
+          onClick={() => setActiveTask(null)}
+          className="back-link"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "8px",
+            marginBottom: "18px",
+            border: "none",
+            background: "transparent",
+            color: "#6B7280",
+            fontSize: "14px",
+            fontWeight: 700,
+            cursor: "pointer",
+            padding: 0,
+          }}
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M19 12H5M12 19l-7-7 7-7" />
           </svg>
-          Back to tasks
+          Back to queue
         </button>
 
-        {/* Task header */}
-        <div className="card-elevated" style={{
-          padding: "28px 32px",
-          display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px",
-          marginBottom: "16px",
-        }}>
-          <div style={{ flex: 1 }}>
-            <h2 style={{
-              fontFamily: "var(--font-sans)", fontSize: "22px", fontWeight: 800,
-              color: "#0C0C0C", margin: "0 0 6px", letterSpacing: "-0.4px",
-            }}>
-              {activeTask.description}
-            </h2>
-            <p style={{ fontFamily: "var(--font-sans)", fontSize: "13px", color: "#9CA3AF", margin: 0 }}>
-              {activeTask.max_workers - activeTask.vote_count} slots remaining
-            </p>
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "8px", flexShrink: 0 }}>
-            <span style={{
-              fontFamily: "var(--font-sans)", fontSize: "28px", fontWeight: 900,
-              color: "#059669", letterSpacing: "-0.5px",
-              lineHeight: 1,
-            }}>
-              {payout}
-            </span>
-            <span style={{ fontFamily: "var(--font-sans)", fontSize: "11px", color: "#9CA3AF" }}>
-              to you
-            </span>
-            <TierBadge tier={tier} />
-          </div>
-        </div>
+        <div className="feed-grid">
+          <div style={{ display: "grid", gap: "16px" }}>
+            <div className="premium-card" style={{ padding: "26px" }}>
+              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "18px", flexWrap: "wrap", marginBottom: "16px" }}>
+                <div style={{ maxWidth: "640px" }}>
+                  <div className="pill-row" style={{ marginBottom: "12px" }}>
+                    <TierBadge tier={tier} />
+                    <span className="pill">{options.length} options</span>
+                    <span className="pill">{slotsRemaining} slots left</span>
+                  </div>
+                  <h1 style={{ margin: "0 0 10px", fontSize: "32px", lineHeight: 1.08, fontWeight: 800, letterSpacing: "-0.05em" }}>{activeTask.description}</h1>
+                  <p style={{ margin: 0, fontSize: "14px", lineHeight: 1.75, color: "#6B7280" }}>
+                    Open a contributor report, evaluate the strongest option, and submit a single verified vote.
+                  </p>
+                </div>
 
-        <div className="card-elevated" style={{ padding: "28px 32px" }}>
-          <div style={{ marginBottom: "18px" }}>
-            <EconomicsBreakdown
-              taskRevenue={parseFloat(String(activeTask.bounty_per_vote))}
-              ideaContributorShare={ideaContributorShare}
-              maxWorkers={activeTask.max_workers}
-              title="What this vote pays"
-              subtitle="The split is transparent before you commit your attention."
-            />
+                <div
+                  style={{
+                    minWidth: "200px",
+                    padding: "18px",
+                    borderRadius: "22px",
+                    background: "linear-gradient(135deg, rgba(16,185,129,0.12), rgba(255,255,255,0.92))",
+                    border: "1px solid rgba(16,185,129,0.16)",
+                  }}
+                >
+                  <div className="micro-label" style={{ marginBottom: "8px", color: "#059669" }}>
+                    payout per vote
+                  </div>
+                  <div style={{ fontSize: "32px", fontWeight: 800, letterSpacing: "-0.06em", color: "#052E16" }}>{payout}</div>
+                  <div style={{ fontSize: "13px", lineHeight: 1.6, color: "#047857", marginTop: "6px" }}>{tierInfo.desc}</div>
+                </div>
+              </div>
+
+              <MultiOptionJudgment
+                taskId={activeTask.id}
+                options={options}
+                tier={tier}
+                nullifierHash={nullifierHash}
+                workerWallet={workerWallet || undefined}
+                context={activeTask.context}
+                onVoted={() => handleVoted(activeTask.id)}
+                onBackToQueue={() => setActiveTask(null)}
+              />
+            </div>
           </div>
-          <MultiOptionJudgment
-            taskId={activeTask.id}
-            options={options}
-            tier={tier}
-            nullifierHash={nullifierHash}
-            workerWallet={workerWallet || undefined}
-            context={activeTask.context}
-            onVoted={() => handleVoted(activeTask.id)}
-          />
+
+          <div style={{ display: "grid", gap: "14px", alignSelf: "start", position: "sticky", top: "104px" }}>
+            <div className="surface-card" style={{ padding: "22px" }}>
+              <div className="soft-label" style={{ marginBottom: "10px" }}>
+                Contributor status
+              </div>
+              <div style={{ fontSize: "18px", fontWeight: 800, letterSpacing: "-0.04em", marginBottom: "10px" }}>You are verified and ready to vote</div>
+              <div style={{ fontSize: "13px", lineHeight: 1.7, color: "#6B7280", marginBottom: "12px" }}>
+                Wallet: {workerWallet ? <span style={{ fontFamily: "var(--font-mono), monospace" }}>{workerWallet}</span> : "no payout wallet attached"}
+              </div>
+              <SplitBadge compact />
+            </div>
+
+            <div className="surface-card" style={{ padding: "22px" }}>
+              <div className="soft-label" style={{ marginBottom: "10px" }}>
+                Ground rules
+              </div>
+              <div style={{ display: "grid", gap: "10px" }}>
+                {[
+                  "One vote per verified human on each task.",
+                  "Payments settle on Base when a wallet is attached.",
+                  "Reasoned and detailed tasks should prioritize signal over speed.",
+                ].map((item) => (
+                  <div key={item} style={{ fontSize: "13px", lineHeight: 1.65, color: "#6B7280" }}>
+                    {item}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
-  // ── Task list ───────────────────────────────────────────────────
-  const availableTasks = tasks.filter((t) => !votedTaskIds.has(t.id) && (t.max_workers - (t.vote_count ?? 0)) > 0);
-
   return (
-    <div style={{ maxWidth: "680px", margin: "0 auto", padding: "40px 24px" }}>
-      {/* Header */}
-      <div className="animate-fade-in-up" style={{
-        display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "28px",
-      }}>
-        <div>
-          <h1 style={{
-            fontFamily: "var(--font-sans)", fontSize: "28px", fontWeight: 800,
-            color: "#0C0C0C", margin: "0 0 4px", letterSpacing: "-0.6px",
-          }}>
-            Open tasks
-          </h1>
-          <p style={{ fontFamily: "var(--font-sans)", fontSize: "14px", color: "#6B7280", margin: 0 }}>
-            {availableTasks.length} available
-          </p>
+    <div className="page-shell">
+      <div className="feed-grid">
+        <div style={{ display: "grid", gap: "16px" }}>
+          <div className="premium-card animate-fade-in-up" style={{ padding: "26px" }}>
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "18px", flexWrap: "wrap" }}>
+              <div>
+                <div className="soft-label" style={{ marginBottom: "8px" }}>
+                  Work queue
+                </div>
+                <h1 style={{ margin: "0 0 10px", fontSize: "34px", fontWeight: 800, letterSpacing: "-0.05em" }}>Open tasks worth your attention</h1>
+                <p style={{ margin: 0, maxWidth: "620px", fontSize: "14px", lineHeight: 1.75, color: "#6B7280" }}>
+                  Browse live judgment tasks, choose the ones that pay well and match your strengths, then move through the queue with zero extra ceremony.
+                </p>
+              </div>
+
+              <div className="pill-row">
+                <span className="pill">{availableTasks.length} live tasks</span>
+                <span className="pill">${highestPayout.toFixed(2)} highest payout</span>
+                <span className="pill">verified state active</span>
+              </div>
+            </div>
+          </div>
+
+          {availableTasks.length === 0 ? (
+            <div className="premium-card animate-fade-in" style={{ padding: "34px", textAlign: "center" }}>
+              <div style={{ width: "64px", height: "64px", borderRadius: "22px", display: "inline-flex", alignItems: "center", justifyContent: "center", background: "#F1EFE8", marginBottom: "18px" }}>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M8 12h8M12 8v8" />
+                </svg>
+              </div>
+              <div style={{ fontSize: "22px", fontWeight: 800, letterSpacing: "-0.04em", marginBottom: "8px" }}>No open tasks right now</div>
+              <div style={{ fontSize: "14px", lineHeight: 1.7, color: "#6B7280", marginBottom: "18px" }}>
+                The next contribution opportunity appears as soon as a creator funds a task.
+              </div>
+              <Link href="/" className="quiet-link">
+                Post the next task
+              </Link>
+            </div>
+          ) : (
+            availableTasks.map((task, index) => {
+              const tier = task.tier ?? "quick";
+              const payout = formatBounty(task);
+              const options = resolveOptions(task);
+              const slotsLeft = Math.max(task.max_workers - (task.vote_count ?? 0), 0);
+              const tierInfo = getTierInfo(tier);
+
+              return (
+                <button
+                  key={task.id}
+                  type="button"
+                  onClick={() => setActiveTask(task)}
+                  className={`feed-card animate-fade-in-up delay-${Math.min((index + 1) * 100, 500)}`}
+                  style={{ width: "100%", padding: "22px", textAlign: "left", display: "grid", gap: "16px" }}
+                >
+                  <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "18px", flexWrap: "wrap" }}>
+                    <div style={{ maxWidth: "620px" }}>
+                      <div className="pill-row" style={{ marginBottom: "12px" }}>
+                        <TierBadge tier={tier} />
+                        <span className="pill">{formatRelativeDate(task.created_at)}</span>
+                        <span className="pill">{slotsLeft} slots left</span>
+                      </div>
+                      <div style={{ fontSize: "22px", fontWeight: 800, lineHeight: 1.2, letterSpacing: "-0.04em", marginBottom: "8px" }}>{task.description}</div>
+                      <div style={{ fontSize: "14px", lineHeight: 1.7, color: "#6B7280" }}>{tierInfo.desc}</div>
+                    </div>
+
+                    <div style={{ minWidth: "140px", textAlign: "right" }}>
+                      <div style={{ fontSize: "32px", fontWeight: 800, letterSpacing: "-0.06em", color: "#059669" }}>{payout}</div>
+                      <div style={{ fontSize: "12px", color: "#6B7280" }}>per vote</div>
+                    </div>
+                  </div>
+
+                  <div className="pill-row">
+                    {options.map((option) => (
+                      <span key={option.option_index} className="pill">
+                        {option.label}
+                      </span>
+                    ))}
+                  </div>
+
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "14px", flexWrap: "wrap" }}>
+                    <div style={{ fontSize: "13px", color: "#6B7280" }}>
+                      {task.context ? "Includes contributor context" : "No extra context attached"}
+                    </div>
+                    <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", fontSize: "13px", fontWeight: 800, color: "#0C0C0C" }}>
+                      Open task
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M5 12h14M12 5l7 7-7 7" />
+                      </svg>
+                    </div>
+                  </div>
+                </button>
+              );
+            })
+          )}
         </div>
-        <div style={{
-          display: "flex", alignItems: "center", gap: "8px",
-          backgroundColor: "#F0FDF4", border: "1px solid #D1FAE5",
-          borderRadius: "12px", padding: "8px 14px",
-        }}>
-          <div style={{
-            width: "7px", height: "7px", backgroundColor: "#10B981", borderRadius: "100px",
-            boxShadow: "0 0 6px rgba(16, 185, 129, 0.5)",
-          }} />
-          <span style={{ fontFamily: "var(--font-sans)", fontSize: "13px", fontWeight: 600, color: "#065F46" }}>
-            Verified
-          </span>
+
+        <div style={{ display: "grid", gap: "14px", alignSelf: "start", position: "sticky", top: "104px" }}>
+          <div className="surface-card animate-fade-in-up" style={{ padding: "22px" }}>
+            <div className="soft-label" style={{ marginBottom: "10px" }}>
+              Your state
+            </div>
+            <div style={{ fontSize: "20px", fontWeight: 800, letterSpacing: "-0.04em", marginBottom: "10px" }}>Verified and ready</div>
+            <div style={{ fontSize: "13px", lineHeight: 1.7, color: "#6B7280", marginBottom: "14px" }}>
+              Nullifier active. {workerWallet ? "Payout wallet attached." : "Votes can still be submitted without a payout wallet in demo mode."}
+            </div>
+            <SplitBadge compact />
+          </div>
+
+          <div className="surface-card animate-fade-in-up delay-100" style={{ padding: "22px" }}>
+            <div className="soft-label" style={{ marginBottom: "10px" }}>
+              Queue economics
+            </div>
+            <div style={{ display: "grid", gap: "12px" }}>
+              {[
+                { label: "open tasks", value: `${availableTasks.length}` },
+                { label: "highest payout", value: `$${highestPayout.toFixed(2)}` },
+                { label: "remaining queue spend", value: `$${totalQueueBudget.toFixed(2)}` },
+              ].map((item) => (
+                <div key={item.label} style={{ padding: "14px 16px", borderRadius: "18px", background: "#F6F4EE" }}>
+                  <div className="micro-label" style={{ marginBottom: "6px" }}>
+                    {item.label}
+                  </div>
+                  <div style={{ fontSize: "18px", fontWeight: 800, letterSpacing: "-0.04em" }}>{item.value}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="surface-card animate-fade-in-up delay-200" style={{ padding: "22px" }}>
+            <div className="soft-label" style={{ marginBottom: "10px" }}>
+              Need context?
+            </div>
+            <div style={{ fontSize: "14px", lineHeight: 1.75, color: "#6B7280", marginBottom: "14px" }}>
+              Creators use the docs to fund tasks through the API. Result pages become the source of truth for downstream decisions.
+            </div>
+            <Link href="/docs" className="quiet-link">
+              Open docs
+            </Link>
+          </div>
         </div>
       </div>
-
-      {availableTasks.length === 0 ? (
-        <div className="animate-fade-in" style={{
-          textAlign: "center", padding: "80px 40px",
-          backgroundColor: "#FFFFFF", border: "1px solid #E8E5DE",
-          borderRadius: "20px",
-        }}>
-          <div style={{
-            width: "56px", height: "56px", margin: "0 auto 20px",
-            backgroundColor: "#F5F4F0", borderRadius: "16px",
-            display: "flex", alignItems: "center", justifyContent: "center",
-          }}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10" />
-              <path d="M8 12h8M12 8v8" />
-            </svg>
-          </div>
-          <p style={{ fontFamily: "var(--font-sans)", fontSize: "17px", fontWeight: 600, color: "#374151", margin: "0 0 6px" }}>
-            No open tasks right now
-          </p>
-          <p style={{ fontFamily: "var(--font-sans)", fontSize: "14px", color: "#9CA3AF", margin: "0 0 20px" }}>
-            Check back soon or create one to get the pool started
-          </p>
-          <a href="/" style={{
-            fontFamily: "var(--font-sans)", fontSize: "14px", fontWeight: 600,
-            color: "#FFFFFF", backgroundColor: "#10B981",
-            textDecoration: "none", padding: "10px 20px", borderRadius: "10px",
-            display: "inline-block",
-            transition: "all 0.2s ease",
-          }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = "#059669";
-              e.currentTarget.style.boxShadow = "0 4px 12px rgba(16, 185, 129, 0.3)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "#10B981";
-              e.currentTarget.style.boxShadow = "none";
-            }}
-          >
-            Post a task
-          </a>
-        </div>
-      ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-          {availableTasks.map((task, idx) => {
-            const tier = task.tier ?? "quick";
-            const payout = formatBounty(task);
-            const opts = resolveOptions(task);
-            const slotsLeft = task.max_workers - (task.vote_count ?? 0);
-            const ideaContributorShare = Number(
-              task.idea_contributor_share ?? ECONOMICS.DEFAULT_IDEA_CONTRIBUTOR_SHARE
-            );
-
-            return (
-              <button
-                key={task.id}
-                onClick={() => setActiveTask(task)}
-                className="card-interactive animate-fade-in-up"
-                style={{
-                  width: "100%", textAlign: "left",
-                  padding: "22px 24px",
-                  display: "flex", alignItems: "center", gap: "16px",
-                  animationDelay: `${idx * 0.05}s`,
-                }}
-              >
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{
-                    fontFamily: "var(--font-sans)", fontSize: "15px", fontWeight: 700,
-                    color: "#0C0C0C", margin: "0 0 5px",
-                    overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-                    letterSpacing: "-0.2px",
-                  }}>
-                    {task.description}
-                  </p>
-                  <p style={{ fontFamily: "var(--font-sans)", fontSize: "13px", color: "#9CA3AF", margin: "0 0 10px" }}>
-                    {opts.map((o) => o.label).join(" vs ")}
-                  </p>
-                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                    <TierBadge tier={tier} />
-                    <span style={{
-                      fontFamily: "var(--font-sans)", fontSize: "11px", color: "#B8B5AD",
-                    }}>
-                      {slotsLeft} slots left
-                    </span>
-                  </div>
-                  <div style={{ marginTop: "12px" }}>
-                    <EconomicsBreakdown
-                      taskRevenue={parseFloat(String(task.bounty_per_vote))}
-                      ideaContributorShare={ideaContributorShare}
-                      compact={true}
-                      showFooter={false}
-                      title="Visible economics"
-                    />
-                  </div>
-                </div>
-                <div style={{ textAlign: "right", flexShrink: 0 }}>
-                  <p style={{
-                    fontFamily: "var(--font-sans)", fontSize: "24px", fontWeight: 800,
-                    color: "#059669", margin: "0 0 2px", letterSpacing: "-0.3px",
-                    lineHeight: 1,
-                  }}>
-                    {payout}
-                  </p>
-                  <p style={{ fontFamily: "var(--font-sans)", fontSize: "11px", color: "#B8B5AD", margin: 0 }}>
-                    to you
-                  </p>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      )}
     </div>
   );
 }

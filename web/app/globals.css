@@ -891,6 +891,40 @@ img {
   gap: 28px;
 }
 
+.docs-hero-grid {
+  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 420px);
+}
+
+.docs-code-grid,
+.docs-feature-grid,
+.docs-sdk-grid,
+.docs-status-grid,
+.docs-metric-grid {
+  display: grid;
+  gap: 18px;
+}
+
+.docs-code-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.docs-feature-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.docs-sdk-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.docs-status-grid {
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+}
+
+.docs-metric-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
 .docs-card {
   padding: 28px;
 }
@@ -1009,7 +1043,9 @@ pre {
 @media (max-width: 1120px) {
   .hero-shell,
   .feed-grid,
-  .docs-shell {
+  .docs-shell,
+  .docs-hero-grid,
+  .docs-status-grid {
     grid-template-columns: 1fr;
   }
 
@@ -1036,12 +1072,16 @@ pre {
 
   .metric-grid,
   .story-grid,
-  .docs-grid-4col {
+  .docs-grid-4col,
+  .docs-feature-grid,
+  .docs-sdk-grid {
     grid-template-columns: 1fr;
   }
 
   .docs-grid-2col,
-  .pricing-grid {
+  .pricing-grid,
+  .docs-code-grid,
+  .docs-metric-grid {
     grid-template-columns: 1fr;
   }
 

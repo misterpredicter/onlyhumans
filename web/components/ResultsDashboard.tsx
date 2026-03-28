@@ -1,9 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
-import { EconomicsBreakdown } from "@/components/EconomicsBreakdown";
+import { SplitBadge } from "@/components/SplitBadge";
 import { TierBadge } from "@/components/TierBadge";
-import { ECONOMICS } from "@/lib/economics";
 
 interface TaskOption {
   option_index: number;
@@ -49,46 +49,64 @@ interface TaskData {
     total_paid_usdc: number;
   };
   recent_votes?: RecentVote[];
+  consensus?: {
+    agreement_score?: number;
+  };
+}
+
+interface Props {
+  taskId: string;
 }
 
 const BADGE_STYLES: Record<string, { color: string; bg: string; border: string }> = {
   platinum: { color: "#475569", bg: "#F8FAFC", border: "#E2E8F0" },
-  gold: { color: "#A16207", bg: "#FEFCE8", border: "#FEF08A" },
+  gold: { color: "#A16207", bg: "#FEFCE8", border: "#FDE68A" },
   silver: { color: "#6B7280", bg: "#F9FAFB", border: "#E5E7EB" },
   bronze: { color: "#C2410C", bg: "#FFF7ED", border: "#FED7AA" },
   new: { color: "#9CA3AF", bg: "#F9FAFB", border: "#E5E7EB" },
 };
 
 const BAR_GRADIENTS = [
-  "linear-gradient(90deg, #3B82F6, #2563EB)",
-  "linear-gradient(90deg, #8B5CF6, #7C3AED)",
-  "linear-gradient(90deg, #10B981, #059669)",
-  "linear-gradient(90deg, #F59E0B, #D97706)",
-  "linear-gradient(90deg, #EC4899, #DB2777)",
-  "linear-gradient(90deg, #14B8A6, #0D9488)",
+  "linear-gradient(90deg, #10B981 0%, #14B8A6 100%)",
+  "linear-gradient(90deg, #3B82F6 0%, #6366F1 100%)",
+  "linear-gradient(90deg, #8B5CF6 0%, #EC4899 100%)",
+  "linear-gradient(90deg, #F59E0B 0%, #F97316 100%)",
+  "linear-gradient(90deg, #14B8A6 0%, #06B6D4 100%)",
+  "linear-gradient(90deg, #84CC16 0%, #22C55E 100%)",
 ];
 
-const dm: React.CSSProperties = { fontFamily: "var(--font-sans), sans-serif" };
+function isImage(url: string) {
+  return /\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i.test(url);
+}
 
-interface Props {
-  taskId: string;
+function formatPct(value: number) {
+  return `${Math.round(value * 100)}%`;
+}
+
+function formatDate(value: string) {
+  try {
+    return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }).format(new Date(value));
+  } catch {
+    return value;
+  }
 }
 
 export function ResultsDashboard({ taskId }: Props) {
   const [data, setData] = useState<TaskData | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [showFeedback, setShowFeedback] = useState(false);
+  const [showFeedback, setShowFeedback] = useState(true);
 
   useEffect(() => {
     const poll = async () => {
       try {
-        const res = await fetch(`/api/tasks/${taskId}`);
-        if (!res.ok) {
+        const response = await fetch(`/api/tasks/${taskId}`);
+        if (!response.ok) {
           setError("Task not found");
           return;
         }
+
         setError(null);
-        setData(await res.json());
+        setData(await response.json());
       } catch {
         setError("Connection error");
       }
@@ -101,47 +119,27 @@ export function ResultsDashboard({ taskId }: Props) {
 
   if (error) {
     return (
-      <div style={{
-        backgroundColor: "#FEF2F2", border: "1px solid #FECACA",
-        borderRadius: "14px", padding: "24px",
-        display: "flex", alignItems: "center", gap: "12px",
-      }}>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#DC2626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="12" r="10" />
-          <line x1="15" y1="9" x2="9" y2="15" />
-          <line x1="9" y1="9" x2="15" y2="15" />
-        </svg>
-        <span style={{ ...dm, fontSize: "14px", color: "#DC2626" }}>{error}</span>
+      <div style={{ padding: "18px", borderRadius: "20px", border: "1px solid #FECACA", background: "#FEF2F2", color: "#B91C1C", fontSize: "14px" }}>
+        {error}
       </div>
     );
   }
 
   if (!data) {
     return (
-      <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <div className="skeleton" style={{ height: "16px", width: "200px" }} />
-          <div className="skeleton" style={{ height: "16px", width: "120px" }} />
+      <div style={{ display: "grid", gap: "18px" }}>
+        <div className="skeleton" style={{ height: "180px", borderRadius: "28px" }} />
+        <div className="docs-grid-2col">
+          <div className="skeleton" style={{ height: "260px", borderRadius: "26px" }} />
+          <div className="skeleton" style={{ height: "260px", borderRadius: "26px" }} />
         </div>
-        {[1, 2].map((i) => (
-          <div key={i} style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <div className="skeleton" style={{ height: "14px", width: "100px" }} />
-              <div className="skeleton" style={{ height: "14px", width: "80px" }} />
-            </div>
-            <div className="skeleton" style={{ height: "32px", width: "100%", borderRadius: "100px" }} />
-          </div>
-        ))}
+        <div className="skeleton" style={{ height: "320px", borderRadius: "28px" }} />
       </div>
     );
   }
 
   const { task, results } = data;
-  const total = results.total_votes;
-  const ideaContributorShare =
-    task.idea_contributor_share ?? ECONOMICS.DEFAULT_IDEA_CONTRIBUTOR_SHARE;
-
-  const options: TaskOption[] =
+  const options =
     Array.isArray(task.options) && task.options.length > 0
       ? task.options
       : [
@@ -153,263 +151,258 @@ export function ResultsDashboard({ taskId }: Props) {
     0: results.votes_a,
     1: results.votes_b,
   };
+  const total = results.total_votes;
+  const agreementScore = data.consensus?.agreement_score ?? results.confidence;
+  const feedbackVotes = (data.recent_votes ?? []).filter((vote) => vote.feedback_text);
 
   const winnerLabel =
     results.winner === null
       ? null
       : results.winner === "tie"
-      ? "Tie"
-      : typeof results.winner === "number"
-      ? options.find((o) => o.option_index === results.winner)?.label ?? `Option ${(results.winner as number) + 1}`
-      : results.winner === "A"
-      ? options[0]?.label
-      : options[1]?.label;
+        ? "Tie"
+        : typeof results.winner === "number"
+          ? options.find((option) => option.option_index === results.winner)?.label ?? `Option ${Number(results.winner) + 1}`
+          : results.winner === "A"
+            ? options[0]?.label
+            : options[1]?.label;
 
-  const hasWinner = total >= 5 && results.winner !== null && results.winner !== "tie";
-  const feedbackVotes = (data.recent_votes ?? []).filter((v) => v.feedback_text);
+  const statusLabel =
+    total === 0 ? "Collecting first vote" : results.winner === null ? "Building confidence" : results.winner === "tie" ? "Currently tied" : "Winner identified";
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-      {/* Stats row */}
-      <div style={{
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-        gap: "16px",
-      }}>
-        <div style={{ display: "flex", alignItems: "baseline", gap: "12px" }}>
-          <span style={{ ...dm, fontSize: "14px", color: "#6B7280" }}>
-            <span style={{ fontSize: "24px", fontWeight: 800, color: "#0C0C0C", letterSpacing: "-0.5px" }}>{total}</span> verified votes
-          </span>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <span style={{
-            ...dm, fontSize: "14px", fontWeight: 700, color: "#059669",
-          }}>
-            ${results.total_paid_usdc.toFixed(2)} USDC
-          </span>
-          {task.tier && <TierBadge tier={task.tier} />}
+    <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+      <div
+        className="premium-card"
+        style={{
+          padding: "28px",
+          background: "linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(248,250,247,0.88) 100%)",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "18px", flexWrap: "wrap" }}>
+          <div style={{ maxWidth: "680px" }}>
+            <div className="pill-row" style={{ marginBottom: "14px" }}>
+              <span className="pill">{task.status === "open" ? "Open task" : "Closed task"}</span>
+              {task.tier && <TierBadge tier={task.tier} size="md" />}
+            </div>
+            <h2 style={{ margin: "0 0 10px", fontSize: "30px", lineHeight: 1.08, fontWeight: 800, letterSpacing: "-0.05em" }}>{task.description}</h2>
+            {task.context && (
+              <p style={{ margin: 0, fontSize: "14px", lineHeight: 1.75, color: "#6B7280", maxWidth: "620px" }}>{task.context}</p>
+            )}
+          </div>
+
+          <div style={{ display: "grid", gap: "10px", minWidth: "250px" }}>
+            <SplitBadge compact />
+            <div style={{ padding: "14px 16px", borderRadius: "20px", background: "#0C0C0C", color: "#FFFFFF" }}>
+              <div className="micro-label" style={{ marginBottom: "8px", color: "rgba(255,255,255,0.52)" }}>
+                bounty per vote
+              </div>
+              <div style={{ fontSize: "28px", fontWeight: 800, letterSpacing: "-0.05em" }}>${task.bounty_per_vote.toFixed(2)}</div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <EconomicsBreakdown
-        taskRevenue={task.bounty_per_vote}
-        ideaContributorShare={ideaContributorShare}
-        maxWorkers={task.max_workers}
-        title="Task economics"
-        subtitle="The split is part of the product: contributors can inspect it before committing work."
-      />
+      <div className="docs-grid-2col">
+        <div
+          className="surface-card"
+          style={{
+            padding: "26px",
+            display: "grid",
+            gridTemplateColumns: "180px minmax(0, 1fr)",
+            gap: "22px",
+            alignItems: "center",
+          }}
+        >
+          <div
+            style={{
+              width: "180px",
+              height: "180px",
+              borderRadius: "999px",
+              background: `conic-gradient(#10B981 0 ${(results.confidence || 0) * 360}deg, #E8E5DE ${(results.confidence || 0) * 360}deg 360deg)`,
+              padding: "14px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              margin: "0 auto",
+            }}
+          >
+            <div
+              style={{
+                width: "100%",
+                height: "100%",
+                borderRadius: "999px",
+                background: "rgba(255,255,255,0.96)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexDirection: "column",
+                gap: "6px",
+              }}
+            >
+              <div className="micro-label">confidence</div>
+              <div style={{ fontSize: "34px", fontWeight: 800, letterSpacing: "-0.06em" }}>{formatPct(results.confidence)}</div>
+              <div style={{ fontSize: "12px", color: "#6B7280" }}>{statusLabel}</div>
+            </div>
+          </div>
 
-      {/* Per-option vote bars */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-        {options.map((opt, i) => {
-          const count = votesByOption[opt.option_index] ?? 0;
-          const pct = total > 0 ? Math.round((count / total) * 100) : 0;
-          const barGradient = BAR_GRADIENTS[i % BAR_GRADIENTS.length];
-          const isWinner =
-            !results.winner || results.winner === "tie"
-              ? false
-              : typeof results.winner === "number"
-              ? results.winner === opt.option_index
-              : (results.winner === "A" && opt.option_index === 0) ||
-                (results.winner === "B" && opt.option_index === 1);
-
-          return (
-            <div key={opt.option_index} style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <span style={{
-                  ...dm, fontSize: "14px", fontWeight: 600,
-                  color: isWinner ? "#059669" : "#0C0C0C",
-                  display: "flex", alignItems: "center", gap: "6px",
-                }}>
-                  {opt.label}
-                  {isWinner && (
-                    <span style={{
-                      fontSize: "11px", fontWeight: 600,
-                      color: "#059669", backgroundColor: "#F0FDF4",
-                      border: "1px solid #D1FAE5",
-                      borderRadius: "6px", padding: "1px 8px",
-                    }}>
-                      winner
-                    </span>
-                  )}
-                </span>
-                <span style={{ ...dm, fontSize: "13px", color: "#6B7280", fontWeight: 500 }}>
-                  {count} votes ({pct}%)
-                </span>
+          <div style={{ display: "grid", gap: "12px" }}>
+            <div>
+              <div className="soft-label" style={{ marginBottom: "8px" }}>
+                Consensus snapshot
               </div>
-              <div style={{
-                height: "32px",
-                backgroundColor: "#F5F4F0",
-                borderRadius: "100px",
-                overflow: "hidden",
-                position: "relative",
-              }}>
-                <div
-                  className="progress-bar"
-                  style={{
-                    height: "100%",
-                    borderRadius: "100px",
-                    background: barGradient,
-                    width: `${Math.max(pct, 2)}%`,
-                    display: "flex", alignItems: "center", justifyContent: "flex-end",
-                    paddingRight: pct > 10 ? "12px" : "0",
-                    minWidth: "8px",
-                  }}
-                >
-                  {pct > 10 && (
-                    <span style={{
-                      fontFamily: "var(--font-sans), sans-serif",
-                      fontSize: "12px", fontWeight: 700,
-                      color: "rgba(255,255,255,0.9)",
-                    }}>
-                      {pct}%
-                    </span>
-                  )}
-                </div>
+              <div style={{ fontSize: "24px", fontWeight: 800, letterSpacing: "-0.05em", marginBottom: "6px" }}>
+                {winnerLabel ? winnerLabel : results.winner === "tie" ? "No current winner" : "Still collecting signal"}
+              </div>
+              <div style={{ fontSize: "14px", lineHeight: 1.7, color: "#6B7280" }}>
+                {total === 0
+                  ? "No verified votes have landed yet."
+                  : results.winner === null
+                    ? "The task is live, but there are not enough votes to declare a winner."
+                    : results.winner === "tie"
+                      ? "Contributors are split. More votes should increase confidence."
+                      : `${formatPct(results.confidence)} of verified contributors currently prefer this option.`}
               </div>
             </div>
-          );
-        })}
+
+            <div className="pill-row">
+              <span className="pill">{results.verified_workers} verified humans</span>
+              <span className="pill">{formatPct(agreementScore)} agreement</span>
+              <span className="pill">{Math.max(task.max_workers - total, 0)} slots left</span>
+            </div>
+          </div>
+        </div>
+
+        <div style={{ display: "grid", gap: "14px" }}>
+          {[
+            { label: "verified votes", value: `${total}`, tone: "#10B981", bg: "rgba(16,185,129,0.08)" },
+            { label: "USDC distributed", value: `$${results.total_paid_usdc.toFixed(2)}`, tone: "#1D4ED8", bg: "rgba(59,130,246,0.08)" },
+            { label: "task quality", value: `${(task.creator_rating_up ?? 0) - (task.creator_rating_down ?? 0)}`, tone: "#7C3AED", bg: "rgba(124,58,237,0.08)" },
+          ].map((item) => (
+            <div key={item.label} className="surface-card" style={{ padding: "22px", background: item.bg }}>
+              <div className="micro-label" style={{ marginBottom: "10px", color: item.tone }}>
+                {item.label}
+              </div>
+              <div style={{ fontSize: "28px", fontWeight: 800, letterSpacing: "-0.05em", color: "#0C0C0C" }}>{item.value}</div>
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* Winner banner */}
-      {hasWinner && (
-        <div className="animate-fade-in" style={{
-          background: "linear-gradient(135deg, #F0FDF4 0%, #ECFDF5 100%)",
-          border: "1px solid #A7F3D0",
-          borderRadius: "14px", padding: "18px 20px",
-          display: "flex", alignItems: "center", gap: "14px",
-        }}>
-          <div style={{
-            width: "36px", height: "36px",
-            background: "linear-gradient(135deg, #10B981 0%, #059669 100%)",
-            borderRadius: "10px",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            flexShrink: 0,
-            boxShadow: "0 2px 8px rgba(16, 185, 129, 0.25)",
-          }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="20 6 9 17 4 12" />
-            </svg>
-          </div>
+      <div className="surface-card" style={{ padding: "24px", display: "grid", gap: "16px" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px", flexWrap: "wrap" }}>
           <div>
-            <p style={{ ...dm, fontSize: "16px", fontWeight: 700, color: "#065F46", margin: "0 0 2px" }}>
-              Winner: {winnerLabel}
-            </p>
-            <p style={{ ...dm, fontSize: "13px", color: "#059669", margin: 0 }}>
-              {Math.round(results.confidence * 100)}% of verified humans agree
-            </p>
+            <div className="soft-label" style={{ marginBottom: "8px" }}>
+              Distribution
+            </div>
+            <div style={{ fontSize: "22px", fontWeight: 800, letterSpacing: "-0.04em" }}>How the verified crowd is leaning</div>
+          </div>
+
+          <div className="pill-row">
+            <span className="pill">Task ID {taskId.slice(0, 8)}</span>
+            <span className="pill">{task.status === "open" ? "Live polling" : "Finalized"}</span>
           </div>
         </div>
-      )}
 
-      {total === 0 && (
-        <div style={{
-          textAlign: "center", padding: "24px 12px",
-          backgroundColor: "#FAFAF8", borderRadius: "10px",
-          border: "1px solid #E8E5DE",
-        }}>
-          <p style={{ ...dm, fontSize: "14px", color: "#6B7280", margin: "0 0 4px", fontWeight: 600 }}>
-            No votes yet
-          </p>
-          <p style={{ ...dm, fontSize: "13px", color: "#9CA3AF", margin: 0 }}>
-            Share this task to start collecting human preferences
-          </p>
-        </div>
-      )}
+        <div style={{ display: "grid", gap: "14px" }}>
+          {options.map((option, index) => {
+            const count = votesByOption[option.option_index] ?? 0;
+            const pct = total > 0 ? count / total : 0;
+            const isWinner =
+              results.winner !== null &&
+              results.winner !== "tie" &&
+              ((typeof results.winner === "number" && results.winner === option.option_index) ||
+                (results.winner === "A" && option.option_index === 0) ||
+                (results.winner === "B" && option.option_index === 1));
 
-      {total > 0 && total < 5 && (
-        <div style={{
-          textAlign: "center", padding: "12px",
-          backgroundColor: "#FAFAF8", borderRadius: "10px",
-          border: "1px solid #E8E5DE",
-        }}>
-          <p style={{ ...dm, fontSize: "13px", color: "#6B7280", margin: 0 }}>
-            <span style={{ fontWeight: 600 }}>{5 - total} more votes</span> needed to declare a winner
-          </p>
-        </div>
-      )}
-
-      {/* Creator rating */}
-      {((task.creator_rating_up ?? 0) + (task.creator_rating_down ?? 0)) > 0 && (
-        <div style={{ display: "flex", alignItems: "center", gap: "12px", ...dm, fontSize: "13px", color: "#6B7280" }}>
-          <span>Task quality:</span>
-          <span style={{
-            color: "#059669", backgroundColor: "#F0FDF4",
-            padding: "2px 8px", borderRadius: "6px", fontSize: "12px", fontWeight: 600,
-          }}>
-            +{task.creator_rating_up ?? 0}
-          </span>
-          <span style={{
-            color: "#DC2626", backgroundColor: "#FEF2F2",
-            padding: "2px 8px", borderRadius: "6px", fontSize: "12px", fontWeight: 600,
-          }}>
-            -{task.creator_rating_down ?? 0}
-          </span>
-        </div>
-      )}
-
-      {/* Feedback section */}
-      {feedbackVotes.length > 0 && (
-        <div>
-          <button
-            onClick={() => setShowFeedback((v) => !v)}
-            style={{
-              ...dm, fontSize: "13px", fontWeight: 600, color: "#6B7280",
-              background: "none", border: "none", cursor: "pointer",
-              padding: "4px 0",
-              display: "flex", alignItems: "center", gap: "6px",
-              transition: "color 0.15s",
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.color = "#0C0C0C"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.color = "#6B7280"; }}
-          >
-            <span style={{
-              transition: "transform 0.2s",
-              transform: showFeedback ? "rotate(180deg)" : "rotate(0deg)",
-              display: "inline-block", fontSize: "10px",
-            }}>
-              ▼
-            </span>
-            {feedbackVotes.length} feedback response{feedbackVotes.length !== 1 ? "s" : ""}
-          </button>
-
-          {showFeedback && (
-            <div className="animate-slide-down" style={{ marginTop: "12px", display: "flex", flexDirection: "column", gap: "10px" }}>
-              {feedbackVotes.map((v) => {
-                const badge = BADGE_STYLES[v.reputation_badge] ?? BADGE_STYLES.new;
-                return (
-                  <div key={v.id} style={{
-                    backgroundColor: "#FAFAF8", borderRadius: "14px",
-                    padding: "16px 18px",
-                    border: "1px solid #E8E5DE",
-                  }}>
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                        <span style={{ fontFamily: "var(--font-mono), monospace", fontSize: "11px", color: "#9CA3AF" }}>{v.nullifier_prefix}</span>
-                        <span style={{
-                          fontSize: "11px", fontWeight: 600,
-                          color: badge.color, backgroundColor: badge.bg,
-                          border: `1px solid ${badge.border}`,
-                          borderRadius: "6px", padding: "1px 8px",
-                          textTransform: "capitalize",
-                        }}>
-                          {v.reputation_badge}
-                        </span>
-                      </div>
-                      <span style={{ ...dm, fontSize: "12px", color: "#B8B5AD" }}>
-                        {options.find((o) => o.option_index === v.option_index)?.label ?? `#${v.option_index + 1}`}
-                      </span>
+            return (
+              <div
+                key={option.option_index}
+                style={{
+                  padding: "18px",
+                  borderRadius: "22px",
+                  border: `1px solid ${isWinner ? "rgba(16,185,129,0.26)" : "rgba(12,12,12,0.08)"}`,
+                  background: isWinner ? "linear-gradient(180deg, rgba(240,253,244,0.95) 0%, rgba(255,255,255,0.9) 100%)" : "rgba(255,255,255,0.86)",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", flexWrap: "wrap", marginBottom: "14px" }}>
+                  <div>
+                    <div className="micro-label" style={{ marginBottom: "6px" }}>
+                      option {String.fromCharCode(65 + index)}
                     </div>
-                    <p style={{ ...dm, fontSize: "13px", color: "#374151", lineHeight: 1.6, margin: 0, whiteSpace: "pre-line" }}>
-                      {v.feedback_text}
-                    </p>
-                    {v.feedback_rating && (
-                      <div style={{ marginTop: "8px", display: "flex", gap: "2px" }}>
-                        {Array.from({ length: 5 }).map((_, i) => (
-                          <span key={i} style={{
-                            fontSize: "14px",
-                            color: i < v.feedback_rating! ? "#F59E0B" : "#E5E7EB",
-                          }}>
+                    <div style={{ fontSize: "18px", fontWeight: 800, letterSpacing: "-0.04em" }}>{option.label}</div>
+                  </div>
+
+                  <div className="pill-row">
+                    {isWinner && <span className="pill" style={{ color: "#047857", borderColor: "#A7F3D0", background: "#F0FDF4" }}>winner</span>}
+                    <span className="pill">{count} votes</span>
+                    <span className="pill">{Math.round(pct * 100)}%</span>
+                  </div>
+                </div>
+
+                <div style={{ height: "16px", borderRadius: "999px", background: "#F1EFE8", overflow: "hidden", marginBottom: "14px" }}>
+                  <div className="progress-bar animate-bar-fill" style={{ width: `${Math.max(pct * 100, total > 0 ? 4 : 0)}%`, height: "100%", background: BAR_GRADIENTS[index % BAR_GRADIENTS.length], borderRadius: "999px" }} />
+                </div>
+
+                {option.content && (
+                  isImage(option.content) ? (
+                    <div style={{ position: "relative", width: "100%", height: "220px", borderRadius: "18px", overflow: "hidden", background: "#F1EFE8" }}>
+                      <Image src={option.content} alt={option.label} fill className="object-contain" unoptimized />
+                    </div>
+                  ) : (
+                    <div style={{ padding: "14px 16px", borderRadius: "18px", background: "#F8F7F3", border: "1px solid rgba(12,12,12,0.06)", fontSize: "13px", lineHeight: 1.7, color: "#4B5563" }}>
+                      {option.content}
+                    </div>
+                  )
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="surface-card" style={{ padding: "24px", display: "grid", gap: "16px" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px", flexWrap: "wrap" }}>
+          <div>
+            <div className="soft-label" style={{ marginBottom: "8px" }}>
+              Contributor feedback
+            </div>
+            <div style={{ fontSize: "22px", fontWeight: 800, letterSpacing: "-0.04em" }}>Why people voted the way they did</div>
+          </div>
+
+          <button type="button" className="btn-secondary" onClick={() => setShowFeedback((value) => !value)}>
+            {showFeedback ? "Hide" : "Show"} feedback
+          </button>
+        </div>
+
+        {feedbackVotes.length === 0 ? (
+          <div style={{ padding: "18px", borderRadius: "20px", background: "#F8F7F3", border: "1px solid rgba(12,12,12,0.06)", fontSize: "13px", color: "#6B7280" }}>
+            No written feedback yet. Use reasoned or detailed tasks to collect explanations in addition to votes.
+          </div>
+        ) : (
+          showFeedback && (
+            <div style={{ display: "grid", gap: "12px" }}>
+              {feedbackVotes.map((vote) => {
+                const badge = BADGE_STYLES[vote.reputation_badge] ?? BADGE_STYLES.new;
+
+                return (
+                  <div key={vote.id} style={{ padding: "18px", borderRadius: "20px", border: "1px solid rgba(12,12,12,0.08)", background: "rgba(255,255,255,0.84)" }}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", flexWrap: "wrap", marginBottom: "10px" }}>
+                      <div className="pill-row">
+                        <span className="pill" style={{ fontFamily: "var(--font-mono), monospace" }}>{vote.nullifier_prefix}</span>
+                        <span className="pill" style={{ color: badge.color, background: badge.bg, borderColor: badge.border, textTransform: "capitalize" }}>
+                          {vote.reputation_badge}
+                        </span>
+                        <span className="pill">{options.find((option) => option.option_index === vote.option_index)?.label ?? `Option ${vote.option_index + 1}`}</span>
+                      </div>
+                      <span style={{ fontSize: "12px", color: "#8A8F98" }}>{formatDate(vote.voted_at)}</span>
+                    </div>
+
+                    <div style={{ fontSize: "14px", lineHeight: 1.8, color: "#374151", whiteSpace: "pre-line" }}>{vote.feedback_text}</div>
+
+                    {vote.feedback_rating && (
+                      <div style={{ marginTop: "12px", display: "flex", gap: "2px" }}>
+                        {Array.from({ length: 5 }).map((_, index) => (
+                          <span key={index} style={{ color: index < vote.feedback_rating! ? "#F59E0B" : "#E5E7EB", fontSize: "14px" }}>
                             ★
                           </span>
                         ))}
@@ -419,24 +412,8 @@ export function ResultsDashboard({ taskId }: Props) {
                 );
               })}
             </div>
-          )}
-        </div>
-      )}
-
-      {/* Status */}
-      <div style={{
-        display: "flex", alignItems: "center", gap: "8px",
-        ...dm, fontSize: "12px", color: "#9CA3AF",
-      }}>
-        <span style={{
-          width: "7px", height: "7px", borderRadius: "100px",
-          backgroundColor: task.status === "open" ? "#10B981" : "#9CA3AF",
-          boxShadow: task.status === "open" ? "0 0 6px rgba(16, 185, 129, 0.5)" : "none",
-          animation: task.status === "open" ? "pulse-soft 2s ease-in-out infinite" : "none",
-        }} />
-        {task.status === "open"
-          ? `Open — ${task.max_workers - total} slots remaining`
-          : "Closed"}
+          )
+        )}
       </div>
     </div>
   );

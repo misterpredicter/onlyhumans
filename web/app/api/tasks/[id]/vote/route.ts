@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
-import { payWorker } from "@/lib/payments";
 import { calculateSplit } from "@/lib/economics";
+import { payWorker } from "@/lib/payments";
+import { deliverTaskCompletionCallback } from "@/lib/task-callbacks";
 
 // POST /api/tasks/:id/vote — submit vote + trigger payment
 export async function POST(
@@ -14,14 +15,11 @@ export async function POST(
     const body = await req.json();
     const { nullifier_hash, worker_wallet, feedback_text } = body;
 
-    // Accept option_index (V2) or choice (V1 backward compat)
     let option_index: number;
     let choice: "A" | "B";
 
     if (typeof body.option_index === "number") {
       option_index = body.option_index;
-      // Legacy choice column only supports A/B — map 0→A, 1→B.
-      // For N>2 options, choice='A' is a placeholder; option_index is the source of truth.
       choice = option_index === 0 ? "A" : "B";
     } else if (body.choice === "A" || body.choice === "B") {
       choice = body.choice;
@@ -40,7 +38,6 @@ export async function POST(
       );
     }
 
-    // 1. Verify nullifier exists (worker verified with World ID)
     const { rows: workers } = await sql`
       SELECT nullifier_hash FROM workers WHERE nullifier_hash = ${nullifier_hash}
     `;
@@ -51,7 +48,6 @@ export async function POST(
       );
     }
 
-    // 2. Anti-sybil: check for duplicate vote on this task
     const { rows: existing } = await sql`
       SELECT id FROM votes WHERE task_id = ${id} AND nullifier_hash = ${nullifier_hash}
     `;
@@ -62,7 +58,6 @@ export async function POST(
       );
     }
 
-    // 3. Get task (includes tier for feedback validation) — also check capacity
     const { rows: tasks } = await sql`
       SELECT t.*, (SELECT COUNT(*)::int FROM votes v WHERE v.task_id = t.id) AS current_votes
       FROM tasks t
@@ -71,17 +66,19 @@ export async function POST(
     if (tasks.length === 0) {
       return NextResponse.json({ error: "Task not found or closed" }, { status: 404 });
     }
+
     const task = tasks[0];
     const tier = task.tier ?? "quick";
 
-    // Check capacity before accepting vote
     if (task.current_votes >= task.max_workers) {
-      // Close the task since it's at capacity
-      await sql`UPDATE tasks SET status = 'closed' WHERE id = ${id} AND status = 'open'`;
+      await sql`
+        UPDATE tasks
+        SET status = 'closed', closed_at = COALESCE(closed_at, NOW())
+        WHERE id = ${id} AND status = 'open'
+      `;
       return NextResponse.json({ error: "Task is full — no more slots available" }, { status: 409 });
     }
 
-    // 3b. Validate option_index is within range for this task
     const { rows: taskOptions } = await sql`
       SELECT MAX(option_index) AS max_idx FROM task_options WHERE task_id = ${id}
     `;
@@ -93,13 +90,13 @@ export async function POST(
       );
     }
 
-    // 4. Validate feedback requirement per tier
     if (tier === "reasoned" && !feedback_text?.trim()) {
       return NextResponse.json(
         { error: "feedback_text required for reasoned tier (1-2 sentences)" },
         { status: 400 }
       );
     }
+
     if (tier === "detailed" && !feedback_text?.trim()) {
       return NextResponse.json(
         { error: "feedback_text required for detailed tier" },
@@ -107,9 +104,6 @@ export async function POST(
       );
     }
 
-    // 5. Pay worker with 90/9/1 economics split
-    //    Only the worker's share of the 90% contributor pool goes on-chain.
-    //    Idea contributor, platform fund, and founder amounts tracked in DB ledger.
     const bounty = parseFloat(task.bounty_per_vote);
     const ideaShare = parseFloat(task.idea_contributor_share ?? "0.05");
     const split = calculateSplit(bounty, ideaShare);
@@ -121,9 +115,9 @@ export async function POST(
         { status: 400 }
       );
     }
+
     if (worker_wallet) {
       try {
-        // Only send worker's share on-chain (not the full bounty)
         txHash = await payWorker(worker_wallet as `0x${string}`, split.worker);
         await sql`
           UPDATE workers
@@ -135,12 +129,11 @@ export async function POST(
           INSERT INTO payments (type, wallet_address, amount_usdc, tx_hash, task_id)
           VALUES ('worker_payout', ${worker_wallet}, ${split.worker}, ${txHash}, ${id})
         `;
-      } catch (e) {
-        console.error("Payment failed (vote still counts):", e);
+      } catch (error) {
+        console.error("Payment failed (vote still counts):", error);
       }
     }
 
-    // 6. Insert vote with option_index + feedback (UNIQUE constraint prevents duplicates atomically)
     const { rows: voteRows } = await sql`
       INSERT INTO votes (task_id, nullifier_hash, choice, option_index, feedback_text, payment_tx_hash)
       VALUES (${id}, ${nullifier_hash}, ${choice}, ${option_index}, ${feedback_text ?? null}, ${txHash})
@@ -148,13 +141,19 @@ export async function POST(
     `;
     const voteId = voteRows[0]?.id;
 
-    // 6b. Record economics split in platform ledger
     await sql`
-      INSERT INTO platform_ledger (vote_id, task_id, bounty_per_vote, worker_amount, idea_contributor_amount, platform_amount, founder_amount, early_collaborator_amount, idea_contributor_share)
-      VALUES (${voteId}, ${id}, ${bounty}, ${split.worker}, ${split.idea_contributor}, ${split.platform}, ${split.founder}, 0, ${ideaShare})
+      INSERT INTO platform_ledger (
+        vote_id, task_id, bounty_per_vote, worker_amount,
+        idea_contributor_amount, platform_amount, founder_amount,
+        early_collaborator_amount, idea_contributor_share
+      )
+      VALUES (
+        ${voteId}, ${id}, ${bounty}, ${split.worker},
+        ${split.idea_contributor}, ${split.platform}, ${split.founder},
+        ${split.early_collaborator}, ${ideaShare}
+      )
     `;
 
-    // 7. Upsert reputation for this voter
     await sql`
       INSERT INTO reputation (nullifier_hash, total_votes, total_detailed, badge)
       VALUES (
@@ -175,44 +174,23 @@ export async function POST(
         END
     `;
 
-    // 8. Check if task should be closed (max_workers reached)
     const { rows: voteTotals } = await sql`
       SELECT COUNT(*)::int AS total FROM votes WHERE task_id = ${id}
     `;
     const totalVotes = voteTotals[0]?.total ?? 0;
 
     if (totalVotes >= task.max_workers) {
-      await sql`UPDATE tasks SET status = 'closed' WHERE id = ${id}`;
+      await sql`
+        UPDATE tasks
+        SET status = 'closed', closed_at = COALESCE(closed_at, NOW())
+        WHERE id = ${id}
+      `;
 
-      // Fire webhook callback if the task has a callback_url
       if (task.callback_url) {
-        // Gather final results for the callback payload
-        const { rows: optionVotes } = await sql`
-          SELECT option_index, COUNT(*)::int AS count
-          FROM votes WHERE task_id = ${id}
-          GROUP BY option_index ORDER BY count DESC
-        `;
-        const votesByOption: Record<number, number> = {};
-        for (const ov of optionVotes) votesByOption[ov.option_index] = ov.count;
-        const winnerRow = optionVotes[0];
-        const confidence = winnerRow ? winnerRow.count / totalVotes : 0;
-
-        const callbackPayload = {
-          event: "task_closed",
-          task_id: id,
-          status: "closed",
-          total_votes: totalVotes,
-          votes_by_option: votesByOption,
-          winner: winnerRow?.option_index ?? null,
-          confidence,
-        };
-
-        // Best-effort — don't block the response on webhook delivery
-        fetch(task.callback_url, {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify(callbackPayload),
-        }).catch((err) => console.error("Webhook callback failed:", err));
+        const callbackResult = await deliverTaskCompletionCallback(id, task.callback_url);
+        if (!callbackResult.ok) {
+          console.error("Webhook callback failed:", callbackResult.error);
+        }
       }
     }
 
@@ -229,16 +207,17 @@ export async function POST(
         idea_contributor_accrued: split.idea_contributor,
         platform_accrued: split.platform,
         founder_accrued: split.founder,
+        early_collaborator_accrued: split.early_collaborator,
       },
     });
   } catch (error) {
-    // Catch unique constraint violation (race condition double-vote)
     if (String(error).includes("unique") || String(error).includes("UNIQUE")) {
       return NextResponse.json(
         { error: "Already voted on this task" },
         { status: 409 }
       );
     }
+
     console.error(`POST /api/tasks/${id}/vote error:`, error);
     return NextResponse.json({ error: "Failed to submit vote" }, { status: 500 });
   }

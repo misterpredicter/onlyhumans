@@ -4,6 +4,7 @@ import {
   ECONOMICS,
   FOUNDER_SHARE,
   PLATFORM_FUND,
+  calculateWorkerPayout,
 } from "@/lib/economics";
 
 interface TaskOption {
@@ -68,16 +69,16 @@ export interface TaskResultsPayload {
     completed_at: string | null;
     tier: string;
     bounty_per_vote: number;
+    worker_payout_per_vote: number;
     idea_contributor_share: number;
   };
   economics: {
     contributor_share: number;
     platform_fund: number;
     founder_share: number;
-    early_collaborator_share: number;
-    founder_pool_share: number;
     idea_contributor_share: number;
     worker_share_of_90: number;
+    worker_payout_per_vote: number;
     version: number;
   };
 }
@@ -265,6 +266,7 @@ export async function getTaskResults(taskId: string): Promise<TaskResultsPayload
     ECONOMICS.DEFAULT_IDEA_CONTRIBUTOR_SHARE
   );
   const bountyPerVote = toNumber(task.bounty_per_vote);
+  const workerPayoutPerVote = calculateWorkerPayout(bountyPerVote, ideaContributorShare);
 
   return {
     task: {
@@ -296,7 +298,7 @@ export async function getTaskResults(taskId: string): Promise<TaskResultsPayload
       id: vote.id,
       nullifier_prefix: (vote.nullifier_hash ?? "").slice(0, 8),
       voted_at: toTimestamp(vote.created_at),
-      paid: vote.payment_tx_hash ? bountyPerVote : 0,
+      paid: vote.payment_tx_hash ? workerPayoutPerVote : 0,
       option_index: toInt(vote.option_index, vote.choice === "A" ? 0 : 1),
       feedback_text: vote.feedback_text ?? null,
       feedback_rating: vote.feedback_rating === null ? null : toInt(vote.feedback_rating),
@@ -320,16 +322,16 @@ export async function getTaskResults(taskId: string): Promise<TaskResultsPayload
       completed_at: toTimestamp(task.closed_at),
       tier: task.tier ?? "quick",
       bounty_per_vote: bountyPerVote,
+      worker_payout_per_vote: workerPayoutPerVote,
       idea_contributor_share: ideaContributorShare,
     },
     economics: {
       contributor_share: CONTRIBUTOR_SHARE,
       platform_fund: PLATFORM_FUND,
       founder_share: FOUNDER_SHARE,
-      early_collaborator_share: ECONOMICS.EARLY_COLLABORATOR,
-      founder_pool_share: FOUNDER_SHARE + ECONOMICS.EARLY_COLLABORATOR,
       idea_contributor_share: ideaContributorShare,
       worker_share_of_90: 1 - ideaContributorShare,
+      worker_payout_per_vote: workerPayoutPerVote,
       version: ECONOMICS.VERSION,
     },
   };

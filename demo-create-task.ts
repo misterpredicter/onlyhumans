@@ -51,10 +51,10 @@ async function main() {
 
   console.log(`Buyer wallet: ${BUYER_ADDRESS}`);
   console.log(`Total cost: $${totalCost.toFixed(2)} USDC (${task.max_workers} votes x $${task.bounty_per_vote})`);
-  console.log(`Posting to ${APP_URL}/api/tasks?total=${totalCost.toFixed(2)}...`);
+  console.log(`Posting to ${APP_URL}/api/tasks...`);
   console.log();
 
-  const res = await paidFetch(`${APP_URL}/api/tasks?total=${totalCost.toFixed(2)}`, {
+  const res = await paidFetch(`${APP_URL}/api/tasks`, {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify(task),
