@@ -150,8 +150,8 @@ export async function POST(
 
     // 6b. Record economics split in platform ledger
     await sql`
-      INSERT INTO platform_ledger (vote_id, task_id, bounty_per_vote, worker_amount, idea_contributor_amount, platform_amount, founder_amount, idea_contributor_share)
-      VALUES (${voteId}, ${id}, ${bounty}, ${split.worker}, ${split.idea_contributor}, ${split.platform}, ${split.founder}, ${ideaShare})
+      INSERT INTO platform_ledger (vote_id, task_id, bounty_per_vote, worker_amount, idea_contributor_amount, platform_amount, founder_amount, early_collaborator_amount, idea_contributor_share)
+      VALUES (${voteId}, ${id}, ${bounty}, ${split.worker}, ${split.idea_contributor}, ${split.platform}, ${split.founder}, 0, ${ideaShare})
     `;
 
     // 7. Upsert reputation for this voter

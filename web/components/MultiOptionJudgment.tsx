@@ -17,6 +17,7 @@ interface Props {
   workerWallet?: string;
   context?: string | null;
   onVoted?: () => void;
+  onBackToQueue?: () => void;
 }
 
 interface VoteResult {
@@ -26,10 +27,7 @@ interface VoteResult {
   optionIndex: number;
 }
 
-const dm: React.CSSProperties = { fontFamily: "var(--font-sans), sans-serif" };
-
-const isImage = (url: string) =>
-  /\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i.test(url);
+const isImage = (url: string) => /\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i.test(url);
 
 export function MultiOptionJudgment({
   taskId,
@@ -39,6 +37,7 @@ export function MultiOptionJudgment({
   workerWallet,
   context,
   onVoted,
+  onBackToQueue,
 }: Props) {
   const [voted, setVoted] = useState(false);
   const [voting, setVoting] = useState<number | null>(null);
@@ -56,11 +55,12 @@ export function MultiOptionJudgment({
     if (voting !== null) return;
 
     if (tier === "reasoned" && !feedbackText.trim()) {
-      setError("Please write a brief reason for your choice before submitting.");
+      setError("Write a short reason before you submit.");
       return;
     }
+
     if (tier === "detailed" && !feedbackWorks.trim()) {
-      setError("Please complete the 'What works?' field before submitting.");
+      setError("Complete the 'What works?' field before submitting.");
       return;
     }
 
@@ -71,17 +71,17 @@ export function MultiOptionJudgment({
       tier === "reasoned"
         ? feedbackText
         : tier === "detailed"
-        ? [
-            feedbackWorks ? `What works: ${feedbackWorks}` : "",
-            feedbackDoesnt ? `What doesn't: ${feedbackDoesnt}` : "",
-            feedbackSuggestions ? `Suggestions: ${feedbackSuggestions}` : "",
-          ]
-            .filter(Boolean)
-            .join("\n\n")
-        : null;
+          ? [
+              feedbackWorks ? `What works: ${feedbackWorks}` : "",
+              feedbackDoesnt ? `What doesn't: ${feedbackDoesnt}` : "",
+              feedbackSuggestions ? `Suggestions: ${feedbackSuggestions}` : "",
+            ]
+              .filter(Boolean)
+              .join("\n\n")
+          : null;
 
     try {
-      const res = await fetch(`/api/tasks/${taskId}/vote`, {
+      const response = await fetch(`/api/tasks/${taskId}/vote`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
@@ -92,9 +92,9 @@ export function MultiOptionJudgment({
         }),
       });
 
-      const data = await res.json();
+      const data = await response.json();
 
-      if (!res.ok) {
+      if (!response.ok) {
         setError(data.error ?? "Vote failed");
         setVoting(null);
         return;
@@ -111,7 +111,7 @@ export function MultiOptionJudgment({
         onVoted?.();
       }
     } catch {
-      setError("Network error — please try again");
+      setError("Network error. Please try again.");
       setVoting(null);
     }
   };
@@ -125,88 +125,166 @@ export function MultiOptionJudgment({
       });
       setCreatorRated(true);
     } catch {
-      // silent
+      // Silent failure. Rating is secondary to the primary vote flow.
     }
   };
 
-  // Post-vote screen
   if (voted && result) {
-    const chosenOption = options.find((o) => o.option_index === result.optionIndex);
+    const chosenOption = options.find((option) => option.option_index === result.optionIndex);
+
     return (
       <div className="animate-scale-in" style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-        <div style={{
-          textAlign: "center", padding: "48px 24px",
-          background: "linear-gradient(135deg, #F0FDF4 0%, #ECFDF5 50%, #D1FAE5 100%)",
-          borderRadius: "16px",
-          border: "1px solid #A7F3D0",
-        }}>
-          {/* Checkmark */}
-          <div className="animate-check" style={{
-            width: "56px", height: "56px", margin: "0 auto 16px",
-            background: "linear-gradient(135deg, #10B981 0%, #059669 100%)",
-            borderRadius: "50%",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            boxShadow: "0 4px 16px rgba(16, 185, 129, 0.3)",
-          }}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="20 6 9 17 4 12" />
-            </svg>
-          </div>
-          <p style={{ ...dm, fontSize: "26px", fontWeight: 800, color: "#0C0C0C", margin: "0 0 6px", letterSpacing: "-0.4px" }}>Vote recorded</p>
-          <p style={{ ...dm, fontSize: "14px", color: "#6B7280", margin: "0 0 20px" }}>
-            You picked: <span style={{ fontWeight: 700, color: "#0C0C0C" }}>{chosenOption?.label}</span>
-          </p>
-          {result.amount > 0 ? (
-            <>
-              <p style={{
-                ...dm, fontSize: "20px", fontWeight: 800, color: "#059669", margin: "0 0 4px",
-                letterSpacing: "-0.3px",
-              }}>
-                +${result.amount.toFixed(2)} USDC sent
+        <div
+          style={{
+            padding: "30px",
+            borderRadius: "28px",
+            background: "linear-gradient(135deg, #F0FDF4 0%, #ECFDF5 48%, #D1FAE5 100%)",
+            border: "1px solid #A7F3D0",
+            boxShadow: "0 24px 48px rgba(16,185,129,0.14)",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "18px", flexWrap: "wrap" }}>
+            <div
+              className="animate-check"
+              style={{
+                width: "58px",
+                height: "58px",
+                borderRadius: "18px",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background: "linear-gradient(135deg, #10B981 0%, #059669 100%)",
+                boxShadow: "0 18px 34px rgba(16,185,129,0.24)",
+                color: "#FFFFFF",
+              }}
+            >
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+
+            <div style={{ flex: 1, minWidth: "220px" }}>
+              <p style={{ margin: "0 0 4px", fontSize: "30px", fontWeight: 800, letterSpacing: "-0.05em", color: "#052E16" }}>
+                Vote recorded
               </p>
-              {result.tx && (
-                <p style={{ fontFamily: "var(--font-mono), monospace", fontSize: "11px", color: "#9CA3AF", margin: 0 }}>
-                  tx: {result.tx.slice(0, 22)}...
-                </p>
-              )}
-            </>
-          ) : (
-            <p style={{ ...dm, fontSize: "14px", color: "#6B7280" }}>Vote counted ({result.totalVotes} total)</p>
+              <p style={{ margin: 0, fontSize: "14px", lineHeight: 1.7, color: "#065F46" }}>
+                You chose <strong>{chosenOption?.label}</strong>. The live consensus has been updated.
+              </p>
+            </div>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: "12px" }}>
+            {[
+              { label: "payout", value: result.amount > 0 ? `+${result.amount.toFixed(2)} USDC` : "Counted only" },
+              { label: "total votes", value: `${result.totalVotes}` },
+              { label: "option", value: chosenOption?.label ?? `#${result.optionIndex + 1}` },
+            ].map((item) => (
+              <div key={item.label} style={{ padding: "14px 16px", borderRadius: "18px", background: "rgba(255,255,255,0.7)" }}>
+                <div className="micro-label" style={{ marginBottom: "6px", color: "#059669" }}>
+                  {item.label}
+                </div>
+                <div style={{ fontSize: "15px", fontWeight: 800, letterSpacing: "-0.03em", color: "#052E16" }}>{item.value}</div>
+              </div>
+            ))}
+          </div>
+
+          {result.tx && (
+            <div
+              style={{
+                marginTop: "14px",
+                padding: "12px 14px",
+                borderRadius: "16px",
+                background: "rgba(255,255,255,0.62)",
+                fontFamily: "var(--font-mono), monospace",
+                fontSize: "11px",
+                color: "#065F46",
+              }}
+            >
+              payout tx: {result.tx}
+            </div>
           )}
         </div>
 
-        {!creatorRated && (
-          <div style={{
-            backgroundColor: "#FAFAF8", borderRadius: "14px",
-            padding: "20px", textAlign: "center",
-            border: "1px solid #E8E5DE",
-          }}>
-            <p style={{ ...dm, fontSize: "14px", color: "#374151", margin: "0 0 14px", fontWeight: 500 }}>Was this task clear and fair?</p>
-            <div style={{ display: "flex", justifyContent: "center", gap: "10px" }}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: onBackToQueue ? "minmax(0, 1fr) auto" : "1fr",
+            gap: "14px",
+            alignItems: "center",
+            padding: "18px 20px",
+            borderRadius: "22px",
+            border: "1px solid rgba(12,12,12,0.08)",
+            background: "rgba(255,255,255,0.82)",
+          }}
+        >
+          <div>
+            <div style={{ fontSize: "14px", fontWeight: 800, letterSpacing: "-0.02em", marginBottom: "4px" }}>
+              Keep the queue moving
+            </div>
+            <div style={{ fontSize: "13px", lineHeight: 1.6, color: "#6B7280" }}>
+              Good contributors stay in flow. Head back to the queue for the next decision or rate task quality below.
+            </div>
+          </div>
+
+          {onBackToQueue && (
+            <button type="button" className="btn-secondary" onClick={onBackToQueue}>
+              Next task
+            </button>
+          )}
+        </div>
+
+        {!creatorRated ? (
+          <div
+            style={{
+              padding: "20px",
+              borderRadius: "22px",
+              border: "1px solid rgba(12,12,12,0.08)",
+              background: "rgba(255,255,255,0.82)",
+              display: "flex",
+              flexDirection: "column",
+              gap: "14px",
+            }}
+          >
+            <div>
+              <div style={{ fontSize: "15px", fontWeight: 800, letterSpacing: "-0.02em", marginBottom: "4px" }}>
+                Was this brief clear and fair?
+              </div>
+              <div style={{ fontSize: "13px", color: "#6B7280", lineHeight: 1.6 }}>
+                This helps the best requesters float to the top of the marketplace.
+              </div>
+            </div>
+
+            <div className="pill-row">
               {[
-                { rating: 1 as const, label: "Yes, well written", color: "#059669", bg: "#F0FDF4", border: "#D1FAE5" },
-                { rating: -1 as const, label: "No, confusing", color: "#DC2626", bg: "#FEF2F2", border: "#FECACA" },
-              ].map(({ rating, label, color, bg, border }) => (
+                { rating: 1 as const, label: "Yes, well written", color: "#059669", bg: "#F0FDF4", border: "#A7F3D0" },
+                { rating: -1 as const, label: "No, confusing", color: "#B91C1C", bg: "#FEF2F2", border: "#FECACA" },
+              ].map((item) => (
                 <button
-                  key={rating}
-                  onClick={() => rateCreator(rating)}
+                  key={item.rating}
+                  type="button"
+                  onClick={() => rateCreator(item.rating)}
                   style={{
-                    display: "flex", alignItems: "center", gap: "6px",
-                    padding: "10px 18px",
-                    backgroundColor: bg, border: `1.5px solid ${border}`,
-                    borderRadius: "10px", cursor: "pointer",
-                    fontFamily: "var(--font-sans), sans-serif", fontSize: "13px", fontWeight: 600, color,
-                    transition: "all 0.15s",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    minHeight: "44px",
+                    padding: "0 16px",
+                    borderRadius: "14px",
+                    border: `1px solid ${item.border}`,
+                    background: item.bg,
+                    color: item.color,
+                    fontSize: "13px",
+                    fontWeight: 700,
+                    cursor: "pointer",
                   }}
                 >
-                  {label}
+                  {item.label}
                 </button>
               ))}
             </div>
           </div>
-        )}
-        {creatorRated && (
-          <p className="animate-fade-in" style={{ ...dm, textAlign: "center", fontSize: "14px", color: "#9CA3AF" }}>Thanks for the feedback!</p>
+        ) : (
+          <div style={{ textAlign: "center", fontSize: "13px", color: "#6B7280" }}>Thanks. Your task-quality signal was recorded too.</div>
         )}
       </div>
     );
@@ -214,219 +292,242 @@ export function MultiOptionJudgment({
 
   const gridStyle: React.CSSProperties =
     options.length === 2
-      ? { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }
+      ? { display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "16px" }
       : options.length <= 4
-      ? { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }
-      : { display: "flex", flexDirection: "column", gap: "10px" };
+        ? { display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "14px" }
+        : { display: "flex", flexDirection: "column", gap: "12px" };
+
+  const instruction =
+    tier === "quick"
+      ? "Pick the strongest option below."
+      : tier === "reasoned"
+        ? "Write a short reason, then submit the option you believe is strongest."
+        : "Fill in the structured critique, then choose the strongest option.";
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+        <div className="soft-label">Contributor view</div>
+        <div style={{ fontSize: "22px", fontWeight: 800, letterSpacing: "-0.05em" }}>Make the call</div>
+        <div style={{ fontSize: "14px", lineHeight: 1.7, color: "#6B7280" }}>{instruction}</div>
+      </div>
+
       {error && (
-        <div className="animate-slide-down" style={{
-          backgroundColor: "#FEF2F2", border: "1px solid #FECACA",
-          borderRadius: "12px", padding: "12px 16px",
-          ...dm, fontSize: "13px", color: "#DC2626",
-          display: "flex", alignItems: "center", gap: "8px",
-        }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-            <circle cx="12" cy="12" r="10" />
-            <line x1="15" y1="9" x2="9" y2="15" />
-            <line x1="9" y1="9" x2="15" y2="15" />
-          </svg>
+        <div
+          className="animate-slide-down"
+          style={{
+            padding: "14px 16px",
+            borderRadius: "18px",
+            border: "1px solid #FECACA",
+            background: "#FEF2F2",
+            color: "#B91C1C",
+            fontSize: "13px",
+            lineHeight: 1.55,
+          }}
+        >
           {error}
         </div>
       )}
 
-      {/* Context (collapsible) */}
       {context && (
-        <div style={{
-          backgroundColor: "#FFFBEB", border: "1px solid #FDE68A",
-          borderRadius: "14px", overflow: "hidden",
-        }}>
+        <div style={{ borderRadius: "20px", border: "1px solid #FDE68A", background: "#FFFBEB", overflow: "hidden" }}>
           <button
             type="button"
-            onClick={() => setContextExpanded((v) => !v)}
+            onClick={() => setContextExpanded((value) => !value)}
             style={{
-              width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between",
-              padding: "14px 18px",
-              background: "none", border: "none", cursor: "pointer",
-              transition: "background-color 0.15s",
+              width: "100%",
+              padding: "16px 18px",
+              border: "none",
+              background: "transparent",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "12px",
+              cursor: "pointer",
             }}
           >
-            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B45309" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <span style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "13px", fontWeight: 700, color: "#92400E" }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="10" />
                 <line x1="12" y1="16" x2="12" y2="12" />
                 <line x1="12" y1="8" x2="12.01" y2="8" />
               </svg>
-              <span style={{ ...dm, fontSize: "13px", fontWeight: 600, color: "#92400E" }}>Context from task creator</span>
-            </div>
-            <span style={{
-              ...dm, fontSize: "11px", color: "#B45309",
-              transition: "transform 0.2s",
-              transform: contextExpanded ? "rotate(180deg)" : "rotate(0deg)",
-              display: "inline-block",
-            }}>
+              Context from the requester
+            </span>
+            <span style={{ fontSize: "12px", color: "#B45309", transform: contextExpanded ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s ease" }}>
               ▼
             </span>
           </button>
+
           {contextExpanded && (
-            <div className="animate-slide-down" style={{
-              padding: "0 18px 16px", ...dm, fontSize: "13px", color: "#92400E", lineHeight: 1.6,
-            }}>
+            <div className="animate-slide-down" style={{ padding: "0 18px 18px", fontSize: "13px", lineHeight: 1.7, color: "#92400E" }}>
               {context}
             </div>
           )}
         </div>
       )}
 
-      {/* Tier feedback */}
       {tier === "reasoned" && (
-        <div className="animate-fade-in">
-          <label style={{ ...dm, display: "block", fontSize: "13px", fontWeight: 600, color: "#374151", marginBottom: "6px" }}>
-            Why will you pick this option? <span style={{ color: "#DC2626" }}>*</span>
+        <div style={{ padding: "18px", borderRadius: "22px", border: "1px solid rgba(12,12,12,0.08)", background: "rgba(255,255,255,0.78)" }}>
+          <label style={{ display: "block", marginBottom: "8px", fontSize: "13px", fontWeight: 700, color: "#20242A" }}>
+            Why is this the stronger option? <span style={{ color: "#DC2626" }}>*</span>
           </label>
           <textarea
             value={feedbackText}
-            onChange={(e) => setFeedbackText(e.target.value)}
-            rows={2}
-            placeholder="1-2 sentences explaining your reasoning..."
+            onChange={(event) => setFeedbackText(event.target.value)}
+            rows={3}
+            placeholder="Focus on the tradeoff that matters most."
             className="input-field"
-            style={{ ...dm, resize: "vertical" }}
+            style={{ resize: "vertical" }}
           />
         </div>
       )}
 
       {tier === "detailed" && (
-        <div className="animate-fade-in" style={{
-          backgroundColor: "#FAFAF8", borderRadius: "16px",
-          padding: "18px", display: "flex", flexDirection: "column", gap: "14px",
-          border: "1px solid #E8E5DE",
-        }}>
-          <p style={{ ...dm, fontSize: "13px", fontWeight: 700, color: "#374151", margin: 0 }}>
-            Structured feedback
-          </p>
+        <div
+          style={{
+            padding: "18px",
+            borderRadius: "22px",
+            border: "1px solid rgba(12,12,12,0.08)",
+            background: "rgba(255,255,255,0.78)",
+            display: "grid",
+            gap: "12px",
+          }}
+        >
+          <div>
+            <div style={{ fontSize: "15px", fontWeight: 800, letterSpacing: "-0.02em", marginBottom: "4px" }}>Structured feedback</div>
+            <div style={{ fontSize: "13px", lineHeight: 1.6, color: "#6B7280" }}>
+              Capture the strongest positives, the most important weaknesses, and the next improvement.
+            </div>
+          </div>
+
           {[
-            { label: "What works?", value: feedbackWorks, onChange: setFeedbackWorks, placeholder: "Strengths of your chosen option...", required: true },
-            { label: "What doesn't work?", value: feedbackDoesnt, onChange: setFeedbackDoesnt, placeholder: "Weaknesses or concerns...", required: false },
-            { label: "Suggestions", value: feedbackSuggestions, onChange: setFeedbackSuggestions, placeholder: "How would you improve it?", required: false },
-          ].map(({ label, value, onChange, placeholder, required }) => (
-            <div key={label}>
-              <label style={{ ...dm, display: "block", fontSize: "12px", fontWeight: 600, color: "#6B7280", marginBottom: "4px" }}>
-                {label} {required && <span style={{ color: "#DC2626" }}>*</span>}
+            { label: "What works?", value: feedbackWorks, onChange: setFeedbackWorks, placeholder: "Where does the chosen option feel strongest?", required: true },
+            { label: "What doesn’t work?", value: feedbackDoesnt, onChange: setFeedbackDoesnt, placeholder: "What introduces friction or weakens trust?", required: false },
+            { label: "Suggestions", value: feedbackSuggestions, onChange: setFeedbackSuggestions, placeholder: "What would you change next?", required: false },
+          ].map((field) => (
+            <div key={field.label}>
+              <label style={{ display: "block", marginBottom: "8px", fontSize: "12px", fontWeight: 700, color: "#525967" }}>
+                {field.label} {field.required && <span style={{ color: "#DC2626" }}>*</span>}
               </label>
               <textarea
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-                rows={2}
-                placeholder={placeholder}
+                value={field.value}
+                onChange={(event) => field.onChange(event.target.value)}
+                rows={3}
+                placeholder={field.placeholder}
                 className="input-field"
-                style={{ ...dm, resize: "vertical" }}
+                style={{ resize: "vertical" }}
               />
             </div>
           ))}
         </div>
       )}
 
-      {/* Options */}
       <div style={gridStyle}>
-        {options.map((opt, idx) => {
-          const isLoading = voting === opt.option_index;
+        {options.map((option, index) => {
+          const isLoading = voting === option.option_index;
           const isDisabled = voting !== null && !isLoading;
+
           return (
             <button
-              key={opt.option_index}
-              onClick={() => vote(opt.option_index)}
+              key={option.option_index}
+              type="button"
+              onClick={() => vote(option.option_index)}
               disabled={voting !== null}
               style={{
-                border: `2px solid ${isLoading ? "#10B981" : "#E8E5DE"}`,
-                borderRadius: "18px",
-                padding: "20px",
+                padding: "18px",
+                borderRadius: "24px",
+                border: `1.5px solid ${isLoading ? "#10B981" : "rgba(12,12,12,0.08)"}`,
+                background: isLoading
+                  ? "linear-gradient(180deg, #F0FDF4 0%, #ECFDF5 100%)"
+                  : "rgba(255,255,255,0.88)",
                 textAlign: "left",
                 cursor: voting !== null ? "not-allowed" : "pointer",
-                backgroundColor: isLoading ? "#F0FDF4" : "#FFFFFF",
-                transition: "all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
-                opacity: isDisabled ? 0.45 : 1,
-                display: "flex", flexDirection: "column", gap: "14px",
-                transform: isLoading ? "scale(0.98)" : "scale(1)",
-                boxShadow: isLoading ? "0 0 0 3px rgba(16, 185, 129, 0.15)" : "0 1px 3px rgba(0,0,0,0.04)",
-              }}
-              onMouseEnter={(e) => {
-                if (voting === null) {
-                  e.currentTarget.style.borderColor = "#C4C0B8";
-                  e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.08)";
-                  e.currentTarget.style.transform = "translateY(-2px)";
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (voting === null) {
-                  e.currentTarget.style.borderColor = "#E8E5DE";
-                  e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.04)";
-                  e.currentTarget.style.transform = "scale(1)";
-                }
+                opacity: isDisabled ? 0.48 : 1,
+                transition: "transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease",
+                boxShadow: isLoading ? "0 18px 32px rgba(16,185,129,0.14)" : "var(--shadow-card)",
+                display: "flex",
+                flexDirection: "column",
+                gap: "14px",
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <span style={{ ...dm, fontSize: "14px", fontWeight: 800, color: "#0C0C0C", letterSpacing: "-0.2px" }}>{opt.label}</span>
-                <span style={{
-                  fontFamily: "var(--font-mono), monospace", fontSize: "10px", color: "#B8B5AD",
-                  backgroundColor: "#F5F4F0",
-                  borderRadius: "6px", padding: "2px 7px",
-                  fontWeight: 500,
-                }}>
-                  {String.fromCharCode(65 + idx)}
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
+                <div>
+                  <div className="micro-label" style={{ marginBottom: "6px" }}>
+                    option {String.fromCharCode(65 + index)}
+                  </div>
+                  <div style={{ fontSize: "18px", fontWeight: 800, letterSpacing: "-0.04em", color: "#0C0C0C" }}>{option.label}</div>
+                </div>
+
+                <span
+                  style={{
+                    width: "36px",
+                    height: "36px",
+                    borderRadius: "14px",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    background: isLoading ? "rgba(16,185,129,0.12)" : "#F5F4F0",
+                    color: isLoading ? "#059669" : "#6B7280",
+                    fontFamily: "var(--font-mono), monospace",
+                    fontSize: "12px",
+                    fontWeight: 700,
+                  }}
+                >
+                  {String.fromCharCode(65 + index)}
                 </span>
               </div>
 
-              {isImage(opt.content) ? (
-                <div style={{
-                  position: "relative", width: "100%",
-                  height: options.length <= 2 ? "280px" : "180px",
-                  borderRadius: "12px", overflow: "hidden",
-                  backgroundColor: "#F5F4F0",
-                }}>
-                  <Image src={opt.content} alt={opt.label} fill className="object-contain" unoptimized />
+              {isImage(option.content) ? (
+                <div style={{ position: "relative", width: "100%", height: options.length <= 2 ? "280px" : "210px", borderRadius: "18px", overflow: "hidden", background: "#F1EFE8" }}>
+                  <Image src={option.content} alt={option.label} fill className="object-contain" unoptimized />
                 </div>
               ) : (
-                <p style={{ ...dm, fontSize: "13px", color: "#374151", lineHeight: 1.55, margin: 0 }}>{opt.content}</p>
+                <div
+                  style={{
+                    minHeight: "122px",
+                    padding: "16px",
+                    borderRadius: "18px",
+                    background: "rgba(249,248,245,0.92)",
+                    border: "1px solid rgba(12,12,12,0.06)",
+                    fontSize: "14px",
+                    lineHeight: 1.7,
+                    color: "#374151",
+                  }}
+                >
+                  {option.content}
+                </div>
               )}
 
-              <div style={{
-                background: isLoading
-                  ? "linear-gradient(135deg, #10B981 0%, #059669 100%)"
-                  : "#0C0C0C",
-                borderRadius: "12px", padding: "13px",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                transition: "all 0.2s",
-              }}>
-                <span style={{ ...dm, fontSize: "14px", fontWeight: 700, color: "#FFFFFF" }}>
-                  {isLoading ? (
-                    <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" style={{ animation: "spin 1s linear infinite" }}>
-                        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-                        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" strokeDasharray="32" strokeLinecap="round" />
-                      </svg>
-                      Submitting...
-                    </span>
-                  ) : (
-                    `Vote ${opt.label}`
-                  )}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: "12px",
+                  padding: "14px 16px",
+                  borderRadius: "18px",
+                  background: isLoading ? "linear-gradient(135deg, #10B981 0%, #059669 100%)" : "#0C0C0C",
+                  color: "#FFFFFF",
+                }}
+              >
+                <span style={{ fontSize: "14px", fontWeight: 800, letterSpacing: "-0.02em" }}>
+                  {isLoading ? "Submitting vote..." : `Vote ${option.label}`}
                 </span>
+                {isLoading ? (
+                  <svg width="16" height="16" viewBox="0 0 24 24" style={{ animation: "spin 1s linear infinite" }}>
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" strokeDasharray="32" strokeLinecap="round" />
+                  </svg>
+                ) : (
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M5 12h14M12 5l7 7-7 7" />
+                  </svg>
+                )}
               </div>
             </button>
           );
         })}
       </div>
-
-      {tier !== "quick" && (
-        <p style={{ ...dm, textAlign: "center", fontSize: "12px", color: "#B8B5AD", margin: 0 }}>
-          {tier === "reasoned"
-            ? "Write your reason above, then click your choice"
-            : "Complete the feedback above, then click your choice"}
-        </p>
-      )}
     </div>
   );
 }
-
-export { };

@@ -89,10 +89,13 @@ export async function initializeDatabase() {
       idea_contributor_amount DECIMAL(10,6) NOT NULL DEFAULT 0,
       platform_amount   DECIMAL(10,6) NOT NULL,
       founder_amount    DECIMAL(10,6) NOT NULL,
+      early_collaborator_amount DECIMAL(10,6) NOT NULL DEFAULT 0,
       idea_contributor_share DECIMAL(4,4) DEFAULT 0.05,
       created_at        TIMESTAMPTZ DEFAULT NOW()
     )
   `;
+  // Backward-compatible extra column from an abandoned experiment. New code writes zero.
+  await sql`ALTER TABLE platform_ledger ADD COLUMN IF NOT EXISTS early_collaborator_amount DECIMAL(10,6) NOT NULL DEFAULT 0`;
 
   // V2: Alter existing tables to add new columns (idempotent)
   await sql`ALTER TABLE tasks ADD COLUMN IF NOT EXISTS context TEXT`;
@@ -105,11 +108,18 @@ export async function initializeDatabase() {
 
   // V2: Callback URL for agent webhook notifications when task closes
   await sql`ALTER TABLE tasks ADD COLUMN IF NOT EXISTS callback_url TEXT`;
+  await sql`ALTER TABLE tasks ADD COLUMN IF NOT EXISTS closed_at TIMESTAMPTZ`;
 
   await sql`ALTER TABLE votes ADD COLUMN IF NOT EXISTS option_index INTEGER`;
   await sql`ALTER TABLE votes ADD COLUMN IF NOT EXISTS feedback_text TEXT`;
   await sql`ALTER TABLE votes ADD COLUMN IF NOT EXISTS feedback_rating INTEGER`;
   await sql`ALTER TABLE votes ADD COLUMN IF NOT EXISTS creator_rating INTEGER`;
+
+  await sql`
+    UPDATE tasks
+    SET closed_at = created_at
+    WHERE status = 'closed' AND closed_at IS NULL
+  `;
 
   // V2: Seed task_options from existing option_a/option_b (backward compat, runs once per task)
   await sql`

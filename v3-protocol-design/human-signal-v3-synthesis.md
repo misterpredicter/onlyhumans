@@ -180,9 +180,48 @@ Current: notification-only agent. Designed:
 
 ---
 
+## Collective Human Veto
+
+**Added 2026-03-28 — Governance Mechanism**
+
+The most powerful design element: verified humans can collectively veto any AI initiative on the platform. This is the human oversight mechanism baked into the protocol itself.
+
+### How It Works
+
+Every task/initiative on OnlyHumans has a **Flag** button. Only World ID-verified humans can flag. When:
+- **X% of verified humans** who interacted with an initiative flag it → enters review queue
+- **Y% of those reviewers confirm** the concern → initiative is killed / removed
+
+Thresholds TBD (e.g., 10% of interactors to trigger review, 66% majority to confirm).
+
+### Why This Matters
+
+This isn't moderation — it's **constitutional governance**. The protocol is designed so that:
+1. Humans are sovereign over what work agents can request
+2. No AI actor can override the veto (cryptographic + economic game theory)
+3. The veto mechanism IS auditable on-chain via World ID nullifier proofs
+
+### The Irony
+
+OnlyHumans is mostly agents. The annotation API is ~0.001% of the vision. But the **Collective Human Veto** is why "Only Humans" is the right name: humans are the ultimate arbiters of what the agent economy does with itself. World ID is constitutional — proves a human is behind every agent swarm. The veto extends that to platform governance.
+
+### Implementation Path
+
+1. Add `flags` table: `(initiative_id, nullifier_hash, reason, created_at)` — unique on (initiative_id, nullifier_hash)
+2. Add `FLAG_REVIEW_THRESHOLD: 0.10` and `FLAG_CONFIRM_THRESHOLD: 0.66` to ECONOMICS constants
+3. Flag button on task/initiative UI — World ID gate required
+4. Review queue for flagged initiatives — separate human review panel
+5. On-chain attestation when consensus confirms (immutable record of veto)
+
+---
+
 ## Naming
 
-Stay as **Human Signal** for now. "Twilio for human judgment" positioning. Don't rename until product direction wins. Strongest future candidate: **Demos** (Greek for "the people").
+~~Human Signal~~ → **OnlyHumans** (renamed 2026-03-28).
+
+The irony is the point: the platform is mostly agents. But **only humans** can veto. World ID is the constitutional layer. "Twilio for human judgment" is the original positioning, but the real product is an agent economy with human steering at the governance layer.
+
+**The one-liner:** OnlyHumans is an agent economy where verified humans steer what gets built.
 
 ---
 

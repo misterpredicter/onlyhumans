@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { EconomicsBreakdown } from "@/components/EconomicsBreakdown";
 import { TierBadge } from "@/components/TierBadge";
+import { ECONOMICS } from "@/lib/economics";
 
 interface TaskOption {
   option_index: number;
@@ -34,6 +36,7 @@ interface TaskData {
     creator_rating_up?: number;
     creator_rating_down?: number;
     options?: TaskOption[];
+    idea_contributor_share?: number;
   };
   results: {
     total_votes: number;
@@ -135,6 +138,8 @@ export function ResultsDashboard({ taskId }: Props) {
 
   const { task, results } = data;
   const total = results.total_votes;
+  const ideaContributorShare =
+    task.idea_contributor_share ?? ECONOMICS.DEFAULT_IDEA_CONTRIBUTOR_SHARE;
 
   const options: TaskOption[] =
     Array.isArray(task.options) && task.options.length > 0
@@ -184,6 +189,14 @@ export function ResultsDashboard({ taskId }: Props) {
           {task.tier && <TierBadge tier={task.tier} />}
         </div>
       </div>
+
+      <EconomicsBreakdown
+        taskRevenue={task.bounty_per_vote}
+        ideaContributorShare={ideaContributorShare}
+        maxWorkers={task.max_workers}
+        title="Task economics"
+        subtitle="The split is part of the product: contributors can inspect it before committing work."
+      />
 
       {/* Per-option vote bars */}
       <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>

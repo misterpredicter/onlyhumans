@@ -1,8 +1,30 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withX402 } from "@x402/next";
 import { sql } from "@/lib/db";
-import { getX402Server, getPaymentConfig, type Tier } from "@/lib/x402-server";
 import { ECONOMICS } from "@/lib/economics";
+import { normalizeCallbackUrl } from "@/lib/task-callbacks";
+import { getPaymentConfig, getX402Server } from "@/lib/x402-server";
+
+interface TaskOptionInput {
+  label: string;
+  content: string;
+}
+
+interface CreateTaskBody {
+  description?: string;
+  options?: TaskOptionInput[];
+  option_a?: string;
+  option_b?: string;
+  option_a_label?: string;
+  option_b_label?: string;
+  context?: string | null;
+  max_workers?: number | string;
+  bounty_per_vote?: number | string;
+  requester_wallet?: string;
+  tier?: "quick" | "reasoned" | "detailed";
+  callback_url?: string | null;
+  idea_contributor_share?: number | string;
+}
 
 // GET /api/tasks — list open tasks with options array
 export async function GET() {
@@ -23,33 +45,81 @@ export async function GET() {
       ORDER BY t.created_at DESC
       LIMIT 50
     `;
-    return NextResponse.json({ tasks: rows }, {
-      headers: { "Cache-Control": "no-store, max-age=0" },
-    });
+
+    return NextResponse.json(
+      { tasks: rows },
+      {
+        headers: { "Cache-Control": "no-store, max-age=0" },
+      }
+    );
   } catch (error) {
     console.error("GET /api/tasks error:", error);
     return NextResponse.json({ error: "Failed to fetch tasks" }, { status: 500 });
   }
 }
 
+function toNumber(value: unknown, fallback: number) {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+
+  if (typeof value === "string") {
+    const parsed = parseFloat(value);
+    if (Number.isFinite(parsed)) {
+      return parsed;
+    }
+  }
+
+  return fallback;
+}
+
+function toInteger(value: unknown, fallback: number) {
+  if (typeof value === "number" && Number.isInteger(value)) {
+    return value;
+  }
+
+  if (typeof value === "string") {
+    const parsed = parseInt(value, 10);
+    if (Number.isInteger(parsed)) {
+      return parsed;
+    }
+  }
+
+  return fallback;
+}
+
+function deriveTotalCostFromBody(body: CreateTaskBody) {
+  const bountyPerVote = toNumber(body.bounty_per_vote, 0.08);
+  const maxWorkers = toInteger(body.max_workers, 20);
+
+  if (!Number.isFinite(bountyPerVote) || !Number.isInteger(maxWorkers)) {
+    return Number.NaN;
+  }
+
+  return Number((bountyPerVote * maxWorkers).toFixed(2));
+}
+
 // Inner handler — only runs after x402 payment verified
 async function createTaskHandler(req: NextRequest): Promise<NextResponse> {
-  const body = await req.json();
+  const body = (await req.json()) as CreateTaskBody;
   const {
     description,
-    options,              // V2: array of { label, content }
-    option_a,             // V1 backward compat
+    options,
+    option_a,
     option_b,
     option_a_label = "Option A",
     option_b_label = "Option B",
     context,
-    max_workers = 20,
-    bounty_per_vote = 0.08,
     requester_wallet,
     tier = "quick",
-    callback_url,
-    idea_contributor_share = ECONOMICS.DEFAULT_IDEA_CONTRIBUTOR_SHARE,
   } = body;
+
+  const max_workers = toInteger(body.max_workers, 20);
+  const bounty_per_vote = toNumber(body.bounty_per_vote, 0.08);
+  const idea_contributor_share = toNumber(
+    body.idea_contributor_share,
+    ECONOMICS.DEFAULT_IDEA_CONTRIBUTOR_SHARE
+  );
 
   if (!description?.trim()) {
     return NextResponse.json(
@@ -58,7 +128,6 @@ async function createTaskHandler(req: NextRequest): Promise<NextResponse> {
     );
   }
 
-  // In demo mode, fall back to a placeholder address if wallet is absent
   const isDemo = process.env.DEMO_MODE === "true";
   const resolvedWallet: string = requester_wallet?.trim()
     ? requester_wallet.trim()
@@ -95,11 +164,15 @@ async function createTaskHandler(req: NextRequest): Promise<NextResponse> {
     );
   }
 
-  // Validate idea contributor share (market-determined take rate)
-  const icShare = Number(idea_contributor_share);
-  if (isNaN(icShare) || icShare < ECONOMICS.IDEA_CONTRIBUTOR_RANGE.min || icShare > ECONOMICS.IDEA_CONTRIBUTOR_RANGE.max) {
+  if (
+    !Number.isFinite(idea_contributor_share) ||
+    idea_contributor_share < ECONOMICS.IDEA_CONTRIBUTOR_RANGE.min ||
+    idea_contributor_share > ECONOMICS.IDEA_CONTRIBUTOR_RANGE.max
+  ) {
     return NextResponse.json(
-      { error: `idea_contributor_share must be between ${ECONOMICS.IDEA_CONTRIBUTOR_RANGE.min} and ${ECONOMICS.IDEA_CONTRIBUTOR_RANGE.max}` },
+      {
+        error: `idea_contributor_share must be between ${ECONOMICS.IDEA_CONTRIBUTOR_RANGE.min} and ${ECONOMICS.IDEA_CONTRIBUTOR_RANGE.max}`,
+      },
       { status: 400 }
     );
   }
@@ -111,8 +184,17 @@ async function createTaskHandler(req: NextRequest): Promise<NextResponse> {
     );
   }
 
-  // Resolve options: V2 array OR V1 A/B pair
-  let resolvedOptions: { label: string; content: string }[];
+  let normalizedCallbackUrl: string | null;
+  try {
+    normalizedCallbackUrl = normalizeCallbackUrl(body.callback_url);
+  } catch (error) {
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Invalid callback_url" },
+      { status: 400 }
+    );
+  }
+
+  let resolvedOptions: TaskOptionInput[];
   if (Array.isArray(options) && options.length >= 2) {
     if (options.length > 6) {
       return NextResponse.json(
@@ -120,12 +202,14 @@ async function createTaskHandler(req: NextRequest): Promise<NextResponse> {
         { status: 400 }
       );
     }
-    if (options.some((o: { label?: string; content?: string }) => !o.content?.trim())) {
+
+    if (options.some((option) => !option.content?.trim())) {
       return NextResponse.json(
         { error: "All options must have non-empty content" },
         { status: 400 }
       );
     }
+
     resolvedOptions = options;
   } else if (option_a && option_b) {
     resolvedOptions = [
@@ -140,8 +224,6 @@ async function createTaskHandler(req: NextRequest): Promise<NextResponse> {
   }
 
   const x402TxHash = req.headers.get("x-payment-response") ?? null;
-
-  // For V1 compat columns, use first two options
   const opt0 = resolvedOptions[0];
   const opt1 = resolvedOptions[1];
 
@@ -158,22 +240,24 @@ async function createTaskHandler(req: NextRequest): Promise<NextResponse> {
         ${opt0.label}, ${opt1.label},
         ${bounty_per_vote}, ${max_workers},
         ${resolvedWallet}, ${x402TxHash},
-        ${context ?? null}, ${tier}, ${callback_url ?? null}, ${icShare}
+        ${context ?? null}, ${tier}, ${normalizedCallbackUrl}, ${idea_contributor_share}
       )
       RETURNING id, status, created_at, tier, idea_contributor_share
     `;
 
     const task = rows[0];
 
-    // Insert task_options for all N options
-    for (let i = 0; i < resolvedOptions.length; i++) {
-      const opt = resolvedOptions[i];
+    for (let index = 0; index < resolvedOptions.length; index++) {
+      const option = resolvedOptions[index];
       await sql`
         INSERT INTO task_options (task_id, option_index, label, content)
-        VALUES (${task.id}, ${i}, ${opt.label}, ${opt.content})
-        ON CONFLICT (task_id, option_index) DO UPDATE SET label = EXCLUDED.label, content = EXCLUDED.content
+        VALUES (${task.id}, ${index}, ${option.label}, ${option.content})
+        ON CONFLICT (task_id, option_index) DO UPDATE
+        SET label = EXCLUDED.label, content = EXCLUDED.content
       `;
     }
+
+    const origin = req.nextUrl.origin;
 
     return NextResponse.json({
       task_id: task.id,
@@ -182,6 +266,10 @@ async function createTaskHandler(req: NextRequest): Promise<NextResponse> {
       idea_contributor_share: parseFloat(task.idea_contributor_share),
       payment_tx_hash: x402TxHash,
       created_at: task.created_at,
+      callback_url: normalizedCallbackUrl,
+      total_cost_usdc: deriveTotalCostFromBody(body),
+      results_url: `${origin}/api/tasks/${task.id}`,
+      task_url: `${origin}/task/${task.id}`,
     });
   } catch (error) {
     console.error("POST /api/tasks create error:", error);
@@ -199,6 +287,7 @@ const handlerCache = new Map<string, (req: NextRequest) => Promise<NextResponse>
 function getOrCreateHandler(totalCost: number) {
   const key = totalCost.toFixed(2);
   let handler = handlerCache.get(key);
+
   if (!handler) {
     const paymentConfig = getPaymentConfig(totalCost);
     handler = withX402(
@@ -207,39 +296,49 @@ function getOrCreateHandler(totalCost: number) {
       getX402Server(),
       undefined,
       undefined,
-      true // syncFacilitatorOnStart — required for facilitator to know about exact scheme
+      true
     );
     handlerCache.set(key, handler);
-    // Evict old entries to prevent unbounded growth
+
     if (handlerCache.size > 50) {
       const firstKey = handlerCache.keys().next().value;
-      if (firstKey !== undefined) handlerCache.delete(firstKey);
+      if (firstKey !== undefined) {
+        handlerCache.delete(firstKey);
+      }
     }
   }
+
   return handler;
 }
 
-// POST /api/tasks?total=5.00
-// x402 charges the total upfront. Bounty per vote + max workers in body.
+// POST /api/tasks
+// The x402 price is derived from bounty_per_vote * max_workers in the request body.
 // Set DEMO_MODE=true to bypass x402 payment gate (for demos/testing only).
 export async function POST(req: NextRequest) {
-  const totalParam = req.nextUrl.searchParams.get("total");
-  const totalCost = parseFloat(totalParam ?? "1.00");
-
-  if (isNaN(totalCost) || totalCost < 0.01) {
-    return NextResponse.json({ error: "Invalid total" }, { status: 400 });
-  }
-
-  // Demo mode: skip x402 payment gate, call handler directly
   if (process.env.DEMO_MODE === "true") {
     return createTaskHandler(req);
+  }
+
+  let totalCost: number;
+  try {
+    const body = (await req.clone().json()) as CreateTaskBody;
+    totalCost = deriveTotalCostFromBody(body);
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
+
+  if (isNaN(totalCost) || totalCost < 0.01) {
+    return NextResponse.json(
+      { error: "Invalid bounty_per_vote or max_workers" },
+      { status: 400 }
+    );
   }
 
   try {
     const handler = getOrCreateHandler(totalCost);
     return await handler(req);
   } catch (error) {
-    console.error("x402 handler error:", error);
+    console.error("POST /api/tasks payment gate error:", error);
     return NextResponse.json(
       { error: "Payment gate error", detail: String(error) },
       { status: 500 }

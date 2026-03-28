@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { EconomicsBreakdown } from "@/components/EconomicsBreakdown";
 import { WorldIDVerify } from "@/components/WorldIDVerify";
 import { MultiOptionJudgment } from "@/components/MultiOptionJudgment";
 import { TierBadge } from "@/components/TierBadge";
+import { ECONOMICS, calculateWorkerPayout } from "@/lib/economics";
 
 interface TaskOption {
   option_index: number;
@@ -24,10 +26,14 @@ interface Task {
   tier?: string;
   context?: string | null;
   options?: TaskOption[];
+  idea_contributor_share?: number | string | null;
 }
 
 function formatBounty(task: Task): string {
-  return `$${parseFloat(String(task.bounty_per_vote)).toFixed(2)}`;
+  const ideaContributorShare = Number(
+    task.idea_contributor_share ?? ECONOMICS.DEFAULT_IDEA_CONTRIBUTOR_SHARE
+  );
+  return `$${calculateWorkerPayout(parseFloat(String(task.bounty_per_vote)), ideaContributorShare).toFixed(2)}`;
 }
 
 export default function WorkPageClient() {
@@ -159,9 +165,9 @@ export default function WorkPageClient() {
         {/* Stats row */}
         <div className="animate-fade-in-up delay-200 stats-row" style={{ display: "flex", alignItems: "center", gap: "0" }}>
           {[
-            { value: "$0.10-$0.50", label: "per vote" },
+            { value: "$0.07-$0.45", label: "worker pay" },
             { value: "~30 sec", label: "per task" },
-            { value: "instant", label: "on-chain payout" },
+            { value: "visible", label: "split before you vote" },
           ].map((stat, i) => (
             <div key={i} style={{ display: "flex", alignItems: "center" }}>
               {i > 0 && <div className="divider" style={{ width: "1px", height: "32px", backgroundColor: "rgba(255,255,255,0.1)", margin: "0 32px" }} />}
@@ -207,6 +213,9 @@ export default function WorkPageClient() {
     const options = resolveOptions(activeTask);
     const tier = activeTask.tier ?? "quick";
     const payout = formatBounty(activeTask);
+    const ideaContributorShare = Number(
+      activeTask.idea_contributor_share ?? ECONOMICS.DEFAULT_IDEA_CONTRIBUTOR_SHARE
+    );
 
     return (
       <div className="animate-fade-in" style={{ maxWidth: "760px", margin: "0 auto", padding: "40px 24px" }}>
@@ -250,11 +259,23 @@ export default function WorkPageClient() {
             }}>
               {payout}
             </span>
+            <span style={{ fontFamily: "var(--font-sans)", fontSize: "11px", color: "#9CA3AF" }}>
+              to you
+            </span>
             <TierBadge tier={tier} />
           </div>
         </div>
 
         <div className="card-elevated" style={{ padding: "28px 32px" }}>
+          <div style={{ marginBottom: "18px" }}>
+            <EconomicsBreakdown
+              taskRevenue={parseFloat(String(activeTask.bounty_per_vote))}
+              ideaContributorShare={ideaContributorShare}
+              maxWorkers={activeTask.max_workers}
+              title="What this vote pays"
+              subtitle="The split is transparent before you commit your attention."
+            />
+          </div>
           <MultiOptionJudgment
             taskId={activeTask.id}
             options={options}
@@ -352,6 +373,9 @@ export default function WorkPageClient() {
             const payout = formatBounty(task);
             const opts = resolveOptions(task);
             const slotsLeft = task.max_workers - (task.vote_count ?? 0);
+            const ideaContributorShare = Number(
+              task.idea_contributor_share ?? ECONOMICS.DEFAULT_IDEA_CONTRIBUTOR_SHARE
+            );
 
             return (
               <button
@@ -385,6 +409,15 @@ export default function WorkPageClient() {
                       {slotsLeft} slots left
                     </span>
                   </div>
+                  <div style={{ marginTop: "12px" }}>
+                    <EconomicsBreakdown
+                      taskRevenue={parseFloat(String(task.bounty_per_vote))}
+                      ideaContributorShare={ideaContributorShare}
+                      compact={true}
+                      showFooter={false}
+                      title="Visible economics"
+                    />
+                  </div>
                 </div>
                 <div style={{ textAlign: "right", flexShrink: 0 }}>
                   <p style={{
@@ -395,7 +428,7 @@ export default function WorkPageClient() {
                     {payout}
                   </p>
                   <p style={{ fontFamily: "var(--font-sans)", fontSize: "11px", color: "#B8B5AD", margin: 0 }}>
-                    USDC
+                    to you
                   </p>
                 </div>
               </button>

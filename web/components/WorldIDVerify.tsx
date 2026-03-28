@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 import {
   IDKitRequestWidget,
   deviceLegacy,
@@ -21,14 +21,16 @@ export function WorldIDVerify({ onVerified }: Props) {
   const fetchRpContext = useCallback(async () => {
     setLoading(true);
     setError(null);
+
     try {
-      const res = await fetch("/api/auth/rp-signature");
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
+      const response = await fetch("/api/auth/rp-signature");
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
         throw new Error(data.error ?? "Failed to get RP signature");
       }
-      const { rp_context } = await res.json();
-      setRpContext(rp_context);
+
+      const { rp_context: context } = await response.json();
+      setRpContext(context);
       setOpen(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to initialize verification");
@@ -38,14 +40,14 @@ export function WorldIDVerify({ onVerified }: Props) {
   }, []);
 
   const handleVerify = async (result: IDKitResult) => {
-    const res = await fetch("/api/verify-world-id", {
+    const response = await fetch("/api/verify-world-id", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify(result),
     });
 
-    if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}));
       throw new Error(data.error ?? "Verification failed");
     }
   };
@@ -53,86 +55,139 @@ export function WorldIDVerify({ onVerified }: Props) {
   const handleSuccess = (result: IDKitResult) => {
     const firstResponse = result.responses?.[0];
     if (!firstResponse) {
-      setError("Verification succeeded but no response data received. Please try again.");
+      setError("Verification succeeded but the response payload was empty. Please try again.");
       return;
     }
 
     let nullifier: string | undefined;
+
     if ("nullifier" in firstResponse && firstResponse.nullifier) {
       nullifier = firstResponse.nullifier;
     } else if ("session_nullifier" in firstResponse && firstResponse.session_nullifier?.[0]) {
       nullifier = firstResponse.session_nullifier[0];
     }
 
-    if (nullifier) {
-      onVerified(nullifier);
-    } else {
-      setError("Could not extract nullifier from verification. Please try again.");
+    if (!nullifier) {
+      setError("Could not extract a nullifier from the World ID response. Please retry.");
+      return;
     }
+
+    onVerified(nullifier);
   };
 
   return (
     <>
-      <button
-        onClick={fetchRpContext}
-        disabled={loading}
+      <div
         style={{
-          width: "100%",
-          display: "flex", alignItems: "center", justifyContent: "center", gap: "10px",
-          backgroundColor: "#0C0C0C",
-          color: "#FFFFFF",
-          padding: "14px 24px",
-          borderRadius: "14px",
-          border: "none",
-          fontFamily: "var(--font-sans), sans-serif",
-          fontSize: "15px",
-          fontWeight: 700,
-          cursor: loading ? "wait" : "pointer",
-          transition: "all 0.2s ease",
-          opacity: loading ? 0.7 : 1,
-          position: "relative",
-          overflow: "hidden",
-        }}
-        onMouseEnter={(e) => {
-          if (!loading) {
-            e.currentTarget.style.backgroundColor = "#1A1A1A";
-            e.currentTarget.style.boxShadow = "0 4px 16px rgba(0, 0, 0, 0.2)";
-            e.currentTarget.style.transform = "translateY(-1px)";
-          }
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = "#0C0C0C";
-          e.currentTarget.style.boxShadow = "none";
-          e.currentTarget.style.transform = "translateY(0)";
+          display: "flex",
+          flexDirection: "column",
+          gap: "12px",
+          padding: "18px",
+          borderRadius: "22px",
+          border: "1px solid rgba(12,12,12,0.08)",
+          background: "linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(245,248,246,0.92) 100%)",
         }}
       >
-        {/* World ID icon */}
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" opacity="0.3" />
-          <circle cx="12" cy="12" r="5" fill="currentColor" />
-          <circle cx="12" cy="12" r="2" fill="#0C0C0C" />
-        </svg>
-        {loading ? (
-          <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" style={{ animation: "spin 1s linear infinite" }}>
-              <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" strokeDasharray="32" strokeLinecap="round" />
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <div
+            style={{
+              width: "42px",
+              height: "42px",
+              borderRadius: "14px",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "linear-gradient(135deg, rgba(16,185,129,0.16), rgba(59,130,246,0.18))",
+              color: "#0C0C0C",
+            }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5" opacity="0.45" />
+              <circle cx="12" cy="12" r="4.5" fill="currentColor" />
+              <circle cx="12" cy="12" r="1.8" fill="#FFFFFF" />
             </svg>
-            Connecting...
-          </span>
-        ) : (
-          "Verify with World ID"
-        )}
-      </button>
+          </div>
+
+          <div>
+            <div style={{ fontSize: "14px", fontWeight: 800, letterSpacing: "-0.02em", color: "#0C0C0C" }}>
+              Unlock the verified work queue
+            </div>
+            <div style={{ fontSize: "13px", lineHeight: 1.55, color: "#6B7280" }}>
+              One person, one vote. World ID proves uniqueness without revealing your identity.
+            </div>
+          </div>
+        </div>
+
+        <button
+          onClick={fetchRpContext}
+          disabled={loading}
+          className="btn-primary"
+          style={{
+            width: "100%",
+            minHeight: "54px",
+            background: "linear-gradient(135deg, #0C0C0C 0%, #20252C 100%)",
+            boxShadow: "0 18px 38px rgba(12, 12, 12, 0.22)",
+          }}
+        >
+          {loading ? (
+            <span style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" style={{ animation: "spin 1s linear infinite" }}>
+                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" strokeDasharray="32" strokeLinecap="round" />
+              </svg>
+              Connecting to World ID...
+            </span>
+          ) : (
+            <span style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
+              <span>Verify with World ID</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </span>
+          )}
+        </button>
+
+        <div style={{ display: "grid", gap: "8px" }}>
+          {[
+            "Zero-knowledge proof. No identity data exposed to Human Signal.",
+            "Nullifier hash prevents duplicate votes on the same task.",
+          ].map((item) => (
+            <div key={item} style={{ display: "flex", alignItems: "center", gap: "9px", fontSize: "12px", color: "#6B7280" }}>
+              <span
+                style={{
+                  width: "18px",
+                  height: "18px",
+                  borderRadius: "999px",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  background: "rgba(16,185,129,0.12)",
+                  color: "#059669",
+                  flexShrink: 0,
+                }}
+              >
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </span>
+              <span>{item}</span>
+            </div>
+          ))}
+        </div>
+      </div>
 
       {error && (
-        <div style={{
-          marginTop: "8px",
-          backgroundColor: "#FEF2F2", border: "1px solid #FECACA",
-          borderRadius: "10px", padding: "10px 14px",
-          fontFamily: "var(--font-sans), sans-serif",
-          fontSize: "13px", color: "#DC2626",
-        }}>
+        <div
+          style={{
+            marginTop: "10px",
+            padding: "12px 14px",
+            borderRadius: "16px",
+            border: "1px solid #FECACA",
+            background: "#FEF2F2",
+            color: "#B91C1C",
+            fontSize: "13px",
+            lineHeight: 1.55,
+          }}
+        >
           {error}
         </div>
       )}
