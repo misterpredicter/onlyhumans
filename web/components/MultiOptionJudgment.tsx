@@ -28,22 +28,8 @@ interface VoteResult {
 
 const dm: React.CSSProperties = { fontFamily: "var(--font-sans), sans-serif" };
 
-const textareaStyle: React.CSSProperties = {
-  width: "100%",
-  backgroundColor: "#F9F8F5",
-  border: "1.5px solid #E8E5DE",
-  borderRadius: "10px",
-  padding: "10px 14px",
-  fontFamily: "var(--font-sans), sans-serif",
-  fontSize: "14px",
-  color: "#0C0C0C",
-  outline: "none",
-  resize: "vertical",
-  boxSizing: "border-box",
-};
-
 const isImage = (url: string) =>
-  /\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i.test(url) || url.startsWith("http");
+  /\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i.test(url);
 
 export function MultiOptionJudgment({
   taskId,
@@ -139,7 +125,7 @@ export function MultiOptionJudgment({
       });
       setCreatorRated(true);
     } catch {
-      // silent — optional
+      // silent
     }
   };
 
@@ -147,23 +133,39 @@ export function MultiOptionJudgment({
   if (voted && result) {
     const chosenOption = options.find((o) => o.option_index === result.optionIndex);
     return (
-      <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+      <div className="animate-scale-in" style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
         <div style={{
-          textAlign: "center", padding: "40px 24px",
-          backgroundColor: "#F0FDF4", borderRadius: "16px",
-          border: "1px solid #BBF7D0",
+          textAlign: "center", padding: "48px 24px",
+          background: "linear-gradient(135deg, #F0FDF4 0%, #ECFDF5 50%, #D1FAE5 100%)",
+          borderRadius: "16px",
+          border: "1px solid #A7F3D0",
         }}>
-          <p style={{ ...dm, fontSize: "28px", fontWeight: 800, color: "#0C0C0C", margin: "0 0 6px" }}>Vote recorded</p>
-          <p style={{ ...dm, fontSize: "14px", color: "#6B7280", margin: "0 0 16px" }}>
+          {/* Checkmark */}
+          <div className="animate-check" style={{
+            width: "56px", height: "56px", margin: "0 auto 16px",
+            background: "linear-gradient(135deg, #10B981 0%, #059669 100%)",
+            borderRadius: "50%",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            boxShadow: "0 4px 16px rgba(16, 185, 129, 0.3)",
+          }}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          </div>
+          <p style={{ ...dm, fontSize: "26px", fontWeight: 800, color: "#0C0C0C", margin: "0 0 6px", letterSpacing: "-0.4px" }}>Vote recorded</p>
+          <p style={{ ...dm, fontSize: "14px", color: "#6B7280", margin: "0 0 20px" }}>
             You picked: <span style={{ fontWeight: 700, color: "#0C0C0C" }}>{chosenOption?.label}</span>
           </p>
           {result.amount > 0 ? (
             <>
-              <p style={{ ...dm, fontSize: "18px", fontWeight: 700, color: "#059669", margin: "0 0 4px" }}>
-                +${result.amount.toFixed(2)} USDC sent to your wallet
+              <p style={{
+                ...dm, fontSize: "20px", fontWeight: 800, color: "#059669", margin: "0 0 4px",
+                letterSpacing: "-0.3px",
+              }}>
+                +${result.amount.toFixed(2)} USDC sent
               </p>
               {result.tx && (
-                <p style={{ fontFamily: "var(--font-mono), monospace", fontSize: "12px", color: "#9CA3AF", margin: 0 }}>
+                <p style={{ fontFamily: "var(--font-mono), monospace", fontSize: "11px", color: "#9CA3AF", margin: 0 }}>
                   tx: {result.tx.slice(0, 22)}...
                 </p>
               )}
@@ -175,21 +177,26 @@ export function MultiOptionJudgment({
 
         {!creatorRated && (
           <div style={{
-            backgroundColor: "#F9F8F5", borderRadius: "14px",
+            backgroundColor: "#FAFAF8", borderRadius: "14px",
             padding: "20px", textAlign: "center",
+            border: "1px solid #E8E5DE",
           }}>
-            <p style={{ ...dm, fontSize: "14px", color: "#374151", margin: "0 0 12px" }}>Was this task clear and fair?</p>
+            <p style={{ ...dm, fontSize: "14px", color: "#374151", margin: "0 0 14px", fontWeight: 500 }}>Was this task clear and fair?</p>
             <div style={{ display: "flex", justifyContent: "center", gap: "10px" }}>
-              {[{ rating: 1 as const, label: "👍 Yes" }, { rating: -1 as const, label: "👎 No" }].map(({ rating, label }) => (
+              {[
+                { rating: 1 as const, label: "Yes, well written", color: "#059669", bg: "#F0FDF4", border: "#D1FAE5" },
+                { rating: -1 as const, label: "No, confusing", color: "#DC2626", bg: "#FEF2F2", border: "#FECACA" },
+              ].map(({ rating, label, color, bg, border }) => (
                 <button
                   key={rating}
                   onClick={() => rateCreator(rating)}
                   style={{
                     display: "flex", alignItems: "center", gap: "6px",
-                    padding: "10px 20px",
-                    backgroundColor: "#FFFFFF", border: "1.5px solid #E8E5DE",
+                    padding: "10px 18px",
+                    backgroundColor: bg, border: `1.5px solid ${border}`,
                     borderRadius: "10px", cursor: "pointer",
-                    fontFamily: "var(--font-sans), sans-serif", fontSize: "14px", color: "#374151",
+                    fontFamily: "var(--font-sans), sans-serif", fontSize: "13px", fontWeight: 600, color,
+                    transition: "all 0.15s",
                   }}
                 >
                   {label}
@@ -199,7 +206,7 @@ export function MultiOptionJudgment({
           </div>
         )}
         {creatorRated && (
-          <p style={{ ...dm, textAlign: "center", fontSize: "14px", color: "#9CA3AF" }}>Thanks for the feedback!</p>
+          <p className="animate-fade-in" style={{ ...dm, textAlign: "center", fontSize: "14px", color: "#9CA3AF" }}>Thanks for the feedback!</p>
         )}
       </div>
     );
@@ -215,11 +222,17 @@ export function MultiOptionJudgment({
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
       {error && (
-        <div style={{
+        <div className="animate-slide-down" style={{
           backgroundColor: "#FEF2F2", border: "1px solid #FECACA",
-          borderRadius: "10px", padding: "12px 16px",
+          borderRadius: "12px", padding: "12px 16px",
           ...dm, fontSize: "13px", color: "#DC2626",
+          display: "flex", alignItems: "center", gap: "8px",
         }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+            <circle cx="12" cy="12" r="10" />
+            <line x1="15" y1="9" x2="9" y2="15" />
+            <line x1="9" y1="9" x2="15" y2="15" />
+          </svg>
           {error}
         </div>
       )}
@@ -228,25 +241,39 @@ export function MultiOptionJudgment({
       {context && (
         <div style={{
           backgroundColor: "#FFFBEB", border: "1px solid #FDE68A",
-          borderRadius: "12px", overflow: "hidden",
+          borderRadius: "14px", overflow: "hidden",
         }}>
           <button
             type="button"
             onClick={() => setContextExpanded((v) => !v)}
             style={{
               width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between",
-              padding: "12px 16px",
+              padding: "14px 18px",
               background: "none", border: "none", cursor: "pointer",
+              transition: "background-color 0.15s",
             }}
           >
-            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <span>💡</span>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B45309" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="16" x2="12" y2="12" />
+                <line x1="12" y1="8" x2="12.01" y2="8" />
+              </svg>
               <span style={{ ...dm, fontSize: "13px", fontWeight: 600, color: "#92400E" }}>Context from task creator</span>
             </div>
-            <span style={{ ...dm, fontSize: "11px", color: "#B45309" }}>{contextExpanded ? "▲ hide" : "▼ show"}</span>
+            <span style={{
+              ...dm, fontSize: "11px", color: "#B45309",
+              transition: "transform 0.2s",
+              transform: contextExpanded ? "rotate(180deg)" : "rotate(0deg)",
+              display: "inline-block",
+            }}>
+              ▼
+            </span>
           </button>
           {contextExpanded && (
-            <div style={{ padding: "0 16px 14px", ...dm, fontSize: "13px", color: "#92400E", lineHeight: 1.5 }}>
+            <div className="animate-slide-down" style={{
+              padding: "0 18px 16px", ...dm, fontSize: "13px", color: "#92400E", lineHeight: 1.6,
+            }}>
               {context}
             </div>
           )}
@@ -255,7 +282,7 @@ export function MultiOptionJudgment({
 
       {/* Tier feedback */}
       {tier === "reasoned" && (
-        <div>
+        <div className="animate-fade-in">
           <label style={{ ...dm, display: "block", fontSize: "13px", fontWeight: 600, color: "#374151", marginBottom: "6px" }}>
             Why will you pick this option? <span style={{ color: "#DC2626" }}>*</span>
           </label>
@@ -264,18 +291,20 @@ export function MultiOptionJudgment({
             onChange={(e) => setFeedbackText(e.target.value)}
             rows={2}
             placeholder="1-2 sentences explaining your reasoning..."
-            style={textareaStyle}
+            className="input-field"
+            style={{ ...dm, resize: "vertical" }}
           />
         </div>
       )}
 
       {tier === "detailed" && (
-        <div style={{
-          backgroundColor: "#F9F8F5", borderRadius: "14px",
-          padding: "16px", display: "flex", flexDirection: "column", gap: "12px",
+        <div className="animate-fade-in" style={{
+          backgroundColor: "#FAFAF8", borderRadius: "16px",
+          padding: "18px", display: "flex", flexDirection: "column", gap: "14px",
+          border: "1px solid #E8E5DE",
         }}>
           <p style={{ ...dm, fontSize: "13px", fontWeight: 700, color: "#374151", margin: 0 }}>
-            Structured feedback (required before voting)
+            Structured feedback
           </p>
           {[
             { label: "What works?", value: feedbackWorks, onChange: setFeedbackWorks, placeholder: "Strengths of your chosen option...", required: true },
@@ -291,7 +320,8 @@ export function MultiOptionJudgment({
                 onChange={(e) => onChange(e.target.value)}
                 rows={2}
                 placeholder={placeholder}
-                style={textareaStyle}
+                className="input-field"
+                style={{ ...dm, resize: "vertical" }}
               />
             </div>
           ))}
@@ -302,7 +332,7 @@ export function MultiOptionJudgment({
       <div style={gridStyle}>
         {options.map((opt, idx) => {
           const isLoading = voting === opt.option_index;
-          const isFirst = idx === 0;
+          const isDisabled = voting !== null && !isLoading;
           return (
             <button
               key={opt.option_index}
@@ -310,42 +340,77 @@ export function MultiOptionJudgment({
               disabled={voting !== null}
               style={{
                 border: `2px solid ${isLoading ? "#10B981" : "#E8E5DE"}`,
-                borderRadius: "16px",
-                padding: "18px",
+                borderRadius: "18px",
+                padding: "20px",
                 textAlign: "left",
                 cursor: voting !== null ? "not-allowed" : "pointer",
                 backgroundColor: isLoading ? "#F0FDF4" : "#FFFFFF",
-                transition: "border-color 0.15s, box-shadow 0.15s",
-                opacity: voting !== null && !isLoading ? 0.5 : 1,
-                display: "flex", flexDirection: "column", gap: "12px",
+                transition: "all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+                opacity: isDisabled ? 0.45 : 1,
+                display: "flex", flexDirection: "column", gap: "14px",
+                transform: isLoading ? "scale(0.98)" : "scale(1)",
+                boxShadow: isLoading ? "0 0 0 3px rgba(16, 185, 129, 0.15)" : "0 1px 3px rgba(0,0,0,0.04)",
+              }}
+              onMouseEnter={(e) => {
+                if (voting === null) {
+                  e.currentTarget.style.borderColor = "#C4C0B8";
+                  e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.08)";
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (voting === null) {
+                  e.currentTarget.style.borderColor = "#E8E5DE";
+                  e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.04)";
+                  e.currentTarget.style.transform = "scale(1)";
+                }
               }}
             >
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <span style={{ ...dm, fontSize: "14px", fontWeight: 800, color: "#0C0C0C" }}>{opt.label}</span>
+                <span style={{ ...dm, fontSize: "14px", fontWeight: 800, color: "#0C0C0C", letterSpacing: "-0.2px" }}>{opt.label}</span>
                 <span style={{
-                  fontFamily: "var(--font-sans), sans-serif", fontSize: "11px", color: "#9CA3AF",
-                  backgroundColor: "#F9F8F5", border: "1px solid #E8E5DE",
-                  borderRadius: "100px", padding: "2px 8px",
+                  fontFamily: "var(--font-mono), monospace", fontSize: "10px", color: "#B8B5AD",
+                  backgroundColor: "#F5F4F0",
+                  borderRadius: "6px", padding: "2px 7px",
+                  fontWeight: 500,
                 }}>
-                  #{opt.option_index + 1}
+                  {String.fromCharCode(65 + idx)}
                 </span>
               </div>
 
               {isImage(opt.content) ? (
-                <div style={{ position: "relative", width: "100%", height: options.length <= 2 ? "280px" : "180px", borderRadius: "10px", overflow: "hidden", backgroundColor: "#F9F8F5" }}>
+                <div style={{
+                  position: "relative", width: "100%",
+                  height: options.length <= 2 ? "280px" : "180px",
+                  borderRadius: "12px", overflow: "hidden",
+                  backgroundColor: "#F5F4F0",
+                }}>
                   <Image src={opt.content} alt={opt.label} fill className="object-contain" unoptimized />
                 </div>
               ) : (
-                <p style={{ ...dm, fontSize: "13px", color: "#374151", lineHeight: 1.5, margin: 0 }}>{opt.content}</p>
+                <p style={{ ...dm, fontSize: "13px", color: "#374151", lineHeight: 1.55, margin: 0 }}>{opt.content}</p>
               )}
 
               <div style={{
-                backgroundColor: isLoading ? "#10B981" : isFirst ? "#0C0C0C" : "#0C0C0C",
-                borderRadius: "10px", padding: "12px",
+                background: isLoading
+                  ? "linear-gradient(135deg, #10B981 0%, #059669 100%)"
+                  : "#0C0C0C",
+                borderRadius: "12px", padding: "13px",
                 display: "flex", alignItems: "center", justifyContent: "center",
+                transition: "all 0.2s",
               }}>
                 <span style={{ ...dm, fontSize: "14px", fontWeight: 700, color: "#FFFFFF" }}>
-                  {isLoading ? "Submitting..." : `Vote for ${opt.label}`}
+                  {isLoading ? (
+                    <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" style={{ animation: "spin 1s linear infinite" }}>
+                        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" strokeDasharray="32" strokeLinecap="round" />
+                      </svg>
+                      Submitting...
+                    </span>
+                  ) : (
+                    `Vote ${opt.label}`
+                  )}
                 </span>
               </div>
             </button>
@@ -354,7 +419,7 @@ export function MultiOptionJudgment({
       </div>
 
       {tier !== "quick" && (
-        <p style={{ ...dm, textAlign: "center", fontSize: "12px", color: "#9CA3AF", margin: 0 }}>
+        <p style={{ ...dm, textAlign: "center", fontSize: "12px", color: "#B8B5AD", margin: 0 }}>
           {tier === "reasoned"
             ? "Write your reason above, then click your choice"
             : "Complete the feedback above, then click your choice"}

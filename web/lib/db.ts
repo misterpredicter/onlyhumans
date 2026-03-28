@@ -78,11 +78,33 @@ export async function initializeDatabase() {
     )
   `;
 
+  // V3: Platform economics ledger (90/9/1 split tracking)
+  await sql`
+    CREATE TABLE IF NOT EXISTS platform_ledger (
+      id                TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+      vote_id           TEXT REFERENCES votes(id) ON DELETE CASCADE,
+      task_id           TEXT REFERENCES tasks(id) ON DELETE CASCADE,
+      bounty_per_vote   DECIMAL(10,6) NOT NULL,
+      worker_amount     DECIMAL(10,6) NOT NULL,
+      idea_contributor_amount DECIMAL(10,6) NOT NULL DEFAULT 0,
+      platform_amount   DECIMAL(10,6) NOT NULL,
+      founder_amount    DECIMAL(10,6) NOT NULL,
+      idea_contributor_share DECIMAL(4,4) DEFAULT 0.05,
+      created_at        TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+
   // V2: Alter existing tables to add new columns (idempotent)
   await sql`ALTER TABLE tasks ADD COLUMN IF NOT EXISTS context TEXT`;
   await sql`ALTER TABLE tasks ADD COLUMN IF NOT EXISTS tier TEXT DEFAULT 'quick'`;
   await sql`ALTER TABLE tasks ADD COLUMN IF NOT EXISTS creator_rating_up INTEGER DEFAULT 0`;
   await sql`ALTER TABLE tasks ADD COLUMN IF NOT EXISTS creator_rating_down INTEGER DEFAULT 0`;
+
+  // V3: Idea contributor share — market-determined take rate (1-20% of the 90%)
+  await sql`ALTER TABLE tasks ADD COLUMN IF NOT EXISTS idea_contributor_share DECIMAL(4,4) DEFAULT 0.05`;
+
+  // V2: Callback URL for agent webhook notifications when task closes
+  await sql`ALTER TABLE tasks ADD COLUMN IF NOT EXISTS callback_url TEXT`;
 
   await sql`ALTER TABLE votes ADD COLUMN IF NOT EXISTS option_index INTEGER`;
   await sql`ALTER TABLE votes ADD COLUMN IF NOT EXISTS feedback_text TEXT`;

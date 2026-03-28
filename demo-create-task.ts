@@ -14,9 +14,11 @@ import { toClientEvmSigner } from "@x402/evm";
 import { registerExactEvmScheme } from "@x402/evm/exact/client";
 import { wrapFetchWithPayment, x402Client } from "@x402/fetch";
 import { privateKeyToAccount } from "viem/accounts";
+import { createPublicClient, http } from "viem";
+import { baseSepolia } from "viem/chains";
 
 // ── Buyer wallet (fund this with testnet USDC on Base Sepolia) ──────────
-const BUYER_PRIVATE_KEY = "0x61944c75ae1539e940a956336e71145dcabfe1ed7a755a686e82e1642cda493b";
+const BUYER_PRIVATE_KEY = process.env.BUYER_PRIVATE_KEY ?? "";
 const BUYER_ADDRESS = "0xfc271e50E7B1DF02C4430882Ae67C045CD724fa9";
 
 // ── Config ──────────────────────────────────────────────────────────────
@@ -41,9 +43,10 @@ const totalCost = task.bounty_per_vote * task.max_workers;
 async function main() {
   console.log("Creating x402 payment client...");
   const account = privateKeyToAccount(BUYER_PRIVATE_KEY as `0x${string}`);
-  const signer = toClientEvmSigner(account);
+  const publicClient = createPublicClient({ chain: baseSepolia, transport: http() });
+  const signer = toClientEvmSigner(account, publicClient);
   const client = new x402Client();
-  registerExactEvmScheme(client, signer);
+  registerExactEvmScheme(client, { signer });
   const paidFetch = wrapFetchWithPayment(fetch, client);
 
   console.log(`Buyer wallet: ${BUYER_ADDRESS}`);

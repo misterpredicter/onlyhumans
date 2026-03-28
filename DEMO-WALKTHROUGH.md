@@ -28,7 +28,9 @@ npx tsx demo-create-task.ts
 ### SCENE 3: Worker Verification (0:30 - 0:50)
 **Show:** Go to www.themo.live/work in the browser.
 
-**Say:** "Now the worker side. Before you can earn, you verify with World ID. One person, one vote. No bots, no sybil attacks."
+**Say:** "Now the worker side. Before you can earn, you verify with World ID. One person, one vote. No bots, no sybil attacks. When you vote, you get paid instantly — USDC sent to your wallet on Base Sepolia."
+
+**Enter this as your worker wallet to receive payout:** `0x5A0aa111d66e187B667778dEb45FAcC31678889f`
 
 **Do:** Click "Verify with World ID"
 - The World ID modal appears

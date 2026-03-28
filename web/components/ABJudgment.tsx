@@ -96,7 +96,7 @@ export function ABJudgment({
   }
 
   const isImage = (url: string) =>
-    /\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i.test(url) || url.startsWith("http");
+    /\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i.test(url);
 
   return (
     <div className="space-y-4">
