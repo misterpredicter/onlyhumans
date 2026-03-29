@@ -131,12 +131,25 @@ Full research in `v3-protocol-design/`.
 
 ---
 
+## Repo Structure
+
+This repo contains two hackathon submissions:
+
+| Submission | What | Where |
+|---|---|---|
+| **OnlyHumans (v3)** | The full agent economy platform vision, spec, and research | Root + `v3-protocol-design/` |
+| **Human Signal (v1)** | Working judgment API — verified humans vote on tasks, paid via x402 | `human-signal/` |
+
+Human Signal is the working prototype that proves the core loop: World ID verification → human judgment → x402 payment. OnlyHumans is the platform that loop scales into.
+
 ## Quick Start
 
 ```bash
 # Fork and clone
 git clone https://github.com/YOUR_USERNAME/onlyhumans.git
-cd onlyhumans/web && npm install && npm run dev
+
+# Run the Human Signal working demo
+cd onlyhumans/human-signal/web && npm install && npm run dev
 
 # Visit localhost:3000 → explore the site
 # Visit localhost:3000/join → verify with World ID
