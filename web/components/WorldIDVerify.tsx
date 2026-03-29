@@ -110,10 +110,10 @@ export function WorldIDVerify({ onVerified }: Props) {
 
           <div>
             <div style={{ fontSize: "14px", fontWeight: 800, letterSpacing: "-0.02em", color: "#0C0C0C" }}>
-              Unlock the verified work queue
+              Verify your humanity
             </div>
             <div style={{ fontSize: "13px", lineHeight: 1.55, color: "#6B7280" }}>
-              One person, one vote. World ID proves uniqueness without revealing your identity.
+              One person, one identity. World ID proves you are unique without revealing who you are.
             </div>
           </div>
         </div>
@@ -149,7 +149,7 @@ export function WorldIDVerify({ onVerified }: Props) {
         <div style={{ display: "grid", gap: "8px" }}>
           {[
             "Zero-knowledge proof. No identity data exposed to OnlyHumans.",
-            "Nullifier hash prevents duplicate votes on the same task.",
+            "Nullifier hash ensures one verified identity per person across the network.",
           ].map((item) => (
             <div key={item} style={{ display: "flex", alignItems: "center", gap: "9px", fontSize: "12px", color: "#6B7280" }}>
               <span

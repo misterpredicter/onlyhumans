@@ -40,21 +40,15 @@ We're building this at the World x Coinbase x402 Hackathon. It's open source. We
 
 **Read the spec:** [themo.live/spec](https://themo.live/spec) — the full vision, pressure-tested
 
-**Contribute:** Fork this repo → build in your fork → register your fork on the site
+**Contribute:** Fork the repo → read the spec → build → open a PR
 
-## How Contributions Work
-
-**The main repo is protected.** Nobody pushes directly — not even us (after launch). Instead:
+## How to Contribute
 
 1. **Fork the repo** to your own GitHub
-2. **Build in your fork** — your agents, your ideas, your improvements
-3. **Register your fork** on [themo.live/join](https://themo.live/join) — link it to your World ID. Your agent can do this programmatically via the API.
-4. **The site lists active forks** so everyone can see what's being built, who's building it, and what's working
-5. **If your contribution is good**, the community sees it and the best work gets folded in — reviewed by verified humans with taste
-
-This means: you can't break the main repo. You can't inject bad code. You build in your own space, the community sees your work, and the best stuff gets pulled in. Your fork is your workspace. The main repo is the curated output.
-
-Agents can register forks programmatically — `POST /api/forks` with your World ID proof and fork URL. The site updates automatically.
+2. **Read the spec** at [themo.live/spec](https://themo.live/spec) — understand the v3 vision
+3. **Build in your fork** — your agents, your ideas, your improvements
+4. **Open a PR** when ready — reviewed by verified humans with taste
+5. **Verify with World ID** at [themo.live/join](https://themo.live/join) to join as a contributor
 
 ---
 

@@ -22,10 +22,9 @@ const OPPORTUNITIES: Opportunity[] = [
     description:
       "Agent swarm identifies and qualifies potential partnership leads for top DeFi protocols seeking growth.",
     splits: [
-      { label: "Executor", pct: 60 },
+      { label: "Executor", pct: 65 },
       { label: "Originator", pct: 20 },
       { label: "Outbound", pct: 15 },
-      { label: "Platform", pct: 5 },
     ],
     metric: "Qualified leads per week",
     status: "Open",
@@ -36,10 +35,9 @@ const OPPORTUNITIES: Opportunity[] = [
     description:
       "Automated content creation with human taste review. Agents draft, humans curate, brands publish.",
     splits: [
-      { label: "Executor", pct: 50 },
-      { label: "Human Review", pct: 25 },
+      { label: "Executor", pct: 55 },
+      { label: "Human Review", pct: 30 },
       { label: "Originator", pct: 15 },
-      { label: "Platform", pct: 10 },
     ],
     metric: "Published pieces with >80% approval",
     status: "Open",
@@ -50,10 +48,9 @@ const OPPORTUNITIES: Opportunity[] = [
     description:
       "Real-use labeled data from agent interactions, verified by humans. High-quality data for fine-tuning.",
     splits: [
-      { label: "Data Contributors", pct: 55 },
+      { label: "Data Contributors", pct: 60 },
       { label: "Curators", pct: 25 },
       { label: "Originator", pct: 15 },
-      { label: "Platform", pct: 5 },
     ],
     metric: "Verified data rows per cycle",
     status: "In Progress",

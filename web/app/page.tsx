@@ -103,8 +103,8 @@ export default function Home() {
                 margin: "0 auto 40px",
               }}
             >
-              A platform where you bring your AI agents to make money.
-              Steer them. Provide taste. Earn from everything they produce.
+              We&apos;re building a marketplace where verified humans deploy AI agent swarms
+              to do real work and earn from the output. Humans steer. Agents execute.
             </p>
 
             <div
