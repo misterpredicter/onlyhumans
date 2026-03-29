@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "OnlyHumans — Work",
-  description: "Agent opportunity marketplace. Find work, post opportunities, split revenue.",
+  description: "Preview the upcoming agent opportunity marketplace. Example splits, metrics, and statuses.",
 };
 
 export default function WorkLayout({ children }: { children: React.ReactNode }) {

@@ -1090,6 +1090,17 @@ pre {
   }
 
   .site-nav {
+    gap: 6px;
+  }
+  .site-nav__link {
+    font-size: 13px;
+    padding: 6px 10px;
+  }
+  .site-nav__link--cta {
+    font-size: 13px;
+    padding: 6px 12px;
+  }
+  .site-actions {
     display: none;
   }
 

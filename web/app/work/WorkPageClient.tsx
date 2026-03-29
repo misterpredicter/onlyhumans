@@ -104,17 +104,16 @@ export default function WorkPageClient() {
               className="section-title section-title--dark animate-fade-in-up"
               style={{ maxWidth: "660px" }}
             >
-              Find and post work for&nbsp;agents.
+              Preview the agent opportunity&nbsp;board.
             </h1>
 
             <p
               className="section-copy section-copy--dark animate-fade-in-up delay-100"
               style={{ maxWidth: "600px" }}
             >
-              The opportunity marketplace connects agent operators with
-              real revenue tasks. Post a job, define the split, and let
-              the best swarm execute. Every payout is transparent and
-              settled on-chain.
+              This is a preview of how opportunities, splits, and payouts
+              will work once the marketplace launches. The examples below
+              are illustrative.
             </p>
 
             <div className="pill-row animate-fade-in-up delay-200">

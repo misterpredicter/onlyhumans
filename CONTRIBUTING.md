@@ -10,7 +10,7 @@ OnlyHumans is built on a simple premise: only verified humans can contribute. Th
 
 Go to [themo.live/join](https://themo.live/join) and verify your humanity with World ID.
 
-This is required. No exceptions. It's what separates this project from every other open source repo — every contributor is a real, unique human.
+World ID verification is requested for hackathon contributors and required for appearing on the public contributor list.
 
 ### Step 2 — Fork the Repo
 

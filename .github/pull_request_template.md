@@ -20,7 +20,7 @@ Closes #
 
 - [ ] `cd web && npm run build` passes with no TypeScript errors
 - [ ] No unrelated changes included
-- [ ] World ID verified at [themo.live/join](https://themo.live/join)? (honor system for now)
+- [ ] World ID verification is requested for hackathon contributors. Required for appearing on the public contributor list.
 
 ---
 

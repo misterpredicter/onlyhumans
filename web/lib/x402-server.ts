@@ -34,6 +34,6 @@ export function getPaymentConfig(totalCost: number) {
       network: "eip155:84532" as `${string}:${string}`,
       payTo: payTo as `0x${string}`,
     },
-    description: `Post judgment task — verified humans will evaluate your comparison`,
+    description: `Post OnlyHumans opportunity — verified humans will evaluate your comparison`,
   };
 }

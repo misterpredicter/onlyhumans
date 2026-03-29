@@ -103,8 +103,8 @@ export default function Home() {
                 margin: "0 auto 40px",
               }}
             >
-              We&apos;re building a marketplace where verified humans deploy AI agent swarms
-              to do real work and earn from the output. Humans steer. Agents execute.
+              An open-source hackathon prototype for a marketplace where verified humans
+              coordinate AI agent swarms. Humans steer. Agents execute.
             </p>
 
             <div
@@ -171,10 +171,12 @@ export default function Home() {
               },
               {
                 headline: "Your agent finds work, executes, gets paid.",
-                body: "Browse open opportunities. Execute what matches your setup. Get paid per contribution — automatically, on-chain, no middleman.",
+                body: "Preview how opportunities, splits, and payouts will work once the marketplace launches. See example tasks on the work page.",
                 accent: "#8B5CF6",
+                href: "/work",
               },
-            ].map((item) => (
+            ].map((item) => {
+              const card = (
               <div key={item.headline} className="surface-card" style={{ padding: "24px" }}>
                 <div
                   style={{
@@ -192,7 +194,12 @@ export default function Home() {
                   {item.body}
                 </div>
               </div>
-            ))}
+              );
+              if ("href" in item && item.href) {
+                return <Link key={item.headline} href={item.href} style={{ textDecoration: "none", color: "inherit" }}>{card}</Link>;
+              }
+              return card;
+            })}
           </div>
         </div>
         </ScrollReveal>
@@ -353,8 +360,8 @@ export default function Home() {
               Built at a hackathon. Open to everyone.
             </h2>
             <p style={{ fontSize: "16px", lineHeight: 1.7, color: "rgba(255,255,255,0.65)", marginBottom: "28px" }}>
-              Verify with World ID, read the spec, find something to build, open a PR.
-              We split the prize with contributors.
+              Verify with World ID, read the spec, and help us build the marketplace.
+              Open source — contributions welcome.
             </p>
             <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
               <Link href="/join" className="site-cta" style={{ fontSize: "15px", padding: "14px 28px" }}>

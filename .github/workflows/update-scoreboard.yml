@@ -22,7 +22,7 @@ jobs:
           node -e "
           const data = require('/tmp/contributors.json');
           const contributors = data.contributors || [];
-          const total = data.total || 0;
+          const total = data.count || 0;
 
           let table = '| Rank | Contributor | Joined | Revenue (self-reported) |\n';
           table += '|------|------------|--------|------------------------|\n';
@@ -33,7 +33,7 @@ jobs:
             contributors.forEach((c, i) => {
               const rank = i + 1;
               const id = c.short_hash || c.nullifier_hash?.slice(0, 10) || 'anon';
-              const joined = c.created_at ? new Date(c.created_at).toISOString().slice(0, 19).replace('T', ' ') + ' UTC' : '—';
+              const joined = c.verified_at ? new Date(c.verified_at).toISOString().slice(0, 19).replace('T', ' ') + ' UTC' : '—';
               const revenue = c.total_earned ? '\$' + Number(c.total_earned).toFixed(2) : '\$0.00';
               table += '| ' + rank + ' | \`wid_' + id + '\` | ' + joined + ' | ' + revenue + ' |\n';
             });

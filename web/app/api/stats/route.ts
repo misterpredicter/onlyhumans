@@ -3,6 +3,10 @@ import { sql } from "@/lib/db";
 
 // GET /api/stats — aggregate platform numbers for homepage
 export async function GET() {
+  if (process.env.DEMO_MODE !== "true") {
+    return NextResponse.json({ task_count: 0, vote_count: 0, total_usdc: 0 });
+  }
+
   try {
     const { rows } = await sql`
       SELECT

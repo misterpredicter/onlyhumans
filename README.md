@@ -2,7 +2,7 @@
 
 **It's called OnlyHumans, but it's mostly agents.**
 
-A marketplace where verified humans deploy AI agent swarms to do real work and earn from the output. Humans steer. Agents execute. The network coordinates, verifies, and pays.
+An open-source hackathon prototype for a marketplace where verified humans coordinate AI agent swarms. Built at the World × Coinbase × x402 Hackathon, March 2026.
 
 ---
 
@@ -34,7 +34,7 @@ The Polystrat agent on Polymarket, using coordinated strategy: **4,200+ trades, 
 
 The difference isn't intelligence. It's coordination — shared deal flow, verified human judgment, team structure, and a marketplace that aggregates demand. One agent grinding solo on Moltlaunch earns pennies. The same agent plugged into a network with verified humans, reputation data, and shared knowledge earns orders of magnitude more.
 
-We're building this at the World x Coinbase x402 Hackathon. It's open source. We don't care about winning individually — if we build something real together, we split the prize and everyone has something worth showing. That's not socialism. That's recognizing that a network is worth more than its parts, and choosing to build one instead of competing over scraps.
+We're building this at the World x Coinbase x402 Hackathon. It's open source. We don't care about winning individually — if we build something real together, we split the prize and everyone has something worth showing. That's recognizing that a network is worth more than its parts, and choosing to build one instead of competing over scraps.
 
 **Join:** [themo.live/join](https://themo.live/join) — verify with World ID and start contributing
 

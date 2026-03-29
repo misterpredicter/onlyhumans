@@ -28,6 +28,7 @@ export default function ContributorsPage() {
   const [contributors, setContributors] = useState<Contributor[]>([]);
   const [count, setCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     fetch("/api/contributors")
@@ -36,7 +37,7 @@ export default function ContributorsPage() {
         setContributors(d.contributors ?? []);
         setCount(d.count ?? 0);
       })
-      .catch(() => {})
+      .catch(() => { setError(true); })
       .finally(() => setLoading(false));
   }, []);
 
@@ -53,8 +54,25 @@ export default function ContributorsPage() {
             className="section-title animate-fade-in-up"
             style={{ fontSize: "clamp(34px, 5vw, 56px)", marginBottom: "16px" }}
           >
-            {loading ? "Loading..." : `${count} verified human${count !== 1 ? "s" : ""} contributing.`}
+            Verified humans contributing.
           </h1>
+          {!loading && !error && (
+            <span
+              style={{
+                display: "inline-block",
+                padding: "4px 14px",
+                borderRadius: "999px",
+                background: "rgba(16,185,129,0.10)",
+                color: "#059669",
+                fontSize: "14px",
+                fontWeight: 700,
+                letterSpacing: "-0.02em",
+                marginBottom: "12px",
+              }}
+            >
+              {count} contributor{count !== 1 ? "s" : ""}
+            </span>
+          )}
           <p className="section-copy animate-fade-in-up delay-100" style={{ maxWidth: "520px", marginBottom: "28px" }}>
             Each contributor has completed World ID biometric verification — one person, one identity.
             Nullifier hashes are shown for privacy. No names, no wallets, no surveillance.
@@ -79,6 +97,21 @@ export default function ContributorsPage() {
             />
             <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
           </div>
+        ) : error ? (
+          <div style={{
+            padding: "32px",
+            borderRadius: "20px",
+            background: "#FEF2F2",
+            border: "1px solid #FECACA",
+            textAlign: "center",
+          }}>
+            <div style={{ fontSize: "16px", fontWeight: 700, color: "#B91C1C", marginBottom: "8px" }}>
+              Could not load contributors
+            </div>
+            <p style={{ fontSize: "14px", color: "#6B7280", margin: 0 }}>
+              The contributor list requires a database connection. Try again later or visit the live site.
+            </p>
+          </div>
         ) : count === 0 ? (
           <div
             style={{
@@ -94,7 +127,7 @@ export default function ContributorsPage() {
               No contributors yet.
             </div>
             <p style={{ fontSize: "14px", color: "#6B7280", marginBottom: "20px" }}>
-              Be the first verified contributor to this open hackathon project.
+              Be the first to verify and join the project.
             </p>
             <Link href="/join" className="btn-primary" style={{ display: "inline-flex" }}>
               Verify and join

@@ -6,6 +6,8 @@ import { signRequest } from "@worldcoin/idkit/signing";
 export async function GET() {
   const signingKey = process.env.RP_SIGNING_KEY;
   const rpId = process.env.WORLD_RP_ID;
+  // NOTE: "vote-on-task" is the registered World ID action name. Changing it requires
+  // re-registering at developer.world.org. The user-facing copy has been updated to v3.
   const action = process.env.NEXT_PUBLIC_WORLD_ACTION ?? "vote-on-task";
 
   if (!signingKey) {

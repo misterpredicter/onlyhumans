@@ -9,6 +9,10 @@ import { sql } from "@/lib/db";
 
 // GET /api/status — lightweight operational snapshot for agent developers
 export async function GET() {
+  if (process.env.DEMO_MODE !== "true") {
+    return NextResponse.json({ status: "ok", mode: "production" });
+  }
+
   try {
     const [{ rows: taskRows }, { rows: workerRows }] = await Promise.all([
       sql`

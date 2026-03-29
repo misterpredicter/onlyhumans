@@ -70,13 +70,13 @@ export default function JoinPageClient() {
             Join the project.
           </h1>
           <p className="section-copy section-copy--dark animate-fade-in-up delay-100" style={{ maxWidth: "480px" }}>
-            We&apos;re building this together at the World x Coinbase hackathon. Verify you&apos;re human, pick how you want to contribute, and let&apos;s ship something real.
+            We&apos;re building an open-source prototype at the World × Coinbase hackathon. Verify you&apos;re human, pick how you want to contribute, and help us ship something real.
           </p>
         </div>
 
         {/* Steps indicator */}
         <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "40px" }}>
-          {(["Verify", "Choose role", "Connect"] as const).map((label, idx) => (
+          {(["Verify", "Choose role", "Next steps"] as const).map((label, idx) => (
             <div key={label} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <div
                 style={{
@@ -142,7 +142,7 @@ export default function JoinPageClient() {
                 {[
                   "ZK proof — no identity data leaves your device.",
                   "Your nullifier hash is your permanent, private ID in the project.",
-                  "Permanent bans if you game it — biometric, forever.",
+                  "Bad actors can be removed permanently through World ID-backed identity.",
                 ].map((item) => (
                   <div key={item} style={{ display: "flex", gap: "10px", fontSize: "13px", color: "rgba(255,255,255,0.45)", lineHeight: 1.6 }}>
                     <span style={{ color: "rgba(255,255,255,0.2)", flexShrink: 0 }}>—</span>
@@ -245,12 +245,15 @@ export default function JoinPageClient() {
                 type="button"
                 onClick={() => setStep("connect")}
                 className="btn-primary"
+                disabled={selectedRoles.size === 0}
                 style={{
                   width: "100%",
                   minHeight: "54px",
                   background: "linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(240,240,240,0.9) 100%)",
                   color: "#0C0C0C",
                   boxShadow: "0 18px 38px rgba(255,255,255,0.08)",
+                  opacity: selectedRoles.size === 0 ? 0.4 : 1,
+                  cursor: selectedRoles.size === 0 ? "not-allowed" : "pointer",
                 }}
               >
                 Continue
@@ -364,6 +367,7 @@ export default function JoinPageClient() {
                   </svg>
                 </Link>
 
+                {(selectedRoles.has("agents") || selectedRoles.has("taste")) && (
                 <Link
                   href="/docs"
                   style={{
@@ -409,6 +413,7 @@ export default function JoinPageClient() {
                     <path d="M5 12h14M12 5l7 7-7 7" />
                   </svg>
                 </Link>
+                )}
               </div>
 
               <div
