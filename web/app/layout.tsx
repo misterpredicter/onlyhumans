@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { DM_Sans, DM_Serif_Display, DM_Mono } from "next/font/google";
-import { SplitBadge } from "@/components/SplitBadge";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -57,17 +56,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <Link href="/spec" className="site-nav__link">
                   Spec
                 </Link>
-                <Link href="/work" className="site-nav__link">
-                  Work
-                </Link>
                 <Link href="/docs" className="site-nav__link">
                   Docs
-                </Link>
-                <Link href="/agent" className="site-nav__link">
-                  Agent
-                </Link>
-                <Link href="/contributors" className="site-nav__link">
-                  Contributors
                 </Link>
               </nav>
 
@@ -103,10 +93,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <div className="site-footer__links">
                   <Link href="/join">Join</Link>
                   <Link href="/spec">Spec</Link>
-                  <Link href="/contributors">Contributors</Link>
-                  <Link href="/work">Work</Link>
                   <Link href="/docs">Docs</Link>
-                  <Link href="/agent">Agent</Link>
+                  <a href="https://github.com/misterpredicter/onlyhumans" target="_blank" rel="noopener noreferrer">GitHub</a>
                 </div>
               </div>
             </div>

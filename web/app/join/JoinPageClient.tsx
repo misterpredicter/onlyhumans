@@ -16,7 +16,7 @@ const ROLES = [
   {
     id: "taste",
     label: "I'm a human with taste",
-    sub: "Browse the judgment queue, vote, earn USDC. Real decisions agents can't fake.",
+    sub: "Provide quality judgment, preference calls, and aesthetic direction that agents can't fake.",
     icon: "✦",
   },
   {
@@ -365,7 +365,7 @@ export default function JoinPageClient() {
                 </Link>
 
                 <Link
-                  href="/work"
+                  href="/docs"
                   style={{
                     padding: "20px 22px",
                     borderRadius: "22px",
@@ -391,106 +391,18 @@ export default function JoinPageClient() {
                     }}
                   >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34D399" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                      <line x1="12" y1="1" x2="12" y2="23" />
-                      <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
+                      <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                      <polyline points="14 2 14 8 20 8" />
+                      <line x1="16" y1="13" x2="8" y2="13" />
+                      <line x1="16" y1="17" x2="8" y2="17" />
                     </svg>
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: "15px", fontWeight: 800, letterSpacing: "-0.02em", marginBottom: "3px" }}>
-                      Earn USDC Now
+                      How It Works
                     </div>
                     <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)" }}>
-                      Browse the judgment queue — real tasks, instant payouts
-                    </div>
-                  </div>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M5 12h14M12 5l7 7-7 7" />
-                  </svg>
-                </Link>
-
-                <Link
-                  href="/agent"
-                  style={{
-                    padding: "20px 22px",
-                    borderRadius: "22px",
-                    border: "1px solid rgba(139,92,246,0.2)",
-                    background: "rgba(139,92,246,0.06)",
-                    color: "#FFFFFF",
-                    textDecoration: "none",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "14px",
-                  }}
-                >
-                  <div
-                    style={{
-                      width: "40px",
-                      height: "40px",
-                      borderRadius: "12px",
-                      background: "rgba(139,92,246,0.15)",
-                      display: "inline-flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      flexShrink: 0,
-                    }}
-                  >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                      <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
-                      <line x1="8" y1="21" x2="16" y2="21" />
-                      <line x1="12" y1="17" x2="12" y2="21" />
-                    </svg>
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: "15px", fontWeight: 800, letterSpacing: "-0.02em", marginBottom: "3px" }}>
-                      Agent Quick Start
-                    </div>
-                    <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)" }}>
-                      Integrate the API — curl to first human judgment in 60 seconds
-                    </div>
-                  </div>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M5 12h14M12 5l7 7-7 7" />
-                  </svg>
-                </Link>
-
-                <Link
-                  href="/contributors"
-                  style={{
-                    padding: "20px 22px",
-                    borderRadius: "22px",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    background: "rgba(255,255,255,0.04)",
-                    color: "#FFFFFF",
-                    textDecoration: "none",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "14px",
-                  }}
-                >
-                  <div
-                    style={{
-                      width: "40px",
-                      height: "40px",
-                      borderRadius: "12px",
-                      background: "rgba(255,255,255,0.1)",
-                      display: "inline-flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      flexShrink: 0,
-                    }}
-                  >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
-                      <circle cx="9" cy="7" r="4" />
-                      <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
-                    </svg>
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: "15px", fontWeight: 800, letterSpacing: "-0.02em", marginBottom: "3px" }}>
-                      See Contributors
-                    </div>
-                    <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)" }}>
-                      Live scoreboard of verified project members
+                      Platform guide for humans and agents
                     </div>
                   </div>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

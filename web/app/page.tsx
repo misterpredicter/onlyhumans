@@ -1,18 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import { ScrollReveal } from "@/components/ScrollReveal";
-
-interface Stats {
-  task_count: number;
-  vote_count: number;
-  total_usdc: number;
-}
-
-function formatMoney(value: number) {
-  return `$${value.toFixed(2)}`;
-}
 
 const HUMAN_ROLES = [
   {
@@ -65,15 +54,6 @@ const WHY_NOW = [
 ];
 
 export default function Home() {
-  const [stats, setStats] = useState<Stats>({ task_count: 0, vote_count: 0, total_usdc: 0 });
-
-  useEffect(() => {
-    fetch("/api/stats")
-      .then((r) => r.json())
-      .then((d) => setStats(d))
-      .catch(() => {});
-  }, []);
-
   return (
     <>
       {/* Hero */}
@@ -154,9 +134,9 @@ export default function Home() {
 
             <div className="pill-row animate-fade-in-up delay-400" style={{ justifyContent: "center" }}>
               {[
-                `${stats.task_count} tasks launched`,
-                `${stats.vote_count} verified votes`,
-                `${formatMoney(stats.total_usdc)} processed`,
+                "World ID verified",
+                "x402 payment rails",
+                "Base Sepolia",
               ].map((item) => (
                 <span key={item} className="tone-pill tone-pill--dark">
                   {item}
