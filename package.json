@@ -1,5 +1,5 @@
 {
-  "name": "human-signal",
+  "name": "onlyhumans",
   "private": true,
   "workspaces": [
     "web",

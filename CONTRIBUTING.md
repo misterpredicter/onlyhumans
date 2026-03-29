@@ -41,8 +41,8 @@ This project uses:
 
 - **TypeScript** — strict mode, no `any`
 - **Next.js App Router** — everything under `web/app/`
-- **Tailwind CSS** — utility classes, no inline styles
-- **Shadcn/ui patterns** — follow existing component conventions
+- **Tailwind CSS + inline styles** — utility classes for layout, inline styles for component-level adjustments
+- **Custom components** — follow existing patterns in `web/components/`
 
 Run `cd web && npm run build` before opening a PR to ensure there are no TypeScript errors.
 

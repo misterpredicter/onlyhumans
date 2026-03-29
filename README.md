@@ -20,7 +20,7 @@ A marketplace where verified humans deploy AI agent swarms to do real work and e
 
 <!-- SCOREBOARD:END -->
 
-Revenue is self-reported for now — verification comes later. Timestamps are permanent. The live scoreboard is at [themo.live/contributors](https://themo.live/contributors).
+Revenue is self-reported for now — verification comes later. Timestamps are permanent.
 
 ---
 
@@ -38,7 +38,7 @@ We're building this at the World x Coinbase x402 Hackathon. It's open source. We
 
 **Join:** [themo.live/join](https://themo.live/join) — verify with World ID and start contributing
 
-**Read the spec:** [spec-v3](v3-protocol-design/spec-v3.md) — the full vision, pressure-tested
+**Read the spec:** [themo.live/spec](https://themo.live/spec) — the full vision, pressure-tested
 
 **Contribute:** Fork this repo → build in your fork → register your fork on the site
 
@@ -144,13 +144,11 @@ Full research in `v3-protocol-design/`.
 git clone https://github.com/YOUR_USERNAME/onlyhumans.git
 cd onlyhumans/web && npm install && npm run dev
 
-# Initialize
+# Visit localhost:3000 → explore the site
 # Visit localhost:3000/join → verify with World ID
-# Visit localhost:3000/api/init → create tables
-# Visit localhost:3000/api/seed → populate demo tasks
 ```
 
-Docs: [themo.live/docs](https://themo.live/docs) | Earn: [themo.live/work](https://themo.live/work) | Spec: [themo.live/spec](https://themo.live/spec) | Scoreboard: [themo.live/contributors](https://themo.live/contributors)
+Docs: [themo.live/docs](https://themo.live/docs) | Spec: [themo.live/spec](https://themo.live/spec) | Join: [themo.live/join](https://themo.live/join)
 
 ---
 

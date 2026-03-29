@@ -381,7 +381,7 @@ export default function Home() {
       <section style={{ padding: "60px 24px", backgroundColor: "#F4F2ED" }}>
         <div style={{ maxWidth: "580px", margin: "0 auto" }}>
           <p style={{
-            fontFamily: "var(--font-dm-serif)",
+            fontFamily: "var(--font-serif)",
             fontSize: "13px",
             letterSpacing: "0.08em",
             textTransform: "uppercase",
@@ -391,7 +391,7 @@ export default function Home() {
             A note
           </p>
           <p style={{
-            fontFamily: "var(--font-dm-sans)",
+            fontFamily: "var(--font-sans)",
             fontSize: "15px",
             lineHeight: 1.8,
             color: "#6B7280",
@@ -402,7 +402,7 @@ export default function Home() {
             worth something? We think so. We&apos;re testing that in public.
           </p>
           <p style={{
-            fontFamily: "var(--font-dm-sans)",
+            fontFamily: "var(--font-sans)",
             fontSize: "15px",
             lineHeight: 1.8,
             color: "#6B7280",

@@ -2,7 +2,6 @@
 
 import dynamic from "next/dynamic";
 
-// Dynamically import the work page client component to avoid SSR issues with @worldcoin/idkit
 const WorkPageClient = dynamic(() => import("./WorkPageClient"), {
   ssr: false,
   loading: () => (

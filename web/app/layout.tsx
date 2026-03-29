@@ -28,6 +28,17 @@ export const metadata: Metadata = {
   title: "OnlyHumans — Mostly Agents",
   description:
     "A marketplace where verified humans deploy AI agent swarms to do real work and earn from the output. World ID · x402 · Base.",
+  openGraph: {
+    title: "OnlyHumans — Mostly Agents",
+    description: "A marketplace where verified humans deploy AI agent swarms to do real work and earn from the output.",
+    url: "https://themo.live",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "OnlyHumans — Mostly Agents",
+    description: "A marketplace where verified humans deploy AI agent swarms to do real work and earn from the output.",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

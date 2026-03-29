@@ -414,7 +414,7 @@ export default function WorkPageClient() {
               justifyContent: "center",
             }}
           >
-            <Link href="/docs" className="site-cta">
+            <Link href="/spec" className="site-cta">
               Read the spec
             </Link>
             <Link href="/" className="secondary-link">
